@@ -28,6 +28,7 @@
 		F1A2B3C4D5E6F70123456715 /* TimelineEventCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456714 /* TimelineEventCard.swift */; };
 		F1A2B3C4D5E6F70123456717 /* NowIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456716 /* NowIndicatorView.swift */; };
 		F1A2B3C4D5E6F70123456719 /* AllDayBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456718 /* AllDayBannerView.swift */; };
+		F3A4B5C6D7E8F90345678901 /* WeekTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A4B5C6D7E8F90345678900 /* WeekTimelineView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +50,7 @@
 		F1A2B3C4D5E6F70123456714 /* TimelineEventCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEventCard.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E6F70123456716 /* NowIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowIndicatorView.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E6F70123456718 /* AllDayBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllDayBannerView.swift; sourceTree = "<group>"; };
+		F3A4B5C6D7E8F90345678900 /* WeekTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekTimelineView.swift; sourceTree = "<group>"; };
 		F2A3B4C5D6E7F80234567801 /* NLEventParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NLEventParser.swift; sourceTree = "<group>"; };
 		F2A3B4C5D6E7F80234567803 /* EventCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCreationView.swift; sourceTree = "<group>"; };
 		F2A3B4C5D6E7F80234567805 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
@@ -138,6 +140,7 @@
 				F1A2B3C4D5E6F70123456714 /* TimelineEventCard.swift */,
 				F1A2B3C4D5E6F70123456716 /* NowIndicatorView.swift */,
 				F1A2B3C4D5E6F70123456718 /* AllDayBannerView.swift */,
+				F3A4B5C6D7E8F90345678900 /* WeekTimelineView.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -263,6 +266,7 @@
 				F2A3B4C5D6E7F80234567802 /* EventCreationView.swift in Sources */,
 				F2A3B4C5D6E7F80234567804 /* EventDetailView.swift in Sources */,
 				F2A3B4C5D6E7F80234567806 /* EventEditView.swift in Sources */,
+				F3A4B5C6D7E8F90345678901 /* WeekTimelineView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

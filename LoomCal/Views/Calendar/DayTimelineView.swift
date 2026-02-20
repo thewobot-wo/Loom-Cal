@@ -10,6 +10,9 @@ struct DayTimelineView: View {
     let allDayEvents: [LoomEvent]
     /// Callback when an event card is tapped (wired to detail sheet in Plan 02)
     var onEventTap: (LoomEvent) -> Void = { _ in }
+    /// Callback when an event card is drag-moved. Receives (event, pointsDelta).
+    /// The parent (ContentView) converts pointsDelta to a time offset and calls updateEvent.
+    var onEventDragMove: ((LoomEvent, CGFloat) -> Void)?
 
     // MARK: - Layout Constants
 
@@ -118,9 +121,13 @@ struct DayTimelineView: View {
         let layoutEvents = computeLayout(for: events, contentWidth: contentWidth)
 
         ForEach(layoutEvents, id: \.event._id) { item in
-            TimelineEventCard(event: item.event) {
-                onEventTap(item.event)
-            }
+            TimelineEventCard(
+                event: item.event,
+                onTap: { onEventTap(item.event) },
+                onDragMove: { delta in
+                    onEventDragMove?(item.event, delta)
+                }
+            )
             .frame(width: item.width, height: max(item.height, 24))
             .offset(x: labelWidth + item.xOffset, y: item.yOffset)
         }

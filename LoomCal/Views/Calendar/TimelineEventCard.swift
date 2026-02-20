@@ -3,9 +3,15 @@ import SwiftUI
 /// Fantastical-inspired event card for the day timeline.
 /// Displays event title and formatted 12-hour start time.
 /// Visual style: rounded rectangle, blue tint, left accent bar, subtle shadow.
+/// Supports long-press + drag gesture for drag-to-move functionality.
 struct TimelineEventCard: View {
     let event: LoomEvent
     var onTap: () -> Void = {}
+    /// Called with vertical point delta (positive = down, negative = up) on drag end.
+    var onDragMove: ((CGFloat) -> Void)?
+
+    @State private var dragOffset: CGFloat = 0
+    @State private var isDragging: Bool = false
 
     private static let timeFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -23,7 +29,12 @@ struct TimelineEventCard: View {
     }
 
     var body: some View {
-        Button(action: onTap) {
+        Button(action: {
+            // Only fire tap when not in drag mode
+            if !isDragging {
+                onTap()
+            }
+        }) {
             HStack(spacing: 0) {
                 // Leading blue accent bar
                 RoundedRectangle(cornerRadius: 2)
@@ -49,11 +60,43 @@ struct TimelineEventCard: View {
             }
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.blue.opacity(0.15))
+                    .fill(Color.blue.opacity(isDragging ? 0.25 : 0.15))
             )
-            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+            .shadow(color: .black.opacity(isDragging ? 0.18 : 0.08), radius: isDragging ? 8 : 4, y: 2)
+            .opacity(isDragging ? 0.8 : 1.0)
         }
         .buttonStyle(.plain)
+        .offset(y: dragOffset)
+        .gesture(
+            // Long-press activates drag mode to prevent accidental drags.
+            // After hold, drag gesture tracks vertical movement.
+            LongPressGesture(minimumDuration: 0.3)
+                .sequenced(before: DragGesture(minimumDistance: 1, coordinateSpace: .global))
+                .onChanged { value in
+                    switch value {
+                    case .first:
+                        // Long-press recognized — activate drag mode
+                        isDragging = true
+                    case .second(true, let drag?):
+                        // Dragging — update visual offset
+                        isDragging = true
+                        dragOffset = drag.translation.height
+                    default:
+                        break
+                    }
+                }
+                .onEnded { value in
+                    if case .second(true, let drag?) = value {
+                        // Drag completed — notify parent with total vertical delta
+                        onDragMove?(drag.translation.height)
+                    }
+                    // Reset drag state
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        dragOffset = 0
+                        isDragging = false
+                    }
+                }
+        )
     }
 }
 

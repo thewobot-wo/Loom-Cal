@@ -4,8 +4,10 @@ import ConvexMobile
 // CRITICAL: All v.int64() schema fields use @ConvexInt var (NOT let).
 // @ConvexInt handles BigInt <-> Swift Int round-tripping over the wire.
 // Source: https://docs.convex.dev/client/swift/data-types
-struct LoomEvent: Decodable {
+struct LoomEvent: Decodable, Identifiable {
     let _id: String
+    /// Identifiable conformance — required for .sheet(item: $selectedEvent) in ContentView.
+    var id: String { _id }
     let calendarId: String
     let title: String
     @ConvexInt var start: Int          // UTC milliseconds — v.int64() // MARK: ConvexInt required
