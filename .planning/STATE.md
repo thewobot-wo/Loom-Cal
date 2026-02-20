@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 1 of 8 (Foundation)
-Plan: 1 of TBD in current phase
-Status: In Progress
-Last activity: 2026-02-20 — Plan 01 complete; Convex schema and backend functions deployed
+Plan: 2 of TBD in current phase
+Status: In Progress — awaiting human verify checkpoint (Task 3)
+Last activity: 2026-02-20 — Plan 02 tasks 1 and 2 complete; SwiftUI Xcode project + ConvexMobile + Swift models
 
 Progress: [█░░░░░░░░░] 5%
 
@@ -34,6 +34,7 @@ Progress: [█░░░░░░░░░] 5%
 - Trend: Establishing baseline
 
 *Updated after each plan completion*
+| Phase 01-foundation P02 | 7 | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -48,6 +49,9 @@ Recent decisions affecting current work:
 - [Plan 01-01]: Studio events deduplication uses title field match — replace with Supabase PK once schema confirmed
 - [Plan 01-01]: _generated stubs committed for pre-deploy TypeScript type-checking; overwritten by npx convex dev on first deploy
 - [Plan 01-01]: syncFromSupabase handles both snake_case and camelCase Supabase field names for robustness
+- [Phase 01-02]: ConvexMobile 0.8.0 confirmed compatible with Xcode 16.2/iOS 18.6 SDK — XCFramework links without errors (resolves RESEARCH open question)
+- [Phase 01-02]: SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD used for Mac target — simpler for Phase 1; native Mac target deferred
+- [Phase 01-02]: @OptionalConvexInt available in ConvexMobile 0.8.0 — used for LoomTask.dueDate (v.optional(v.int64()))
 
 ### Pending Todos
 
@@ -57,7 +61,7 @@ Recent decisions affecting current work:
 ### Blockers/Concerns
 
 - [Phase 1]: HorizonCalendar Mac target behavior unverified — needs hands-on testing in Phase 1; fallback is custom SwiftUI calendar grid (~2-3 weeks additional)
-- [Phase 1]: ConvexMobile minimum Swift version not confirmed — verify before setting Xcode build settings
+- [Phase 1 - RESOLVED]: ConvexMobile 0.8.0 confirmed compatible with Xcode 16.2 / iOS 18.6 SDK
 - [Phase 4]: Loom MCP must have write access to `chat_messages` Convex table — coordinate Loom config before Phase 4 planning
 - [Phase 5]: Convex background subscription behavior on iOS not documented — test in Phase 4/5 before notification implementation
 - [Phase 1 - User Action Required]: npx convex dev must be run interactively to link Convex project and generate real _generated/ files
@@ -65,5 +69,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Plan 01-01 complete — Convex schema and backend functions; user must run npx convex dev to link project
-Resume file: .planning/phases/01-foundation/01-01-SUMMARY.md
+Stopped at: Plan 01-02 tasks 1-2 complete — awaiting human verify checkpoint (Task 3); user must fill ConvexEnv.swift deployment URL after npx convex dev, then verify real-time sync in app
+Resume file: .planning/phases/01-foundation/01-02-SUMMARY.md
