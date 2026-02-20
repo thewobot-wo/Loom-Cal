@@ -13,7 +13,7 @@ Loom Cal is built in eight phases that follow the natural dependency graph of th
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Convex schema, data model, real-time sync backbone, and source-of-truth ownership rules
-- [ ] **Phase 2: Calendar Views** - Day and week calendar views with Convex-native event CRUD
+- [x] **Phase 2: Calendar Views** - Day and week calendar views with Convex-native event CRUD
 - [ ] **Phase 3: Task System** - Full task CRUD, today view, task markers on calendar, and time-blocking
 - [ ] **Phase 4: Loom Chat** - In-app chat with Loom, message history, graceful offline degradation
 - [ ] **Phase 5: Loom Calendar and Task Actions** - Loom creates, edits, and deletes events and tasks via Convex MCP
@@ -49,11 +49,11 @@ Plans:
   3. User can tap a time slot to create a new event by entering a title, date, start time, and duration — the event appears on the calendar immediately
   4. User can tap an existing event to edit its title, time, or duration — changes reflect in real-time across both iOS and Mac
   5. User can delete an event from the event detail view and it disappears from the calendar without requiring a reload
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
-- [ ] 02-01-PLAN.md — CalendarViewModel, HorizonCalendar mini month, and day timeline with event cards
-- [ ] 02-02-PLAN.md — Event CRUD: NL parser, creation sheet, detail view, edit view, delete confirmation
-- [ ] 02-03-PLAN.md — Week view, ContentView replacement, navigation gestures, and end-to-end verification
+- [x] 02-01-PLAN.md — CalendarViewModel, HorizonCalendar mini month, and day timeline with event cards
+- [x] 02-02-PLAN.md — Event CRUD: NL parser, creation sheet, detail view, edit view, delete confirmation
+- [x] 02-03-PLAN.md — Week view, ContentView replacement, navigation gestures, and end-to-end verification
 
 ### Phase 3: Task System
 **Goal**: Users can create and manage tasks with due dates and priorities, see task due dates on the calendar, and drag tasks into calendar time slots
@@ -133,7 +133,7 @@ Note: Phase 4 (Loom Chat) depends only on Phase 1 and can proceed in parallel wi
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete    | 2026-02-20 |
-| 2. Calendar Views | 2/3 | In Progress|  |
+| 2. Calendar Views | 3/3 | Complete | 2026-02-20 |
 | 3. Task System | 0/TBD | Not started | - |
 | 4. Loom Chat | 0/TBD | Not started | - |
 | 5. Loom Calendar and Task Actions | 0/TBD | Not started | - |

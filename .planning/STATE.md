@@ -10,35 +10,31 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 2 of 8 (Calendar Views)
-Plan: 3 of 3 in current phase (PAUSED at checkpoint — awaiting human verification)
-Status: In Progress — Plan 03 Task 1 complete (adc295c); paused at checkpoint:human-verify (Task 2)
-Last activity: 2026-02-20 — Plan 02-03 Task 1 complete; WeekTimelineView, full ContentView, LoomEvent Identifiable, drag-to-move; awaiting user verification in simulator
+Plan: 3 of 3 in current phase — COMPLETE
+Status: Phase 2 complete — all 3 plans executed, checkpoint approved
+Last activity: 2026-02-20 — Plan 02-03 complete with post-checkpoint fixes (macOS guards, scroll fix, end time pickers, alert delete, week view redesign)
 
 Progress: [█████░░░░░] 25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 5 min
-- Total execution time: 0.38 hours
+- Total plans completed: 6
+- Average duration: 7 min
+- Total execution time: 0.67 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 15 min | 5 min |
-| 02-calendar-views | 2 (of 3) | 10 min | 5 min |
+| 02-calendar-views | 3 | 25 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (7 min), 01-03 (4 min), 02-01 (6 min), 02-02 (4 min)
-- Trend: Consistent 4-7 min per plan
+- Last 5 plans: 01-03 (4 min), 02-01 (6 min), 02-02 (4 min), 02-03 (~15 min incl. post-checkpoint fixes)
+- Trend: 4-7 min per plan; 02-03 longer due to human checkpoint + 5 post-checkpoint fixes
 
 *Updated after each plan completion*
-| Phase 01-foundation P02 | 7 | 2 tasks | 11 files |
-| Phase 01-foundation P03 | 4 | 2 tasks | 6 files |
-| Phase 02-calendar-views P01 | 6 | 2 tasks | 8 files |
-| Phase 02-calendar-views P02 | 4 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -66,6 +62,13 @@ Recent decisions affecting current work:
 - [Plan 02-03]: LoomEvent Identifiable via computed var id: String { _id } — avoids CodingKeys issues with @ConvexInt wrapper properties
 - [Plan 02-03]: Swipe navigation uses abs(xDelta) > abs(yDelta) disambiguation — prevents day navigation during vertical timeline scroll
 - [Plan 02-03]: WeekTimelineView narrow column threshold 60pt — below that, colored bar only (no text)
+- [Plan 02-03]: GeometryReader must be ROOT view (outside ScrollView) — GeometryReader inside ScrollView prevents scrolling
+- [Plan 02-03]: Color.clear spacer needed as first ZStack child in ScrollView — offset-positioned children don't report correct content height
+- [Plan 02-03]: Mini month hidden in week mode — week header IS the navigation, eliminates redundant double-calendar
+- [Plan 02-03]: End time pickers replace duration picker — no artificial cap, more natural time entry
+- [Plan 02-03]: .alert replaces .confirmationDialog for delete — more reliable in nested sheet contexts
+- [Plan 02-03]: HorizonCalendar needs platformFilters = (ios, ) — UIKit dependency fails macOS build
+- [Plan 02-03]: Cross-platform colors: Color.gray.opacity(0.15) replaces Color(.systemGray5), .background replaces Color(.systemBackground)
 
 ### Pending Todos
 
@@ -74,7 +77,7 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-- [Phase 2 - PARTIALLY RESOLVED]: HorizonCalendar 1.16.0 integrated and building on iOS target; Mac target behavior unverified — MiniDayCellView is UIKit-based so Mac behavior still needs runtime testing
+- [Phase 2 - RESOLVED]: HorizonCalendar 1.16.0 with platformFilters = (ios, ); macOS uses LazyVGrid fallback via #if canImport(UIKit) guard
 - [Phase 1 - RESOLVED]: ConvexMobile 0.8.0 confirmed compatible with Xcode 16.2 / iOS 18.6 SDK
 - [Phase 4]: Loom MCP must have write access to `chat_messages` Convex table — coordinate Loom config before Phase 4 planning
 - [Phase 5]: Convex background subscription behavior on iOS not documented — test in Phase 4/5 before notification implementation
@@ -83,5 +86,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Plan 02-03 Task 1 complete (adc295c) — paused at checkpoint:human-verify; WeekTimelineView, full ContentView replacement, LoomEvent Identifiable, drag-to-move all built and compiled; user must verify in Xcode simulator
-Resume file: .planning/phases/02-calendar-views/02-03-PLAN.md (Task 2 — human verification; type "approved" to complete Phase 2)
+Stopped at: Phase 2 complete — all 3 plans executed, checkpoint approved, post-checkpoint fixes applied
+Resume file: Phase 3 ready to plan — run `/gsd:plan-phase 3`

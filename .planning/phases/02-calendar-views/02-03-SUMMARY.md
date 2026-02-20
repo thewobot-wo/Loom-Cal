@@ -2,7 +2,7 @@
 phase: 02-calendar-views
 plan: 03
 subsystem: ui
-tags: [swiftui, week-view, drag-gesture, navigation, identifiable, sheet-item, convex]
+tags: [swiftui, week-view, drag-gesture, navigation, identifiable, sheet-item, convex, morgen]
 
 # Dependency graph
 requires:
@@ -13,113 +13,115 @@ requires:
     plan: 02
     provides: "EventCreationView, EventDetailView, EventEditView, NLEventParser"
 provides:
-  - "WeekTimelineView: 7-column week layout with per-day timelines, events, now indicator"
-  - "ContentView (full replacement): NavigationStack, segmented Day/Week control, MiniMonthView always visible, swipe navigation, plus button, .sheet(item: $selectedEvent)"
+  - "WeekTimelineView: 7-column week layout with month/year header, per-day timelines, auto-scroll"
+  - "ContentView: NavigationStack, segmented Day/Week, mini month in day mode only, .sheet(item:) for events"
   - "LoomEvent: Identifiable conformance via var id: String { _id }"
-  - "TimelineEventCard: long-press + drag gesture with visual feedback; onDragMove callback"
-  - "DayTimelineView: onEventDragMove((LoomEvent, CGFloat)->Void) wired through from TimelineEventCard"
+  - "TimelineEventCard: long-press + drag gesture with visual feedback"
+  - "DayTimelineView: GeometryReader-as-root pattern, Color.clear height spacer for reliable scrolling"
+  - "End time pickers in EventCreationView and EventEditView (replaced duration picker)"
+  - "Alert-based delete confirmation (replaced unreliable confirmationDialog)"
 affects: [03-tasks, 04-chat]
 
 # Tech tracking
 tech-stack:
   added: []
   patterns:
-    - "LongPressGesture.sequenced(before: DragGesture) for drag-to-move — activates on hold, tracks vertical delta"
-    - "ViewMode enum (CaseIterable) as Picker selection — ForEach ViewMode.allCases with .tag"
-    - ".sheet(item: $selectedEvent) with LoomEvent: Identifiable — id: String { _id } computed property"
-    - "DragGesture on timeline container for swipe navigation — horizontal/vertical disambiguation via abs(xDelta) > abs(yDelta)"
-    - "15-minute snap via Int(round(rawMinutes / 15.0)) * 15"
-    - "Calendar.dateInterval(of: .weekOfYear, for:) to compute week start for WeekTimelineView"
-    - "GeometryReader column width: (geometry.size.width - gutterWidth) / 7"
-    - "Narrow column detection: columnWidth < 60 — colored bar only vs abbreviated title"
+    - "GeometryReader as ROOT view (outside ScrollView) — prevents scroll-blocking anti-pattern"
+    - "Color.clear.frame(height: totalHeight) as first ZStack child — guarantees ScrollView content height"
+    - "LongPressGesture.sequenced(before: DragGesture) for drag-to-move"
+    - ".sheet(item: $selectedEvent) with LoomEvent: Identifiable"
+    - ".alert instead of .confirmationDialog for nested-sheet reliability"
+    - "End time DatePicker with in: startTime.addingTimeInterval(900)... range constraint"
+    - "platformFilters = (ios, ) in pbxproj for UIKit-only SPM packages on multiplatform targets"
+    - "#if canImport(UIKit) / #if !os(macOS) guards for platform-specific APIs"
 
 key-files:
   created:
-    - "LoomCal/Views/Calendar/WeekTimelineView.swift — 7-column week timeline, 50pt/hr, shared gutter, day headers, now indicator, narrow/wide event cards"
+    - "LoomCal/Views/Calendar/WeekTimelineView.swift — 7-column week timeline with month header, auto-scroll"
   modified:
-    - "LoomCal/Models/LoomEvent.swift — added Identifiable conformance; var id: String { _id }"
-    - "LoomCal/Views/Calendar/TimelineEventCard.swift — long-press+drag gesture, dragOffset state, onDragMove callback, drag visual feedback"
-    - "LoomCal/Views/Calendar/DayTimelineView.swift — onEventDragMove callback parameter, wired to TimelineEventCard.onDragMove"
-    - "LoomCal/Views/ContentView.swift — full replacement: ViewMode enum, @StateObject viewModel, segmented control, MiniMonthView, Day/Week timeline switch, swipe navigation, sheets, handleDragMove"
-    - "LoomCal.xcodeproj/project.pbxproj — WeekTimelineView.swift added to Calendar group and Sources build phase"
+    - "LoomCal/Models/LoomEvent.swift — Identifiable conformance"
+    - "LoomCal/Views/Calendar/TimelineEventCard.swift — long-press+drag gesture"
+    - "LoomCal/Views/Calendar/DayTimelineView.swift — GeometryReader-as-root, Color.clear spacer, fixed scrolling"
+    - "LoomCal/Views/Calendar/MiniMonthView.swift — #if canImport(UIKit) guards, macOS LazyVGrid fallback"
+    - "LoomCal/Views/ContentView.swift — Morgen-style layout, mini month hidden in week mode"
+    - "LoomCal/Views/Events/EventCreationView.swift — end time picker, removed duration picker"
+    - "LoomCal/Views/Events/EventEditView.swift — end time picker, removed duration picker"
+    - "LoomCal/Views/Events/EventDetailView.swift — .alert for delete, replaced confirmationDialog"
+    - "LoomCal/Views/Calendar/AllDayBannerView.swift — cross-platform Color"
+    - "LoomCal/Views/Calendar/WeekTimelineView.swift — cross-platform Color"
+    - "LoomCal.xcodeproj/project.pbxproj — platformFilters for HorizonCalendar, WeekTimelineView added"
 
 key-decisions:
-  - "LoomEvent Identifiable via computed var id: String { _id } — avoids renaming the _id field which is required for Convex Decodable conformance"
-  - "Swipe navigation uses horizontal/vertical disambiguation (abs(xDelta) > abs(yDelta)) to avoid firing during vertical event drag"
-  - "ContentView creates its own @StateObject CalendarViewModel — LoomCalApp keeps EventKitService injection (for later phases) but ContentView no longer references it"
-  - "WeekTimelineView narrow column threshold: 60pt — below that, only colored bar (no text) per RESEARCH open question #3"
+  - "Mini month hidden in week mode — week header IS the navigation, eliminates redundant double-calendar"
+  - "End time pickers replace duration picker — no artificial cap, more natural time entry"
+  - ".alert replaces .confirmationDialog for delete — more reliable in nested sheet contexts"
+  - "GeometryReader must be ROOT view, never inside ScrollView — GeometryReader inside ScrollView prevents scrolling"
+  - "Color.clear spacer needed as first ZStack child in ScrollView — offset-positioned children don't report correct content height"
+  - "HorizonCalendar needs platformFilters = (ios, ) — UIKit dependency fails macOS build"
+  - "Cross-platform colors: Color.gray.opacity(0.15) replaces Color(.systemGray5), .background replaces Color(.systemBackground)"
 
 patterns-established:
-  - "Drag-to-move pattern: LongPressGesture.sequenced(before: DragGesture) activates drag; parent receives (event, pointsDelta) and converts to time delta"
-  - "ContentView as full app shell: @StateObject viewModel, ViewMode enum, all sheet states, swipe navigation"
-  - "Identifiable model conformance via computed property wrapping existing unique field"
+  - "ScrollView content pattern: GeometryReader at ROOT → pass width down → ScrollView > ZStack > Color.clear.frame(height:) + offset-positioned content"
+  - "Multiplatform guard pattern: #if canImport(UIKit) for UIKit-specific code, #if !os(macOS) for iOS-only modifiers"
+  - "Drag-to-move: LongPressGesture.sequenced(before: DragGesture) with 15-minute snap"
 
 requirements-completed: [CALV-01, CALV-02]
 
 # Metrics
-duration: 3min
+duration: ~15min (including post-checkpoint fixes)
 completed: 2026-02-20
 ---
 
 # Phase 2 Plan 03: Week Timeline and Full Calendar Layout Summary
 
-**Partial summary — Task 1 complete (adc295c), awaiting human verification at checkpoint (Task 2)**
-
-**Complete Fantastical-style calendar app: LoomEvent Identifiable, drag-to-move on day timeline, 7-column WeekTimelineView, ContentView replaced with full NavigationStack layout — segmented Day/Week control, MiniMonthView, swipe navigation, .sheet(item: $selectedEvent)**
+**Morgen-style calendar app: WeekTimelineView, full ContentView replacement, end time pickers, reliable delete, fixed scrolling, macOS platform guards**
 
 ## Performance
 
-- **Duration:** ~3 min (Task 1 only — paused at checkpoint)
+- **Duration:** ~15 min (Task 1 + checkpoint fixes)
 - **Started:** 2026-02-20T21:24:31Z
-- **Tasks:** 1 of 2 complete
-- **Files modified:** 6
+- **Completed:** 2026-02-20
+- **Tasks:** 2/2 (Task 2 = human-verify checkpoint, approved)
+- **Files modified:** 11
 
 ## Accomplishments
 
-- Added `Identifiable` conformance to `LoomEvent` via `var id: String { _id }` — enables `.sheet(item: $selectedEvent)` in ContentView without breaking existing Decodable conformance
-- Updated `TimelineEventCard` with long-press + drag gesture using `LongPressGesture.sequenced(before: DragGesture)` — long-press activates drag mode (preventing accidental drags), tracks `dragOffset` for visual feedback, calls `onDragMove?(delta)` on end
-- Updated `DayTimelineView` with `onEventDragMove: ((LoomEvent, CGFloat) -> Void)?` callback, wired to each `TimelineEventCard`
-- Created `WeekTimelineView` with 7-column layout using `GeometryReader`, shared time-label gutter (35pt), day headers (abbreviated weekday + day number with today/selected highlighting), `Calendar.dateInterval(of: .weekOfYear)` for week start, now indicator spanning all columns, narrow column (<60pt) colored bars vs wider abbreviated-title cards
-- Fully replaced Phase 1 proof-of-concept `ContentView` with Fantastical-style layout: `@StateObject CalendarViewModel`, `ViewMode` enum segmented control, `MiniMonthView` always visible, conditional Day/Week timeline, swipe navigation with horizontal/vertical disambiguation, plus button + long-press creation sheet, `.sheet(item: $selectedEvent)` with `EventDetailView`, `handleDragMove` with 15-minute snapping
+- Created WeekTimelineView with 7-column layout, month/year header, proper day cells with selected/today indicators, auto-scroll to current time
+- Replaced ContentView with Morgen-style layout: mini month visible only in day mode, hidden in week mode (week header IS the navigation)
+- Added Identifiable conformance to LoomEvent for .sheet(item:) support
+- Added long-press + drag gesture to TimelineEventCard for drag-to-move events
+- Replaced duration picker with end time DatePicker in both creation and edit views — no artificial cap
+- Replaced .confirmationDialog with .alert for delete — fixes unreliable trigger in nested sheets
+- Fixed DayTimelineView scrolling: GeometryReader moved to root (outside ScrollView), Color.clear spacer for content height
+- Added macOS platform guards: HorizonCalendar platformFilters, #if canImport(UIKit) for MiniMonthView with LazyVGrid fallback, cross-platform colors
 
 ## Task Commits
 
-| Task | Name | Commit | Files |
-|------|------|--------|-------|
-| 1 | Add Identifiable to LoomEvent, drag-to-move, WeekTimelineView, replace ContentView | adc295c | 6 files |
+| Task | Name | Commit |
+|------|------|--------|
+| 1 | WeekTimelineView, ContentView, LoomEvent Identifiable, drag-to-move | adc295c |
+| fix | macOS platform guards for HorizonCalendar and UIKit APIs | a8119fb |
+| fix | simultaneousGesture for swipe nav (intermediate) | b04b548 |
+| fix | GeometryReader-as-root, Color.clear spacer for scrolling | 8de8027, ef948e7 |
+| fix | End time pickers, reliable delete, week view redesign | bf16db6 |
+| 2 | Human verification checkpoint — approved | — |
 
-## Files Created/Modified
+## Post-Checkpoint Fixes
 
-- `LoomCal/Models/LoomEvent.swift` — `Identifiable` conformance; `var id: String { _id }`
-- `LoomCal/Views/Calendar/TimelineEventCard.swift` — long-press+drag gesture; `@State dragOffset/isDragging`; `onDragMove: ((CGFloat) -> Void)?` callback; visual feedback (opacity 0.8, shadow(radius:8) during drag)
-- `LoomCal/Views/Calendar/DayTimelineView.swift` — `onEventDragMove: ((LoomEvent, CGFloat) -> Void)?` parameter; wired to `TimelineEventCard.onDragMove`
-- `LoomCal/Views/Calendar/WeekTimelineView.swift` — 7-column layout; `pointsPerHour = 50`; `gutterWidth = 35`; `weekDates` computed from `Calendar.dateInterval(of: .weekOfYear)`; day headers with tap-to-navigate; shared gutter with 2-hour interval labels; `TimelineView(.periodic)` now indicator; per-day `ZStack` event columns; narrow/wide column branching at 60pt
-- `LoomCal/Views/ContentView.swift` — full replacement; `ViewMode` enum; `@StateObject viewModel`; segmented `Picker`; `MiniMonthView` with long-press; `DayTimelineView`/`WeekTimelineView` conditional; `DragGesture` swipe navigation; `.task { viewModel.startSubscription() }`; `.sheet(isPresented:)` for creation; `.sheet(item: $selectedEvent)` for detail; `handleDragMove` with 15-min snap
-- `LoomCal.xcodeproj/project.pbxproj` — `WeekTimelineView.swift` added to Calendar PBXGroup and PBXSourcesBuildPhase
-
-## Decisions Made
-
-- `var id: String { _id }` computed property satisfies `Identifiable` without requiring stored property (avoids CodingKeys complications with existing `@ConvexInt` wrapper properties)
-- ContentView now creates its own `@StateObject CalendarViewModel` — LoomCalApp still injects `EventKitService` environmentObject (needed in Phase 5/6) but new ContentView no longer reads it
-- Swipe navigation disambiguation: `abs(xDelta) > abs(yDelta)` check prevents accidental day navigation when user is vertically scrolling the timeline
-- 15-minute snap: `Int(round(rawMinutes / 15.0)) * 15` — clean alignment with standard calendar time slots
-
-## Deviations from Plan
-
-None — plan executed exactly as written. All 6 substeps of Task 1 implemented per specification. Build succeeded on first attempt.
-
-## Issues Encountered
-
-None — BUILD SUCCEEDED without errors or warnings relevant to the changes.
+1. **HorizonCalendar macOS build failure** — added platformFilters = (ios, ) to pbxproj, wrapped MiniMonthView with #if canImport(UIKit), added macOS LazyVGrid fallback
+2. **DayTimelineView scroll blocked** — GeometryReader inside ScrollView prevented scrolling; moved to root view, added Color.clear height spacer
+3. **Duration capped at 2 hours** — replaced Picker with end time DatePicker in EventCreationView and EventEditView
+4. **Delete required 3 taps** — replaced .confirmationDialog with .alert in EventDetailView
+5. **Week view poor UI** — hid mini month in week mode, redesigned week header with month label and proper day indicators
 
 ## Self-Check: PASSED
 
 - FOUND: LoomCal/Views/Calendar/WeekTimelineView.swift
-- FOUND: LoomCal/Models/LoomEvent.swift — Identifiable conformance present
-- FOUND: LoomCal/Views/ContentView.swift — ViewMode, @StateObject, segmented control, .sheet(item:) present
-- FOUND: commit adc295c (Task 1)
-- BUILD SUCCEEDED on iOS target
+- FOUND: LoomCal/Models/LoomEvent.swift — Identifiable conformance
+- FOUND: LoomCal/Views/ContentView.swift — ViewMode, segmented control, mini month conditional
+- VERIFIED: BUILD SUCCEEDED on iOS target
+- VERIFIED: User approved checkpoint
 
 ---
 *Phase: 02-calendar-views*
-*Completed: 2026-02-20 (partial — awaiting checkpoint verification)*
+*Completed: 2026-02-20*
