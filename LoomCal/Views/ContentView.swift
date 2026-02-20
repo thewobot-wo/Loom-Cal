@@ -72,13 +72,16 @@ struct ContentView: View {
                         )
                     }
                 }
-                // Swipe left/right to navigate days or weeks
-                .gesture(
-                    DragGesture(minimumDistance: 40)
+                // Swipe left/right to navigate days or weeks.
+                // Must use .simultaneousGesture so the ScrollView inside
+                // DayTimelineView can still handle vertical scrolling.
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 50)
                         .onEnded { value in
                             let xDelta = value.translation.width
-                            // Only handle horizontal swipes (not accidentally triggering on drag-to-move)
-                            guard abs(xDelta) > abs(value.translation.height) else { return }
+                            // Only handle clearly horizontal swipes — require 2:1 ratio
+                            guard abs(xDelta) > abs(value.translation.height) * 2 else { return }
+                            guard abs(xDelta) > 60 else { return }
 
                             let daysToAdvance: Int = viewMode == .week ? 7 : 1
                             withAnimation(.easeInOut(duration: 0.2)) {
