@@ -5,37 +5,39 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** One app where you see everything on your plate — calendars, tasks, projects — and chat with Loom to actively manage your day.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — Calendar Views
 
 ## Current Position
 
-Phase: 1 of 8 (Foundation)
-Plan: 3 of TBD in current phase
-Status: In Progress — Plan 03 complete; Phase 1 Foundation complete
-Last activity: 2026-02-20 — Plan 03 complete; EventKit permission flow, macOS entitlements, and data ownership documentation
+Phase: 2 of 8 (Calendar Views)
+Plan: 1 of 3 in current phase
+Status: In Progress — Plan 01 complete; calendar view infrastructure built
+Last activity: 2026-02-20 — Plan 02-01 complete; CalendarViewModel, DayTimelineView, MiniMonthView, and supporting calendar views
 
-Progress: [███░░░░░░░] 15%
+Progress: [████░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: 5 min
-- Total execution time: 0.22 hours
+- Total execution time: 0.32 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 15 min | 5 min |
+| 02-calendar-views | 1 (of 3) | 6 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min), 01-02 (7 min), 01-03 (4 min)
+- Last 5 plans: 01-01 (4 min), 01-02 (7 min), 01-03 (4 min), 02-01 (6 min)
 - Trend: Consistent 4-7 min per plan
 
 *Updated after each plan completion*
 | Phase 01-foundation P02 | 7 | 2 tasks | 11 files |
 | Phase 01-foundation P03 | 4 | 2 tasks | 6 files |
+| Phase 02-calendar-views P01 | 6 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -56,6 +58,8 @@ Recent decisions affecting current work:
 - [Phase 01-03]: com.apple.security.app-sandbox required alongside calendar entitlement for macOS privacy permissions to work
 - [Phase 01-03]: EKAuthorizationStatus switch must include .writeOnly explicitly (iOS 17+ known case) to avoid exhaustiveness warning
 - [Phase 01-03]: EventKit events NOT stored in Convex — read on-device via EventKitService, documented in schema.ts comments
+- [Phase 02-calendar-views]: HorizonCalendar resolved at 1.16.0 (1.x not 2.x) — CalendarViewRepresentable is 2.x API only; used UIViewRepresentable wrapper instead
+- [Phase 02-calendar-views]: ConvexMobile mutation args require [String: ConvexEncodable?] not [String: Any] — explicit type annotation required
 
 ### Pending Todos
 
@@ -64,7 +68,7 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-- [Phase 1]: HorizonCalendar Mac target behavior unverified — needs hands-on testing in Phase 1; fallback is custom SwiftUI calendar grid (~2-3 weeks additional)
+- [Phase 2 - PARTIALLY RESOLVED]: HorizonCalendar 1.16.0 integrated and building on iOS target; Mac target behavior unverified — MiniDayCellView is UIKit-based so Mac behavior still needs runtime testing
 - [Phase 1 - RESOLVED]: ConvexMobile 0.8.0 confirmed compatible with Xcode 16.2 / iOS 18.6 SDK
 - [Phase 4]: Loom MCP must have write access to `chat_messages` Convex table — coordinate Loom config before Phase 4 planning
 - [Phase 5]: Convex background subscription behavior on iOS not documented — test in Phase 4/5 before notification implementation
@@ -73,5 +77,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Plan 01-03 complete — Phase 1 Foundation complete; EventKit permission flow, macOS entitlements, ContentView proof-of-concept dashboard done
-Resume file: .planning/phases/02-calendar-ui/ (Phase 2 planning)
+Stopped at: Plan 02-01 complete — calendar view infrastructure done; CalendarViewModel, DayTimelineView, MiniMonthView, TimelineEventCard, NowIndicatorView, AllDayBannerView all compile
+Resume file: .planning/phases/02-calendar-views/02-02-PLAN.md (next: event CRUD UI)
