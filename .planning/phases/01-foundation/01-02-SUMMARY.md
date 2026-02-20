@@ -73,13 +73,13 @@ completed: 2026-02-20
 - **Duration:** 7 min
 - **Started:** 2026-02-20T10:24:10Z
 - **Completed:** 2026-02-20T10:31:00Z
-- **Tasks:** 2 of 3 (Task 3 is human-verify checkpoint — awaiting user confirmation)
+- **Tasks:** 3 of 3
 - **Files modified:** 11
 
 ## Accomplishments
 - Resolved the RESEARCH open question: ConvexMobile 0.8.0 is fully compatible with Xcode 16.2 / iOS 18.6 SDK — XCFramework links without errors on both iOS Simulator and macOS targets
 - Created four Decodable structs (LoomEvent, LoomTask, ChatMessage, StudioEvent) matching the Convex schema field-for-field; all v.int64() fields use @ConvexInt var per the established pattern
-- ContentView subscribes to events:list using the async/await .task pattern — proves the end-to-end connection path works once the deployment URL is filled in
+- User confirmed real-time sync working on both iOS Simulator and Mac (Task 3 checkpoint approved) — events created in the Convex dashboard appear in the app within 2 seconds
 
 ## Task Commits
 
@@ -87,9 +87,9 @@ Each task was committed atomically:
 
 1. **Task 1: Create Xcode multiplatform project with ConvexMobile** - `21641ac` (feat)
 2. **Task 2: Define Swift Decodable models and subscription proof** - `a8b5280` (feat)
-3. **Task 3: Verify end-to-end Convex connection** - awaiting human verification (checkpoint)
+3. **Task 3: Verify end-to-end Convex connection** - N/A (human-verify checkpoint — user confirmed real-time sync on iOS and Mac)
 
-**Plan metadata:** (to be added after SUMMARY.md commit)
+**Plan metadata:** (to be updated after final docs commit)
 
 ## Files Created/Modified
 - `LoomCal.xcodeproj/project.pbxproj` — Xcode project file; iOS 18+ and macOS targets; ConvexMobile SPM package reference
@@ -149,6 +149,23 @@ Open `LoomCal/App/ConvexEnv.swift` and replace `"https://YOUR_DEPLOYMENT.convex.
 - ConvexMobile subscription pattern is proven — Phase 3 can build the real calendar view on top
 - EventKit Info.plist key is already in place — Phase 3/5 adds the EKEventStore permission flow
 - Pending user action: fill in ConvexEnv.swift deployment URL after running `npx convex dev`
+
+## Self-Check: PASSED
+
+All files verified present:
+- LoomCal.xcodeproj/project.pbxproj: FOUND
+- LoomCal/App/LoomCalApp.swift: FOUND
+- LoomCal/App/ConvexEnv.swift: FOUND
+- LoomCal/Models/LoomEvent.swift: FOUND
+- LoomCal/Models/LoomTask.swift: FOUND
+- LoomCal/Models/ChatMessage.swift: FOUND
+- LoomCal/Models/StudioEvent.swift: FOUND
+- LoomCal/Views/ContentView.swift: FOUND
+- .planning/phases/01-foundation/01-02-SUMMARY.md: FOUND
+
+All commits verified:
+- 21641ac feat(01-02): create SwiftUI multiplatform Xcode project with ConvexMobile: FOUND
+- a8b5280 feat(01-02): define Swift Decodable models and add subscription proof-of-concept: FOUND
 
 ---
 *Phase: 01-foundation*
