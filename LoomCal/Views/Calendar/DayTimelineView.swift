@@ -4,31 +4,21 @@ import SwiftUI
 /// Displays hour grid lines, absolute-positioned event cards, and the now indicator.
 /// All-day events appear in the banner strip above.
 struct DayTimelineView: View {
-    /// Timed (non-all-day) events for this day — pre-filtered by CalendarViewModel
     let events: [LoomEvent]
-    /// All-day events for this day — pre-filtered by CalendarViewModel
     let allDayEvents: [LoomEvent]
-    /// Callback when an event card is tapped
     var onEventTap: (LoomEvent) -> Void = { _ in }
-    /// Callback when an event card is drag-moved. Receives (event, pointsDelta).
     var onEventDragMove: ((LoomEvent, CGFloat) -> Void)?
 
     // MARK: - Layout Constants
 
-    /// Points per hour — 60 pt = 1 pt per minute. 24 * 60 = 1440 pt total.
     let pointsPerHour: CGFloat = 60.0
-    /// Fixed leading width for hour labels
     private let labelWidth: CGFloat = 50.0
+    private var totalHeight: CGFloat { 24 * pointsPerHour } // 1440 pt
 
-    private var totalHeight: CGFloat { 24 * pointsPerHour }
-
-    // MARK: - Scroll Position
+    // MARK: - State
 
     @State private var scrollPosition = ScrollPosition(y: 0)
-
-    // MARK: - Width from parent
-
-    @State private var availableWidth: CGFloat = 0
+    @State private var hasScrolledToNow = false
 
     // MARK: - Time Formatter
 
@@ -39,45 +29,41 @@ struct DayTimelineView: View {
     }()
 
     var body: some View {
-        VStack(spacing: 0) {
-            // All-day events banner (collapses to zero height when empty)
-            AllDayBannerView(events: allDayEvents)
+        // GeometryReader as ROOT — reads width before ScrollView
+        GeometryReader { geometry in
+            let fullWidth = geometry.size.width
+            let contentWidth = fullWidth - labelWidth
 
-            // Measure available width OUTSIDE the ScrollView
-            Color.clear
-                .frame(height: 0)
-                .background(
-                    GeometryReader { geo in
-                        Color.clear.preference(key: WidthPreferenceKey.self, value: geo.size.width)
+            VStack(spacing: 0) {
+                AllDayBannerView(events: allDayEvents)
+
+                ScrollView(.vertical, showsIndicators: true) {
+                    // Single container with explicit height — this is what ScrollView measures
+                    ZStack(alignment: .topLeading) {
+                        // Force the ZStack to be exactly totalHeight
+                        Color.clear
+                            .frame(width: fullWidth, height: totalHeight)
+
+                        // Hour grid lines + labels
+                        ForEach(0..<24, id: \.self) { hour in
+                            hourRow(hour: hour, contentWidth: contentWidth)
+                        }
+
+                        // Now indicator
+                        nowIndicator(contentWidth: contentWidth)
+
+                        // Event cards
+                        eventCards(contentWidth: contentWidth)
                     }
-                )
-                .onPreferenceChange(WidthPreferenceKey.self) { width in
-                    availableWidth = width
                 }
-
-            // Scrollable 24-hour timeline — no GeometryReader inside
-            ScrollView(.vertical) {
-                ZStack(alignment: .topLeading) {
-                    let contentWidth = max(availableWidth - labelWidth, 0)
-
-                    // Hour grid lines + labels
-                    ForEach(0..<24, id: \.self) { hour in
-                        hourRow(hour: hour, contentWidth: contentWidth)
+                .scrollPosition($scrollPosition)
+                .onAppear {
+                    guard !hasScrolledToNow else { return }
+                    hasScrolledToNow = true
+                    let yOffset = max(0, currentTimeYOffset() - 100)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        scrollPosition = ScrollPosition(y: yOffset)
                     }
-
-                    // Now indicator (updates every 60 seconds via TimelineView)
-                    nowIndicator(contentWidth: contentWidth)
-
-                    // Event cards (absolutely positioned)
-                    eventCards(contentWidth: contentWidth)
-                }
-                .frame(width: availableWidth, height: totalHeight)
-            }
-            .scrollPosition($scrollPosition)
-            .onAppear {
-                let yOffset = max(0, currentTimeYOffset() - 100)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    scrollPosition = ScrollPosition(y: yOffset)
                 }
             }
         }
@@ -89,7 +75,6 @@ struct DayTimelineView: View {
     private func hourRow(hour: Int, contentWidth: CGFloat) -> some View {
         let yOffset = CGFloat(hour) * pointsPerHour
 
-        // Hour label
         Text(hourLabel(for: hour))
             .font(.caption2)
             .foregroundStyle(.secondary)
@@ -97,7 +82,6 @@ struct DayTimelineView: View {
             .padding(.trailing, 6)
             .offset(y: yOffset - 7)
 
-        // Grid line
         Rectangle()
             .fill(Color.gray.opacity(0.15))
             .frame(width: contentWidth, height: 0.5)
@@ -109,19 +93,17 @@ struct DayTimelineView: View {
         TimelineView(.periodic(from: .now, by: 60)) { context in
             let yOffset = currentTimeYOffset(for: context.date)
 
-            ZStack(alignment: .leading) {
-                // Red dot
-                Circle()
-                    .fill(Color.red)
-                    .frame(width: 8, height: 8)
-                    .offset(x: labelWidth - 4, y: yOffset - 4)
+            // Red dot
+            Circle()
+                .fill(Color.red)
+                .frame(width: 8, height: 8)
+                .offset(x: labelWidth - 4, y: yOffset - 4)
 
-                // Red line
-                Rectangle()
-                    .fill(Color.red)
-                    .frame(width: contentWidth, height: 1.5)
-                    .offset(x: labelWidth, y: yOffset)
-            }
+            // Red line
+            Rectangle()
+                .fill(Color.red)
+                .frame(width: contentWidth, height: 1.5)
+                .offset(x: labelWidth, y: yOffset)
         }
     }
 
@@ -152,10 +134,8 @@ struct DayTimelineView: View {
         let width: CGFloat
     }
 
-    /// Greedy column-assignment algorithm for overlapping events.
     private func computeLayout(for events: [LoomEvent], contentWidth: CGFloat) -> [EventLayoutItem] {
         let sorted = events.sorted { $0.start < $1.start }
-
         var columnEnds: [Int] = []
         var assignments: [(event: LoomEvent, column: Int)] = []
 
@@ -176,7 +156,6 @@ struct DayTimelineView: View {
         return assignments.map { item in
             let event = item.event
             let col = item.column
-
             let eventStart = event.start
             let eventEnd = event.start + event.duration * 60 * 1000
 
@@ -230,15 +209,6 @@ struct DayTimelineView: View {
         components.second = 0
         let date = Calendar.current.date(from: components) ?? Date()
         return Self.hourFormatter.string(from: date)
-    }
-}
-
-// MARK: - Width Preference Key
-
-private struct WidthPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
     }
 }
 
