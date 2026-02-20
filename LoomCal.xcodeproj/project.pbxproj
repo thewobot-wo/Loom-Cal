@@ -10,6 +10,10 @@
 		12FA6D2EF6D946E3AB7D3D0F /* StudioEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D11F15AA89546D588127322 /* StudioEvent.swift */; };
 		1965BEB40C25491DB960F4F2 /* ConvexEnv.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAC04D985614080945480C4 /* ConvexEnv.swift */; };
 		A1B2C3D4E5F601234567890A /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F601234567890B /* EventKitService.swift */; };
+		F2A3B4C5D6E7F80234567800 /* NLEventParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A3B4C5D6E7F80234567801 /* NLEventParser.swift */; };
+		F2A3B4C5D6E7F80234567802 /* EventCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A3B4C5D6E7F80234567803 /* EventCreationView.swift */; };
+		F2A3B4C5D6E7F80234567804 /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A3B4C5D6E7F80234567805 /* EventDetailView.swift */; };
+		F2A3B4C5D6E7F80234567806 /* EventEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A3B4C5D6E7F80234567807 /* EventEditView.swift */; };
 		1A5118B6ED3A4668805A1F31 /* LoomCalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF164E410628480EB1EB0286 /* LoomCalApp.swift */; };
 		6DF29E450551441382D397E8 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 554F4E556D274D37B8E492C9 /* ChatMessage.swift */; };
 		80E8BCB7ED0E40EB982212A5 /* LoomTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E86A5C0C1E4E8BB0B85A13 /* LoomTask.swift */; };
@@ -45,6 +49,10 @@
 		F1A2B3C4D5E6F70123456714 /* TimelineEventCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEventCard.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E6F70123456716 /* NowIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowIndicatorView.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E6F70123456718 /* AllDayBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllDayBannerView.swift; sourceTree = "<group>"; };
+		F2A3B4C5D6E7F80234567801 /* NLEventParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NLEventParser.swift; sourceTree = "<group>"; };
+		F2A3B4C5D6E7F80234567803 /* EventCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCreationView.swift; sourceTree = "<group>"; };
+		F2A3B4C5D6E7F80234567805 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
+		F2A3B4C5D6E7F80234567807 /* EventEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEditView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +72,7 @@
 			isa = PBXGroup;
 			children = (
 				A1B2C3D4E5F601234567890B /* EventKitService.swift */,
+				F2A3B4C5D6E7F80234567801 /* NLEventParser.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -82,6 +91,7 @@
 			children = (
 				982B51ED173A420B81002FD8 /* ContentView.swift */,
 				F1A2B3C4D5E6F70123456720 /* Calendar */,
+				F2A3B4C5D6E7F80234567810 /* Events */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -130,6 +140,16 @@
 				F1A2B3C4D5E6F70123456718 /* AllDayBannerView.swift */,
 			);
 			path = Calendar;
+			sourceTree = "<group>";
+		};
+		F2A3B4C5D6E7F80234567810 /* Events */ = {
+			isa = PBXGroup;
+			children = (
+				F2A3B4C5D6E7F80234567803 /* EventCreationView.swift */,
+				F2A3B4C5D6E7F80234567805 /* EventDetailView.swift */,
+				F2A3B4C5D6E7F80234567807 /* EventEditView.swift */,
+			);
+			path = Events;
 			sourceTree = "<group>";
 		};
 		F1A2B3C4D5E6F70123456730 /* ViewModels */ = {
@@ -239,6 +259,10 @@
 				F1A2B3C4D5E6F70123456715 /* TimelineEventCard.swift in Sources */,
 				F1A2B3C4D5E6F70123456717 /* NowIndicatorView.swift in Sources */,
 				F1A2B3C4D5E6F70123456719 /* AllDayBannerView.swift in Sources */,
+				F2A3B4C5D6E7F80234567800 /* NLEventParser.swift in Sources */,
+				F2A3B4C5D6E7F80234567802 /* EventCreationView.swift in Sources */,
+				F2A3B4C5D6E7F80234567804 /* EventDetailView.swift in Sources */,
+				F2A3B4C5D6E7F80234567806 /* EventEditView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
