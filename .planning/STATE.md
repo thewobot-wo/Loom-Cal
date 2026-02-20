@@ -10,34 +10,35 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 2 of 8 (Calendar Views)
-Plan: 1 of 3 in current phase
-Status: In Progress — Plan 01 complete; calendar view infrastructure built
-Last activity: 2026-02-20 — Plan 02-01 complete; CalendarViewModel, DayTimelineView, MiniMonthView, and supporting calendar views
+Plan: 2 of 3 in current phase
+Status: In Progress — Plan 02 complete; event CRUD UI built (NLEventParser, EventCreationView, EventDetailView, EventEditView)
+Last activity: 2026-02-20 — Plan 02-02 complete; full event CRUD UI: NL parser, creation sheet, detail sheet, edit form, delete with confirmation
 
-Progress: [████░░░░░░] 20%
+Progress: [█████░░░░░] 25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 5 min
-- Total execution time: 0.32 hours
+- Total execution time: 0.38 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 15 min | 5 min |
-| 02-calendar-views | 1 (of 3) | 6 min | 6 min |
+| 02-calendar-views | 2 (of 3) | 10 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min), 01-02 (7 min), 01-03 (4 min), 02-01 (6 min)
+- Last 5 plans: 01-02 (7 min), 01-03 (4 min), 02-01 (6 min), 02-02 (4 min)
 - Trend: Consistent 4-7 min per plan
 
 *Updated after each plan completion*
 | Phase 01-foundation P02 | 7 | 2 tasks | 11 files |
 | Phase 01-foundation P03 | 4 | 2 tasks | 6 files |
 | Phase 02-calendar-views P01 | 6 | 2 tasks | 8 files |
+| Phase 02-calendar-views P02 | 4 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -60,6 +61,8 @@ Recent decisions affecting current work:
 - [Phase 01-03]: EventKit events NOT stored in Convex — read on-device via EventKitService, documented in schema.ts comments
 - [Phase 02-calendar-views]: HorizonCalendar resolved at 1.16.0 (1.x not 2.x) — CalendarViewRepresentable is 2.x API only; used UIViewRepresentable wrapper instead
 - [Phase 02-calendar-views]: ConvexMobile mutation args require [String: ConvexEncodable?] not [String: Any] — explicit type annotation required
+- [Plan 02-02]: EventEditView passes @Binding isDetailPresented to parent EventDetailView — sets both false on successful save to auto-dismiss the full event sheet chain
+- [Plan 02-02]: NL parsing fires on .onSubmit (not onChange debounce) — simpler, avoids parsing on every keystroke
 
 ### Pending Todos
 
@@ -77,5 +80,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Plan 02-01 complete — calendar view infrastructure done; CalendarViewModel, DayTimelineView, MiniMonthView, TimelineEventCard, NowIndicatorView, AllDayBannerView all compile
-Resume file: .planning/phases/02-calendar-views/02-02-PLAN.md (next: event CRUD UI)
+Stopped at: Plan 02-02 complete — event CRUD UI done; NLEventParser, EventCreationView, EventDetailView, EventEditView all compile; CALV-03/04/05 requirements complete
+Resume file: .planning/phases/02-calendar-views/02-03-PLAN.md (next: week view)
