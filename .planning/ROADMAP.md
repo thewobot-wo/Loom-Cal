@@ -49,7 +49,11 @@ Plans:
   3. User can tap a time slot to create a new event by entering a title, date, start time, and duration — the event appears on the calendar immediately
   4. User can tap an existing event to edit its title, time, or duration — changes reflect in real-time across both iOS and Mac
   5. User can delete an event from the event detail view and it disappears from the calendar without requiring a reload
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 02-01-PLAN.md — CalendarViewModel, HorizonCalendar mini month, and day timeline with event cards
+- [ ] 02-02-PLAN.md — Event CRUD: NL parser, creation sheet, detail view, edit view, delete confirmation
+- [ ] 02-03-PLAN.md — Week view, ContentView replacement, navigation gestures, and end-to-end verification
 
 ### Phase 3: Task System
 **Goal**: Users can create and manage tasks with due dates and priorities, see task due dates on the calendar, and drag tasks into calendar time slots
@@ -122,14 +126,14 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 Note: Phase 4 (Loom Chat) depends only on Phase 1 and can proceed in parallel with Phase 2 and 3 if desired. Phase 8 depends on Phase 3 and Phase 4.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete    | 2026-02-20 |
-| 2. Calendar Views | 0/TBD | Not started | - |
+| 2. Calendar Views | 0/3 | Planned | - |
 | 3. Task System | 0/TBD | Not started | - |
 | 4. Loom Chat | 0/TBD | Not started | - |
 | 5. Loom Calendar and Task Actions | 0/TBD | Not started | - |
