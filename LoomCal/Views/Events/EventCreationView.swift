@@ -1,14 +1,11 @@
 import SwiftUI
 
 /// EventCreationView presents a sheet for creating new calendar events.
-/// The top section provides a natural language text field (e.g. "Dentist 3pm").
-/// Typing in the NL field and pressing Return parses the input and pre-fills the detail fields.
-/// The detail section exposes manual controls for title, date, time, duration, and all-day toggle.
+/// Top section: natural language text field (e.g. "Dentist 3pm").
+/// Detail section: title, date, start time, end time, all-day toggle.
 struct EventCreationView: View {
     @ObservedObject var viewModel: CalendarViewModel
     @Binding var isPresented: Bool
-
-    /// Optional pre-filled date (e.g. from long-press on mini month).
     var prefilledDate: Date?
 
     // MARK: - State
@@ -16,8 +13,8 @@ struct EventCreationView: View {
     @State private var nlInput: String = ""
     @State private var title: String = ""
     @State private var eventDate: Date
-    @State private var startTime: Date = Date()
-    @State private var durationMinutes: Int = 60   // Default: 1 hour per locked decision
+    @State private var startTime: Date
+    @State private var endTime: Date
     @State private var isAllDay: Bool = false
     @State private var saveError: String? = nil
 
@@ -27,36 +24,24 @@ struct EventCreationView: View {
         self.viewModel = viewModel
         self._isPresented = isPresented
         self.prefilledDate = prefilledDate
-        // Initialize eventDate from prefilledDate if provided, otherwise today
-        self._eventDate = State(initialValue: prefilledDate ?? Date())
+        let now = prefilledDate ?? Date()
+        self._eventDate = State(initialValue: now)
+        self._startTime = State(initialValue: now)
+        // Default: 1 hour from start
+        self._endTime = State(initialValue: now.addingTimeInterval(3600))
     }
-
-    // MARK: - Duration options
-
-    private let durationOptions: [(label: String, minutes: Int)] = [
-        ("15 min", 15),
-        ("30 min", 30),
-        ("45 min", 45),
-        ("1 hour", 60),
-        ("1.5 hours", 90),
-        ("2 hours", 120)
-    ]
 
     // MARK: - Body
 
     var body: some View {
         NavigationStack {
             Form {
-                // Natural language input section
                 Section {
                     TextField("Dentist 3pm, Team lunch tomorrow...", text: $nlInput)
                         .font(.title3)
-                        .onSubmit {
-                            parseAndFill()
-                        }
+                        .onSubmit { parseAndFill() }
                 }
 
-                // Manual detail fields section
                 Section("Details") {
                     TextField("Title", text: $title)
 
@@ -64,14 +49,17 @@ struct EventCreationView: View {
                         .datePickerStyle(.compact)
 
                     if !isAllDay {
-                        DatePicker("Start Time", selection: $startTime, displayedComponents: .hourAndMinute)
+                        DatePicker("Starts", selection: $startTime, displayedComponents: .hourAndMinute)
                             .datePickerStyle(.compact)
-
-                        Picker("Duration", selection: $durationMinutes) {
-                            ForEach(durationOptions, id: \.minutes) { option in
-                                Text(option.label).tag(option.minutes)
+                            .onChange(of: startTime) { _, newStart in
+                                // Keep end time at least 15 min after start
+                                if endTime <= newStart {
+                                    endTime = newStart.addingTimeInterval(3600)
+                                }
                             }
-                        }
+
+                        DatePicker("Ends", selection: $endTime, in: startTime.addingTimeInterval(900)..., displayedComponents: .hourAndMinute)
+                            .datePickerStyle(.compact)
                     }
 
                     Toggle("All Day", isOn: $isAllDay)
@@ -91,15 +79,11 @@ struct EventCreationView: View {
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        isPresented = false
-                    }
+                    Button("Cancel") { isPresented = false }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
-                        saveEvent()
-                    }
-                    .disabled(title.isEmpty)
+                    Button("Add") { saveEvent() }
+                        .disabled(title.isEmpty)
                 }
             }
         }
@@ -107,59 +91,50 @@ struct EventCreationView: View {
 
     // MARK: - Actions
 
-    /// Parses the NL input and fills detail fields.
     private func parseAndFill() {
         guard !nlInput.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-
         let parsed = NLEventParser.parse(nlInput)
-
-        // Apply title if detected
-        if !parsed.title.isEmpty {
-            title = parsed.title
-        }
-
-        // Apply date/time from parsed result
+        if !parsed.title.isEmpty { title = parsed.title }
         if let parsedDate = parsed.date {
+            eventDate = parsedDate
             if parsed.hasTime {
-                // Detected both date and time — set both fields
-                eventDate = parsedDate
                 startTime = parsedDate
-            } else {
-                // Date only, no specific time — set date only
-                eventDate = parsedDate
+                endTime = parsedDate.addingTimeInterval(3600)
             }
         }
     }
 
-    /// Combines the date and time fields and calls viewModel.createEvent().
     private func saveEvent() {
-        // Combine eventDate (day) and startTime (hour/minute) into a single Date
         let calendar = Calendar.current
         let dateComponents = calendar.dateComponents([.year, .month, .day], from: eventDate)
-        let timeComponents = calendar.dateComponents([.hour, .minute], from: startTime)
+        let startComponents = calendar.dateComponents([.hour, .minute], from: startTime)
+        let endComponents = calendar.dateComponents([.hour, .minute], from: endTime)
 
-        var combined = DateComponents()
-        combined.year = dateComponents.year
-        combined.month = dateComponents.month
-        combined.day = dateComponents.day
-        combined.hour = isAllDay ? 0 : (timeComponents.hour ?? 0)
-        combined.minute = isAllDay ? 0 : (timeComponents.minute ?? 0)
-        combined.second = 0
+        var combinedStart = DateComponents()
+        combinedStart.year = dateComponents.year
+        combinedStart.month = dateComponents.month
+        combinedStart.day = dateComponents.day
+        combinedStart.hour = isAllDay ? 0 : (startComponents.hour ?? 0)
+        combinedStart.minute = isAllDay ? 0 : (startComponents.minute ?? 0)
 
-        let finalStart = calendar.date(from: combined) ?? eventDate
+        let finalStart = calendar.date(from: combinedStart) ?? eventDate
+
+        // Compute duration from start/end time difference
+        let startMins = (startComponents.hour ?? 0) * 60 + (startComponents.minute ?? 0)
+        let endMins = (endComponents.hour ?? 0) * 60 + (endComponents.minute ?? 0)
+        let durationMinutes = max(endMins - startMins, 15)
 
         Task {
             do {
                 try await viewModel.createEvent(
                     title: title,
                     start: finalStart,
-                    durationMinutes: durationMinutes,
+                    durationMinutes: isAllDay ? 1440 : durationMinutes,
                     isAllDay: isAllDay
                 )
                 isPresented = false
             } catch {
                 saveError = "Failed to create event: \(error.localizedDescription)"
-                print("[EventCreationView] createEvent error: \(error)")
             }
         }
     }

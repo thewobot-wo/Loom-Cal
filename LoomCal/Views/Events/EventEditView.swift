@@ -1,13 +1,11 @@
 import SwiftUI
 
 /// EventEditView provides an editable form pre-filled with the existing event's data.
-/// On save, it calls viewModel.updateEvent() with only the changed fields.
-/// Presented as a nested sheet from EventDetailView.
+/// On save, calls viewModel.updateEvent() with only changed fields.
 struct EventEditView: View {
     let event: LoomEvent
     @ObservedObject var viewModel: CalendarViewModel
     @Binding var isPresented: Bool
-    /// Binding to the parent EventDetailView's isPresented — dismiss both on successful save.
     @Binding var isDetailPresented: Bool
 
     @Environment(\.dismiss) private var dismiss
@@ -17,20 +15,9 @@ struct EventEditView: View {
     @State private var title: String
     @State private var eventDate: Date
     @State private var startTime: Date
-    @State private var durationMinutes: Int
+    @State private var endTime: Date
     @State private var isAllDay: Bool
     @State private var saveError: String? = nil
-
-    // MARK: - Duration options
-
-    private let durationOptions: [(label: String, minutes: Int)] = [
-        ("15 min", 15),
-        ("30 min", 30),
-        ("45 min", 45),
-        ("1 hour", 60),
-        ("1.5 hours", 90),
-        ("2 hours", 120)
-    ]
 
     // MARK: - Init
 
@@ -45,12 +32,12 @@ struct EventEditView: View {
         self._isPresented = isPresented
         self._isDetailPresented = isDetailPresented
 
-        // Pre-fill all fields from the existing event
         let startDate = Date(timeIntervalSince1970: TimeInterval(event.start) / 1000)
+        let endDate = startDate.addingTimeInterval(TimeInterval(event.duration) * 60)
         self._title = State(initialValue: event.title)
         self._eventDate = State(initialValue: startDate)
         self._startTime = State(initialValue: startDate)
-        self._durationMinutes = State(initialValue: event.duration)
+        self._endTime = State(initialValue: endDate)
         self._isAllDay = State(initialValue: event.isAllDay)
     }
 
@@ -59,7 +46,6 @@ struct EventEditView: View {
     var body: some View {
         NavigationStack {
             Form {
-                // Detail fields only — no NL input field (edit context, not creation)
                 Section("Details") {
                     TextField("Title", text: $title)
 
@@ -67,14 +53,16 @@ struct EventEditView: View {
                         .datePickerStyle(.compact)
 
                     if !isAllDay {
-                        DatePicker("Start Time", selection: $startTime, displayedComponents: .hourAndMinute)
+                        DatePicker("Starts", selection: $startTime, displayedComponents: .hourAndMinute)
                             .datePickerStyle(.compact)
-
-                        Picker("Duration", selection: $durationMinutes) {
-                            ForEach(durationOptions, id: \.minutes) { option in
-                                Text(option.label).tag(option.minutes)
+                            .onChange(of: startTime) { _, newStart in
+                                if endTime <= newStart {
+                                    endTime = newStart.addingTimeInterval(3600)
+                                }
                             }
-                        }
+
+                        DatePicker("Ends", selection: $endTime, in: startTime.addingTimeInterval(900)..., displayedComponents: .hourAndMinute)
+                            .datePickerStyle(.compact)
                     }
 
                     Toggle("All Day", isOn: $isAllDay)
@@ -94,15 +82,11 @@ struct EventEditView: View {
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
+                    Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        saveChanges()
-                    }
-                    .disabled(title.isEmpty)
+                    Button("Save") { saveChanges() }
+                        .disabled(title.isEmpty)
                 }
             }
         }
@@ -110,25 +94,27 @@ struct EventEditView: View {
 
     // MARK: - Actions
 
-    /// Compares current values against the original event and calls updateEvent() for changed fields.
     private func saveChanges() {
-        // Combine date + time fields into final start Date
         let calendar = Calendar.current
         let dateComponents = calendar.dateComponents([.year, .month, .day], from: eventDate)
-        let timeComponents = calendar.dateComponents([.hour, .minute], from: startTime)
+        let startComponents = calendar.dateComponents([.hour, .minute], from: startTime)
+        let endComponents = calendar.dateComponents([.hour, .minute], from: endTime)
 
         var combined = DateComponents()
         combined.year = dateComponents.year
         combined.month = dateComponents.month
         combined.day = dateComponents.day
-        combined.hour = isAllDay ? 0 : (timeComponents.hour ?? 0)
-        combined.minute = isAllDay ? 0 : (timeComponents.minute ?? 0)
-        combined.second = 0
+        combined.hour = isAllDay ? 0 : (startComponents.hour ?? 0)
+        combined.minute = isAllDay ? 0 : (startComponents.minute ?? 0)
 
         let finalStart = calendar.date(from: combined) ?? eventDate
         let originalStart = Date(timeIntervalSince1970: TimeInterval(event.start) / 1000)
 
-        // Build changed-fields-only update call
+        // Compute duration from start/end
+        let startMins = (startComponents.hour ?? 0) * 60 + (startComponents.minute ?? 0)
+        let endMins = (endComponents.hour ?? 0) * 60 + (endComponents.minute ?? 0)
+        let durationMinutes = max(endMins - startMins, 15)
+
         let newTitle: String? = (title != event.title) ? title : nil
         let newStart: Date? = (abs(finalStart.timeIntervalSince(originalStart)) > 30) ? finalStart : nil
         let newDuration: Int? = (durationMinutes != event.duration) ? durationMinutes : nil
@@ -141,12 +127,10 @@ struct EventEditView: View {
                     start: newStart,
                     durationMinutes: newDuration
                 )
-                // Dismiss both the edit sheet and the parent detail sheet
                 isDetailPresented = false
                 dismiss()
             } catch {
                 saveError = "Failed to save: \(error.localizedDescription)"
-                print("[EventEditView] updateEvent error: \(error)")
             }
         }
     }
