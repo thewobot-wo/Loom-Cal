@@ -45,7 +45,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **PLAT-02**: Native Mac app via SwiftUI multiplatform (shared codebase)
 - [ ] **PLAT-03**: Local notifications for upcoming events
 - [ ] **PLAT-04**: Local notifications for task deadlines
-- [ ] **PLAT-05**: Real-time data sync via Convex subscriptions
+- [x] **PLAT-05**: Real-time data sync via Convex subscriptions
 
 ## v2 Requirements
 
@@ -126,7 +126,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAT-02 | Phase 8 | Pending |
 | PLAT-03 | Phase 8 | Pending |
 | PLAT-04 | Phase 8 | Pending |
-| PLAT-05 | Phase 1 | Pending |
+| PLAT-05 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 28 total
