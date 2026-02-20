@@ -1,4 +1,14 @@
 // v.int64() fields require BigInt() in mutations and @ConvexInt in Swift structs
+
+// DATA OWNERSHIP RULES:
+// - events: Convex-native (Convex is source of truth). Full CRUD.
+// - tasks: Convex-only (Convex is source of truth). Full CRUD.
+// - chat_messages: Convex-only. Written by app (user role) and Loom (assistant role).
+// - studio_events: Read-only cache. Source of truth is Supabase. Synced via cron every 15 min.
+//   lastSyncedAt tracks freshness.
+// - Apple Calendar events: Read directly from EventKit on-device. NOT stored in Convex.
+//   Device-specific, always fresh, no sync needed.
+
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 

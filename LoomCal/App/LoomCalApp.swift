@@ -7,9 +7,12 @@ let convex = ConvexClient(deploymentUrl: ConvexEnv.deploymentUrl)
 
 @main
 struct LoomCalApp: App {
+    @StateObject private var eventKitService = EventKitService()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(eventKitService)
         }
     }
 }

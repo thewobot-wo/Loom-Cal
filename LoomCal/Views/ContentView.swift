@@ -1,56 +1,68 @@
 import SwiftUI
 import ConvexMobile
 
-// Proof-of-concept view demonstrating:
-// 1. ConvexClient connects to the deployed backend
-// 2. Subscription to events:list works with async/await pattern
-// 3. LoomEvent Decodable struct decodes correctly including @ConvexInt fields
-// Source: https://docs.convex.dev/quickstart/swift (Pattern 3: async/await subscription)
+// Phase 1 proof-of-concept dashboard demonstrating:
+// 1. ConvexClient connects and events:list subscription works in real-time
+// 2. EventKit permission request fires on launch with graceful denial handling
+// 3. Both Convex and Apple Calendar data sources coexist without conflict
+// Proper calendar UI is Phase 2's responsibility — this view is intentionally minimal.
 struct ContentView: View {
     @State private var events: [LoomEvent] = []
-    @State private var connectionStatus: String = "Connecting..."
+    @EnvironmentObject var eventKitService: EventKitService
 
     var body: some View {
         NavigationStack {
-            VStack {
-                Text(connectionStatus)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 8)
-
-                if events.isEmpty {
-                    Spacer()
-                    Text("No events yet")
-                        .foregroundStyle(.secondary)
-                    Text("Add events via Convex Dashboard to test real-time sync")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                    Spacer()
-                } else {
-                    List(events, id: \._id) { event in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(event.title)
-                                .font(.headline)
-                            HStack {
-                                Text("Start: \(event.start)")
+            List {
+                // Convex events section
+                Section("Convex Events") {
+                    if events.isEmpty {
+                        Text("No events yet")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(events, id: \._id) { event in
+                            VStack(alignment: .leading) {
+                                Text(event.title)
+                                    .font(.headline)
+                                Text("Duration: \(event.duration) min")
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Spacer()
-                                Text("\(event.duration) min")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
                             }
                         }
-                        .padding(.vertical, 2)
+                    }
+                }
+
+                // EventKit status section
+                Section("Apple Calendar") {
+                    switch eventKitService.authStatus {
+                    case .fullAccess:
+                        let todayEvents = eventKitService.fetchEvents(
+                            from: Calendar.current.startOfDay(for: Date()),
+                            to: Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: Date()))!
+                        )
+                        Text("\(todayEvents.count) events today")
+                        Text("\(eventKitService.selectedCalendarIdentifiers.count) calendars selected")
+                            .font(.caption)
+                    case .denied, .restricted, .writeOnly:
+                        Text("Calendar access not granted")
+                            .foregroundStyle(.secondary)
+                        Text("Loom Cal works with Convex events only")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    case .notDetermined:
+                        Text("Requesting access...")
+                            .foregroundStyle(.secondary)
+                    @unknown default:
+                        Text("Unknown status")
                     }
                 }
             }
             .navigationTitle("Loom Cal")
         }
         .task {
-            connectionStatus = "Connected"
+            // Request EventKit access
+            await eventKitService.requestAccess()
+        }
+        .task {
+            // Subscribe to Convex events
             for await result: [LoomEvent] in convex
                 .subscribe(to: "events:list")
                 .replaceError(with: [])
@@ -64,4 +76,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environmentObject(EventKitService())
 }
