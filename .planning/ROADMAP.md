@@ -33,7 +33,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The Convex schema has tables for events, tasks, chat_messages, and studio_events, each with correct field types (`v.int64()` for integers, UTC milliseconds for timestamps, explicit timezone fields)
   4. Source-of-truth ownership is documented and enforced in schema: Convex-native events only, tasks Convex-only, studio_events read-only cache stamped with last-synced time
   5. EventKit permission is requested using `requestFullAccessToEvents()` (iOS 17+ API) and the app handles denial gracefully without crashing
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 01-01-PLAN.md — Convex backend schema and query/mutation functions for all 4 tables
+- [ ] 01-02-PLAN.md — Xcode multiplatform project, ConvexMobile integration, Swift models, subscription proof
+- [ ] 01-03-PLAN.md — EventKit permission flow, Apple Calendar read infrastructure, data ownership docs
 
 ### Phase 2: Calendar Views
 **Goal**: Users can see and manage Convex-native events in a day and week calendar view, and perform full event CRUD from the app
@@ -124,7 +128,7 @@ Note: Phase 4 (Loom Chat) depends only on Phase 1 and can proceed in parallel wi
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/3 | Planned | - |
 | 2. Calendar Views | 0/TBD | Not started | - |
 | 3. Task System | 0/TBD | Not started | - |
 | 4. Loom Chat | 0/TBD | Not started | - |
