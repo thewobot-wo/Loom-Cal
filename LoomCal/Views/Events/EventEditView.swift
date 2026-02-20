@@ -89,7 +89,9 @@ struct EventEditView: View {
                 }
             }
             .navigationTitle("Edit Event")
+            #if !os(macOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {

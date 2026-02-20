@@ -90,7 +90,7 @@ struct DayTimelineView: View {
 
         // Grid line
         Rectangle()
-            .fill(Color(.systemGray5))
+            .fill(Color.gray.opacity(0.15))
             .frame(width: contentWidth, height: 0.5)
             .offset(x: labelWidth, y: yOffset)
     }

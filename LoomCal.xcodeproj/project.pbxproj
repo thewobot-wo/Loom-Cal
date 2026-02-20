@@ -22,7 +22,7 @@
 		9AEEEFCA556F480DB9918D32 /* ConvexMobile in Frameworks */ = {isa = PBXBuildFile; productRef = 0E4E9BFFC7444A7D9D90AF8B /* ConvexMobile */; };
 		D915E861CA664BE082311BC5 /* LoomEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CD0C89A47E94DE0B14FEC60 /* LoomEvent.swift */; };
 		F1A2B3C4D5E6F70123456701 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456700 /* CalendarViewModel.swift */; };
-		F1A2B3C4D5E6F70123456703 /* HorizonCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = F1A2B3C4D5E6F70123456702 /* HorizonCalendar */; };
+		F1A2B3C4D5E6F70123456703 /* HorizonCalendar in Frameworks */ = {isa = PBXBuildFile; platformFilters = (ios, ); productRef = F1A2B3C4D5E6F70123456702 /* HorizonCalendar */; };
 		F1A2B3C4D5E6F70123456711 /* MiniMonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456710 /* MiniMonthView.swift */; };
 		F1A2B3C4D5E6F70123456713 /* DayTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456712 /* DayTimelineView.swift */; };
 		F1A2B3C4D5E6F70123456715 /* TimelineEventCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456714 /* TimelineEventCard.swift */; };

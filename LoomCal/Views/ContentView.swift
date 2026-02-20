@@ -102,7 +102,9 @@ struct ContentView: View {
                 )
             }
             .navigationTitle("Loom Cal")
+            #if !os(macOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button(action: { showCreateSheet = true }) {

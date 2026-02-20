@@ -62,7 +62,7 @@ struct WeekTimelineView: View {
                         dayHeader(for: date, width: columnWidth)
                     }
                 }
-                .background(Color(.systemBackground))
+                .background(.background)
 
                 Divider()
 
@@ -154,7 +154,7 @@ struct WeekTimelineView: View {
         let yOffset = CGFloat(hour) * pointsPerHour
 
         Rectangle()
-            .fill(Color(.systemGray5))
+            .fill(Color.gray.opacity(0.15))
             .frame(width: totalWidth - gutterWidth, height: 0.5)
             .offset(x: gutterWidth, y: yOffset)
     }
@@ -189,7 +189,7 @@ struct WeekTimelineView: View {
         ZStack(alignment: .topLeading) {
             // Vertical separator between columns
             Rectangle()
-                .fill(Color(.systemGray5))
+                .fill(Color.gray.opacity(0.15))
                 .frame(width: 0.5)
                 .frame(maxHeight: .infinity, alignment: .leading)
 

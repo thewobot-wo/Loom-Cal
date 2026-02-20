@@ -26,7 +26,7 @@ struct AllDayBannerView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
             }
-            .background(Color(.systemBackground))
+            .background(.background)
             Divider()
         }
     }

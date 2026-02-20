@@ -1,17 +1,22 @@
 import SwiftUI
+
+#if canImport(UIKit)
 import HorizonCalendar
+#endif
 
 /// Compact month calendar at the top of the main calendar screen.
-/// Wraps HorizonCalendar's UIKit CalendarView in a UIViewRepresentable.
+/// On iOS: wraps HorizonCalendar's UIKit CalendarView in a UIViewRepresentable.
+/// On macOS: uses a simple LazyVGrid fallback.
 /// Tapping a day updates CalendarViewModel.selectedDate.
-/// Long-pressing a day triggers onDateLongPress callback (wired to event creation in Plan 02).
+/// Long-pressing a day triggers onDateLongPress callback (wired to event creation).
 struct MiniMonthView: View {
     @ObservedObject var viewModel: CalendarViewModel
 
-    /// Callback for long-press on a date — wired to event creation in Plan 02
+    /// Callback for long-press on a date — wired to event creation
     var onDateLongPress: ((Date) -> Void)?
 
     var body: some View {
+        #if canImport(UIKit)
         HorizonCalendarView(
             selectedDate: viewModel.selectedDate,
             eventsForDate: { date in
@@ -24,10 +29,101 @@ struct MiniMonthView: View {
         )
         .frame(height: 260)
         .background(Color(.systemBackground))
+        #else
+        MacMiniMonthView(viewModel: viewModel, onDateLongPress: onDateLongPress)
+            .frame(height: 260)
+        #endif
     }
 }
 
-// MARK: - HorizonCalendarView (UIViewRepresentable wrapper)
+// MARK: - macOS Fallback
+
+#if os(macOS)
+/// Simple LazyVGrid-based month calendar for macOS where HorizonCalendar (UIKit) is unavailable.
+private struct MacMiniMonthView: View {
+    @ObservedObject var viewModel: CalendarViewModel
+    var onDateLongPress: ((Date) -> Void)?
+
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
+    private let weekdaySymbols = Calendar.current.shortWeekdaySymbols
+
+    private var monthDates: [Date?] {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month], from: viewModel.selectedDate)
+        guard let monthStart = calendar.date(from: components),
+              let range = calendar.range(of: .day, in: .month, for: monthStart) else { return [] }
+
+        let firstWeekday = calendar.component(.weekday, from: monthStart)
+        let leadingEmpty = (firstWeekday - calendar.firstWeekday + 7) % 7
+
+        var dates: [Date?] = Array(repeating: nil, count: leadingEmpty)
+        for day in range {
+            var dayComponents = components
+            dayComponents.day = day
+            dates.append(calendar.date(from: dayComponents))
+        }
+        return dates
+    }
+
+    var body: some View {
+        VStack(spacing: 8) {
+            // Month/year header
+            Text(viewModel.selectedDate, format: .dateTime.month(.wide).year())
+                .font(.headline)
+
+            // Weekday headers
+            LazyVGrid(columns: columns, spacing: 4) {
+                ForEach(weekdaySymbols, id: \.self) { symbol in
+                    Text(symbol)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            // Day grid
+            LazyVGrid(columns: columns, spacing: 4) {
+                ForEach(Array(monthDates.enumerated()), id: \.offset) { _, date in
+                    if let date = date {
+                        let isSelected = Calendar.current.isDate(date, inSameDayAs: viewModel.selectedDate)
+                        let isToday = Calendar.current.isDateInToday(date)
+                        let hasEvents = !viewModel.timedEvents(for: date).isEmpty || !viewModel.allDayEvents(for: date).isEmpty
+
+                        Button {
+                            viewModel.selectedDate = date
+                        } label: {
+                            VStack(spacing: 2) {
+                                Text("\(Calendar.current.component(.day, from: date))")
+                                    .font(.system(size: 14, weight: isSelected || isToday ? .bold : .regular))
+                                    .foregroundStyle(isSelected ? .white : isToday ? .blue : .primary)
+                                    .frame(width: 28, height: 28)
+                                    .background {
+                                        if isSelected {
+                                            Circle().fill(.blue)
+                                        }
+                                    }
+
+                                Circle()
+                                    .fill(isSelected ? .white.opacity(0.8) : .blue)
+                                    .frame(width: 4, height: 4)
+                                    .opacity(hasEvents ? 1 : 0)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        Color.clear
+                            .frame(height: 34)
+                    }
+                }
+            }
+        }
+        .padding(.horizontal)
+    }
+}
+#endif
+
+// MARK: - HorizonCalendarView (UIViewRepresentable wrapper) — iOS only
+
+#if canImport(UIKit)
 
 /// UIViewRepresentable wrapper for HorizonCalendar 1.x CalendarView.
 /// HorizonCalendar 1.x uses UIKit's CalendarView; CalendarViewRepresentable is a 2.x API.
@@ -74,7 +170,6 @@ struct HorizonCalendarView: UIViewRepresentable {
     }
 
     func updateUIView(_ calendarView: CalendarView, context: Context) {
-        // Update content when selected date or events change
         let newContent = makeContent()
         calendarView.setContent(newContent)
         context.coordinator.currentContent = newContent
@@ -82,7 +177,6 @@ struct HorizonCalendarView: UIViewRepresentable {
 
     private func makeContent() -> CalendarViewContent {
         let calendar = Calendar.current
-        let today = Date()
 
         return CalendarViewContent(
             calendar: calendar,
@@ -126,7 +220,6 @@ struct HorizonCalendarView: UIViewRepresentable {
                   let handler = onDateLongPress else { return }
 
             let location = gesture.location(in: calView)
-            // Use the day under the long press location — approximate via hit test
             if let dayView = calView.hitTest(location, with: nil),
                let dayNumber = extractDayNumber(from: dayView) {
                 let calendar = Calendar.current
@@ -140,7 +233,6 @@ struct HorizonCalendarView: UIViewRepresentable {
         }
 
         private func extractDayNumber(from view: UIView) -> Int? {
-            // Walk up view hierarchy to find a label with a day number
             var current: UIView? = view
             while let v = current {
                 if let label = v as? UILabel, let num = Int(label.text ?? "") {
@@ -164,9 +256,7 @@ struct HorizonCalendarView: UIViewRepresentable {
 /// Conforms to CalendarItemViewRepresentable (HorizonCalendar 1.x requirement).
 final class MiniDayCellView: UIView, CalendarItemViewRepresentable {
 
-    struct InvariantViewProperties: Hashable {
-        // No invariant properties needed — cell content always updatable
-    }
+    struct InvariantViewProperties: Hashable {}
 
     struct ViewModel: Equatable {
         let dayNumber: Int
@@ -252,6 +342,8 @@ final class MiniDayCellView: UIView, CalendarItemViewRepresentable {
         view.dotView.backgroundColor = viewModel.isSelected ? .white.withAlphaComponent(0.8) : .systemBlue
     }
 }
+
+#endif
 
 #Preview {
     MiniMonthView(viewModel: CalendarViewModel())

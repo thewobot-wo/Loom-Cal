@@ -86,7 +86,9 @@ struct EventCreationView: View {
                 }
             }
             .navigationTitle("New Event")
+            #if !os(macOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
