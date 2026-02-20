@@ -78,7 +78,7 @@ export const upsertAll = internalMutation({
       // actual Supabase schema is confirmed (e.g., row.id or row.supabase_id).
       const existing = await ctx.db
         .query("studio_events")
-        .filter((q) => q.eq(q.field("title"), row.title))
+        .filter((q) => q.eq(q.field("title"), row.title as string))
         .first();
 
       const now = BigInt(Date.now());
