@@ -2,8 +2,12 @@ node_modules/
 .env.local
 dist/
 
-# Convex auto-generated files (created by `npx convex dev`)
-# The stub files in _generated/ are committed for local TypeScript checking.
-# Real generated files will overwrite them on first `npx convex dev` run.
-convex/_generated/*.js
-convex/_generated/*.d.ts
+# Convex auto-generated files (recreated by `npx convex dev`)
+convex/_generated/
+
+# macOS
+.DS_Store
+
+# Xcode user data
+*.xcuserstate
+xcuserdata/
