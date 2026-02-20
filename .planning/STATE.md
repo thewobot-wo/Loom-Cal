@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 2 of 8 (Calendar Views)
-Plan: 2 of 3 in current phase
-Status: In Progress — Plan 02 complete; event CRUD UI built (NLEventParser, EventCreationView, EventDetailView, EventEditView)
-Last activity: 2026-02-20 — Plan 02-02 complete; full event CRUD UI: NL parser, creation sheet, detail sheet, edit form, delete with confirmation
+Plan: 3 of 3 in current phase (PAUSED at checkpoint — awaiting human verification)
+Status: In Progress — Plan 03 Task 1 complete (adc295c); paused at checkpoint:human-verify (Task 2)
+Last activity: 2026-02-20 — Plan 02-03 Task 1 complete; WeekTimelineView, full ContentView, LoomEvent Identifiable, drag-to-move; awaiting user verification in simulator
 
 Progress: [█████░░░░░] 25%
 
@@ -63,6 +63,9 @@ Recent decisions affecting current work:
 - [Phase 02-calendar-views]: ConvexMobile mutation args require [String: ConvexEncodable?] not [String: Any] — explicit type annotation required
 - [Plan 02-02]: EventEditView passes @Binding isDetailPresented to parent EventDetailView — sets both false on successful save to auto-dismiss the full event sheet chain
 - [Plan 02-02]: NL parsing fires on .onSubmit (not onChange debounce) — simpler, avoids parsing on every keystroke
+- [Plan 02-03]: LoomEvent Identifiable via computed var id: String { _id } — avoids CodingKeys issues with @ConvexInt wrapper properties
+- [Plan 02-03]: Swipe navigation uses abs(xDelta) > abs(yDelta) disambiguation — prevents day navigation during vertical timeline scroll
+- [Plan 02-03]: WeekTimelineView narrow column threshold 60pt — below that, colored bar only (no text)
 
 ### Pending Todos
 
@@ -80,5 +83,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Plan 02-02 complete — event CRUD UI done; NLEventParser, EventCreationView, EventDetailView, EventEditView all compile; CALV-03/04/05 requirements complete
-Resume file: .planning/phases/02-calendar-views/02-03-PLAN.md (next: week view)
+Stopped at: Plan 02-03 Task 1 complete (adc295c) — paused at checkpoint:human-verify; WeekTimelineView, full ContentView replacement, LoomEvent Identifiable, drag-to-move all built and compiled; user must verify in Xcode simulator
+Resume file: .planning/phases/02-calendar-views/02-03-PLAN.md (Task 2 — human verification; type "approved" to complete Phase 2)
