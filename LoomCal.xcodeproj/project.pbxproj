@@ -17,6 +17,13 @@
 		90962D61D8C74D34997ED517 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A616D88800F4FFA9AF9F693 /* Assets.xcassets */; };
 		9AEEEFCA556F480DB9918D32 /* ConvexMobile in Frameworks */ = {isa = PBXBuildFile; productRef = 0E4E9BFFC7444A7D9D90AF8B /* ConvexMobile */; };
 		D915E861CA664BE082311BC5 /* LoomEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CD0C89A47E94DE0B14FEC60 /* LoomEvent.swift */; };
+		F1A2B3C4D5E6F70123456701 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456700 /* CalendarViewModel.swift */; };
+		F1A2B3C4D5E6F70123456703 /* HorizonCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = F1A2B3C4D5E6F70123456702 /* HorizonCalendar */; };
+		F1A2B3C4D5E6F70123456711 /* MiniMonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456710 /* MiniMonthView.swift */; };
+		F1A2B3C4D5E6F70123456713 /* DayTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456712 /* DayTimelineView.swift */; };
+		F1A2B3C4D5E6F70123456715 /* TimelineEventCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456714 /* TimelineEventCard.swift */; };
+		F1A2B3C4D5E6F70123456717 /* NowIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456716 /* NowIndicatorView.swift */; };
+		F1A2B3C4D5E6F70123456719 /* AllDayBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456718 /* AllDayBannerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +39,12 @@
 		982B51ED173A420B81002FD8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		CF164E410628480EB1EB0286 /* LoomCalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoomCalApp.swift; sourceTree = "<group>"; };
 		DFFBADEB5C554067AEADFE73 /* LoomCal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoomCal.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1A2B3C4D5E6F70123456700 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
+		F1A2B3C4D5E6F70123456710 /* MiniMonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMonthView.swift; sourceTree = "<group>"; };
+		F1A2B3C4D5E6F70123456712 /* DayTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimelineView.swift; sourceTree = "<group>"; };
+		F1A2B3C4D5E6F70123456714 /* TimelineEventCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEventCard.swift; sourceTree = "<group>"; };
+		F1A2B3C4D5E6F70123456716 /* NowIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowIndicatorView.swift; sourceTree = "<group>"; };
+		F1A2B3C4D5E6F70123456718 /* AllDayBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllDayBannerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -40,6 +53,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9AEEEFCA556F480DB9918D32 /* ConvexMobile in Frameworks */,
+				F1A2B3C4D5E6F70123456703 /* HorizonCalendar in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -67,6 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				982B51ED173A420B81002FD8 /* ContentView.swift */,
+				F1A2B3C4D5E6F70123456720 /* Calendar */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -76,6 +91,7 @@
 			children = (
 				17E8C3EF5A47488EAD08C5F5 /* App */,
 				D1B0C0701BE6422F9F7574B3 /* Models */,
+				F1A2B3C4D5E6F70123456730 /* ViewModels */,
 				27A6C047C20C4A11BFB6585F /* Views */,
 				0224D9F38C3B4A25A684F1CD /* Services */,
 				8A616D88800F4FFA9AF9F693 /* Assets.xcassets */,
@@ -104,6 +120,26 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		F1A2B3C4D5E6F70123456720 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				F1A2B3C4D5E6F70123456710 /* MiniMonthView.swift */,
+				F1A2B3C4D5E6F70123456712 /* DayTimelineView.swift */,
+				F1A2B3C4D5E6F70123456714 /* TimelineEventCard.swift */,
+				F1A2B3C4D5E6F70123456716 /* NowIndicatorView.swift */,
+				F1A2B3C4D5E6F70123456718 /* AllDayBannerView.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+		F1A2B3C4D5E6F70123456730 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				F1A2B3C4D5E6F70123456700 /* CalendarViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
 		FF610BD8E24B484B9ADAF5AD /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -130,6 +166,7 @@
 			name = LoomCal;
 			packageProductDependencies = (
 				0E4E9BFFC7444A7D9D90AF8B /* ConvexMobile */,
+				F1A2B3C4D5E6F70123456702 /* HorizonCalendar */,
 			);
 			productName = LoomCal;
 			productReference = DFFBADEB5C554067AEADFE73 /* LoomCal.app */;
@@ -161,6 +198,7 @@
 			mainGroup = 90452C32DF9145C7B94D5C0A;
 			packageReferences = (
 				AB3EFF0D88864AC1995F8B06 /* XCRemoteSwiftPackageReference "convex-swift" */,
+				F1A2B3C4D5E6F70123456704 /* XCRemoteSwiftPackageReference "HorizonCalendar" */,
 			);
 			productRefGroup = FF610BD8E24B484B9ADAF5AD /* Products */;
 			projectDirPath = "";
@@ -195,6 +233,12 @@
 				12FA6D2EF6D946E3AB7D3D0F /* StudioEvent.swift in Sources */,
 				862F350F167445A7959E9E7C /* ContentView.swift in Sources */,
 				A1B2C3D4E5F601234567890A /* EventKitService.swift in Sources */,
+				F1A2B3C4D5E6F70123456701 /* CalendarViewModel.swift in Sources */,
+				F1A2B3C4D5E6F70123456711 /* MiniMonthView.swift in Sources */,
+				F1A2B3C4D5E6F70123456713 /* DayTimelineView.swift in Sources */,
+				F1A2B3C4D5E6F70123456715 /* TimelineEventCard.swift in Sources */,
+				F1A2B3C4D5E6F70123456717 /* NowIndicatorView.swift in Sources */,
+				F1A2B3C4D5E6F70123456719 /* AllDayBannerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -396,6 +440,14 @@
 				minimumVersion = 0.4.0;
 			};
 		};
+		F1A2B3C4D5E6F70123456704 /* XCRemoteSwiftPackageReference "HorizonCalendar" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/HorizonCalendar.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.11.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -403,6 +455,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AB3EFF0D88864AC1995F8B06 /* XCRemoteSwiftPackageReference "convex-swift" */;
 			productName = ConvexMobile;
+		};
+		F1A2B3C4D5E6F70123456702 /* HorizonCalendar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1A2B3C4D5E6F70123456704 /* XCRemoteSwiftPackageReference "HorizonCalendar" */;
+			productName = HorizonCalendar;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
