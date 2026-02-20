@@ -8,10 +8,9 @@ struct DayTimelineView: View {
     let events: [LoomEvent]
     /// All-day events for this day — pre-filtered by CalendarViewModel
     let allDayEvents: [LoomEvent]
-    /// Callback when an event card is tapped (wired to detail sheet in Plan 02)
+    /// Callback when an event card is tapped
     var onEventTap: (LoomEvent) -> Void = { _ in }
     /// Callback when an event card is drag-moved. Receives (event, pointsDelta).
-    /// The parent (ContentView) converts pointsDelta to a time offset and calls updateEvent.
     var onEventDragMove: ((LoomEvent, CGFloat) -> Void)?
 
     // MARK: - Layout Constants
@@ -25,14 +24,17 @@ struct DayTimelineView: View {
 
     // MARK: - Scroll Position
 
-    /// iOS 18 ScrollPosition — used for auto-scroll to current time on appear
     @State private var scrollPosition = ScrollPosition(y: 0)
+
+    // MARK: - Width from parent
+
+    @State private var availableWidth: CGFloat = 0
 
     // MARK: - Time Formatter
 
     private static let hourFormatter: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "h a"   // "2 PM", "12 AM" — 12-hour per locked decision
+        f.dateFormat = "h a"
         return f
     }()
 
@@ -41,33 +43,40 @@ struct DayTimelineView: View {
             // All-day events banner (collapses to zero height when empty)
             AllDayBannerView(events: allDayEvents)
 
-            // Scrollable 24-hour timeline
-            ScrollView {
-                GeometryReader { geometry in
-                    let contentWidth = geometry.size.width - labelWidth
-
-                    ZStack(alignment: .topLeading) {
-                        // MARK: Hour grid lines + labels
-                        ForEach(0..<24, id: \.self) { hour in
-                            hourRow(hour: hour, contentWidth: contentWidth)
-                        }
-
-                        // MARK: Now indicator (updates every 60 seconds via TimelineView)
-                        nowIndicator(contentWidth: contentWidth)
-
-                        // MARK: Event cards (absolutely positioned)
-                        eventCards(contentWidth: contentWidth)
+            // Measure available width OUTSIDE the ScrollView
+            Color.clear
+                .frame(height: 0)
+                .background(
+                    GeometryReader { geo in
+                        Color.clear.preference(key: WidthPreferenceKey.self, value: geo.size.width)
                     }
-                    .frame(width: geometry.size.width, height: totalHeight)
+                )
+                .onPreferenceChange(WidthPreferenceKey.self) { width in
+                    availableWidth = width
                 }
-                .frame(height: totalHeight)
+
+            // Scrollable 24-hour timeline — no GeometryReader inside
+            ScrollView(.vertical) {
+                ZStack(alignment: .topLeading) {
+                    let contentWidth = max(availableWidth - labelWidth, 0)
+
+                    // Hour grid lines + labels
+                    ForEach(0..<24, id: \.self) { hour in
+                        hourRow(hour: hour, contentWidth: contentWidth)
+                    }
+
+                    // Now indicator (updates every 60 seconds via TimelineView)
+                    nowIndicator(contentWidth: contentWidth)
+
+                    // Event cards (absolutely positioned)
+                    eventCards(contentWidth: contentWidth)
+                }
+                .frame(width: availableWidth, height: totalHeight)
             }
             .scrollPosition($scrollPosition)
             .onAppear {
-                // Auto-scroll to current time, offset up so current hour isn't at top
                 let yOffset = max(0, currentTimeYOffset() - 100)
-                // Short delay allows the ScrollView layout to complete before scrolling
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     scrollPosition = ScrollPosition(y: yOffset)
                 }
             }
@@ -86,7 +95,7 @@ struct DayTimelineView: View {
             .foregroundStyle(.secondary)
             .frame(width: labelWidth, alignment: .trailing)
             .padding(.trailing, 6)
-            .offset(y: yOffset - 7)   // center label on the line
+            .offset(y: yOffset - 7)
 
         // Grid line
         Rectangle()
@@ -144,13 +153,9 @@ struct DayTimelineView: View {
     }
 
     /// Greedy column-assignment algorithm for overlapping events.
-    /// Events that overlap in time are placed side-by-side in columns.
-    /// Width is divided equally across the number of columns in each overlap group.
     private func computeLayout(for events: [LoomEvent], contentWidth: CGFloat) -> [EventLayoutItem] {
-        // Sort events by start time for greedy assignment
         let sorted = events.sorted { $0.start < $1.start }
 
-        // Track the end time of each column (in ms)
         var columnEnds: [Int] = []
         var assignments: [(event: LoomEvent, column: Int)] = []
 
@@ -158,25 +163,20 @@ struct DayTimelineView: View {
             let eventStart = event.start
             let eventEnd = event.start + event.duration * 60 * 1000
 
-            // Find first column where this event fits (doesn't overlap)
             if let col = columnEnds.firstIndex(where: { $0 <= eventStart }) {
                 columnEnds[col] = eventEnd
                 assignments.append((event: event, column: col))
             } else {
-                // Need a new column
                 let col = columnEnds.count
                 columnEnds.append(eventEnd)
                 assignments.append((event: event, column: col))
             }
         }
 
-        // Determine the total column count for each event's overlap group.
-        // Simple approach: count how many events overlap with each event.
         return assignments.map { item in
             let event = item.event
             let col = item.column
 
-            // Count columns occupied by events that overlap with this event
             let eventStart = event.start
             let eventEnd = event.start + event.duration * 60 * 1000
 
@@ -200,7 +200,7 @@ struct DayTimelineView: View {
                 yOffset: yOffset,
                 height: height,
                 xOffset: xOffset,
-                width: columnWidth - 2   // small gap between columns
+                width: columnWidth - 2
             )
         }
     }
@@ -224,13 +224,21 @@ struct DayTimelineView: View {
     }
 
     private func hourLabel(for hour: Int) -> String {
-        // Create a date with only hour set so formatter produces correct label
         var components = DateComponents()
         components.hour = hour
         components.minute = 0
         components.second = 0
         let date = Calendar.current.date(from: components) ?? Date()
         return Self.hourFormatter.string(from: date)
+    }
+}
+
+// MARK: - Width Preference Key
+
+private struct WidthPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 

@@ -72,37 +72,8 @@ struct ContentView: View {
                         )
                     }
                 }
-                // Swipe left/right to navigate days or weeks.
-                // Must use .simultaneousGesture so the ScrollView inside
-                // DayTimelineView can still handle vertical scrolling.
-                .simultaneousGesture(
-                    DragGesture(minimumDistance: 50)
-                        .onEnded { value in
-                            let xDelta = value.translation.width
-                            // Only handle clearly horizontal swipes — require 2:1 ratio
-                            guard abs(xDelta) > abs(value.translation.height) * 2 else { return }
-                            guard abs(xDelta) > 60 else { return }
-
-                            let daysToAdvance: Int = viewMode == .week ? 7 : 1
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                if xDelta < 0 {
-                                    // Swipe left — advance forward
-                                    viewModel.selectedDate = Calendar.current.date(
-                                        byAdding: .day,
-                                        value: daysToAdvance,
-                                        to: viewModel.selectedDate
-                                    ) ?? viewModel.selectedDate
-                                } else {
-                                    // Swipe right — go back
-                                    viewModel.selectedDate = Calendar.current.date(
-                                        byAdding: .day,
-                                        value: -daysToAdvance,
-                                        to: viewModel.selectedDate
-                                    ) ?? viewModel.selectedDate
-                                }
-                            }
-                        }
-                )
+                // Swipe navigation removed — was blocking ScrollView vertical scrolling.
+                // Navigate days/weeks via mini month taps or Today toolbar button.
             }
             .navigationTitle("Loom Cal")
             #if !os(macOS)
