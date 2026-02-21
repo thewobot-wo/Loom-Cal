@@ -234,11 +234,14 @@ struct WeekTimelineView: View {
     private func weekEventView(event: LoomEvent, columnWidth: CGFloat) -> some View {
         let yPos = yOffsetForStart(event.start)
         let eventHeight = max(CGFloat(event.duration) / 60.0 * pointsPerHour, 16)
+        let isTimeBlock = event.taskId != nil
+        let accentColor: Color = isTimeBlock ? Color.orange.opacity(0.8) : Color.blue
+        let bgColor: Color = isTimeBlock ? Color.orange.opacity(0.12) : Color.blue.opacity(0.12)
 
         Button(action: { onEventTap(event) }) {
             HStack(spacing: 0) {
                 RoundedRectangle(cornerRadius: 1)
-                    .fill(Color.blue)
+                    .fill(accentColor)
                     .frame(width: 2.5)
 
                 if columnWidth > 50 {
@@ -254,7 +257,7 @@ struct WeekTimelineView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(
                 RoundedRectangle(cornerRadius: 3)
-                    .fill(Color.blue.opacity(0.12))
+                    .fill(bgColor)
             )
         }
         .buttonStyle(.plain)

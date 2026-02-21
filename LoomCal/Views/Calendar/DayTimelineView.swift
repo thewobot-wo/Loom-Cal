@@ -114,6 +114,7 @@ struct DayTimelineView: View {
         ForEach(layoutEvents, id: \.event._id) { item in
             TimelineEventCard(
                 event: item.event,
+                isTimeBlock: item.event.taskId != nil,
                 onTap: { onEventTap(item.event) },
                 onDragMove: { delta in
                     onEventDragMove?(item.event, delta)
