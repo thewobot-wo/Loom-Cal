@@ -51,4 +51,46 @@ http.route({
   }),
 });
 
+/**
+ * GET /pending-messages
+ *
+ * Returns the last 50 messages if the most recent message is from a user
+ * (meaning Loom hasn't replied yet). Returns empty array otherwise.
+ * Used by the bridge script to detect when Loom needs to respond.
+ *
+ * Optional auth: Bearer token matching LOOM_WEBHOOK_SECRET env var.
+ */
+http.route({
+  path: "/pending-messages",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const secret = process.env.LOOM_WEBHOOK_SECRET;
+    if (secret) {
+      const auth = request.headers.get("Authorization");
+      if (auth !== `Bearer ${secret}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+    }
+
+    const messages = await ctx.runQuery(internal.chatMessages.listForLoom, {});
+
+    // Only return messages if the last one is from a user (needs reply)
+    if (messages.length === 0 || messages[messages.length - 1].role !== "user") {
+      return new Response(JSON.stringify({ pending: false, messages: [] }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({
+      pending: true,
+      messages: messages.map((m: { role: string; content: string }) => ({
+        role: m.role,
+        content: m.content,
+      })),
+    }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
 export default http;
