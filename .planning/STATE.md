@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 3 of 8 (Task System)
-Plan: 2 of 4 in current phase — COMPLETE
-Status: Phase 3 in progress — plan 03-02 executed (task CRUD UI: TaskRowView, TaskCreationView, TaskDetailView)
-Last activity: 2026-02-21 — Plan 03-02 complete (4 min)
+Plan: 3 of 4 in current phase — COMPLETE
+Status: Phase 3 in progress — plan 03-03 executed (TodayView, ContentView Today mode, WeekTimelineView task dots)
+Last activity: 2026-02-21 — Plan 03-03 complete (5 min)
 
-Progress: [████░░░░░░] 35%
+Progress: [████░░░░░░] 38%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 6 min
-- Total execution time: 0.72 hours
+- Total plans completed: 8
+- Average duration: 5.75 min
+- Total execution time: 0.77 hours
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [████░░░░░░] 35%
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 15 min | 5 min |
 | 02-calendar-views | 3 | 25 min | 8 min |
-| 03-task-system | 2 | 7 min | 3.5 min |
+| 03-task-system | 3 | 12 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (~15 min incl. post-checkpoint fixes), 03-01 (3 min), 03-02 (4 min)
-- Trend: 3-7 min per plan; UI view plans slightly longer than schema/model plans
+- Last 5 plans: 03-01 (3 min), 03-02 (4 min), 03-03 (5 min)
+- Trend: 3-5 min per plan; consistent velocity
 
 *Updated after each plan completion*
 
@@ -77,6 +77,8 @@ Recent decisions affecting current work:
 - [Plan 03-02]: TaskRowView uses .buttonStyle(.plain) on completion circle — prevents row-tap interference
 - [Plan 03-02]: TaskDetailView saveChanges uses explicit Color.secondary/Color.blue to avoid HierarchicalShapeStyle ambiguity
 - [Plan 03-02]: hasDueDate=false→dueDate=nil; hasDueDate+!hasDueTime→Calendar.startOfDay — consistent with TaskViewModel date filtering
+- [Phase 03]: TodayView uses TimelineItem enum for type-erased event+task interleaving in ZStack timeline
+- [Phase 03]: Toolbar + button upgraded to Menu (New Event / New Task) — single entry point for both creation flows
 
 ### Pending Todos
 
@@ -94,5 +96,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Phase 3 plan 03-02 complete — TaskRowView, TaskCreationView, TaskDetailView created and building
-Resume file: Continue Phase 3 — run plan 03-03 (TodayView task list integration)
+Stopped at: Phase 3 plan 03-03 complete — TodayView, ContentView Today mode, WeekTimelineView task dots building
+Resume file: Continue Phase 3 — run plan 03-04 (task filtering/sorting)

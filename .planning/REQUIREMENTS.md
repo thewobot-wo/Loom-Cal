@@ -23,7 +23,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **TASK-04**: User can delete tasks
 - [x] **TASK-05**: Task due dates appear as markers on calendar views
 - [x] **TASK-06**: User can drag a task onto a calendar slot to time-block it
-- [ ] **TASK-07**: Today view shows current-day events and tasks due today
+- [x] **TASK-07**: Today view shows current-day events and tasks due today
 
 ### Loom AI
 
@@ -110,7 +110,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TASK-04 | Phase 3 | Complete |
 | TASK-05 | Phase 3 | Complete |
 | TASK-06 | Phase 3 | Complete |
-| TASK-07 | Phase 3 | Pending |
+| TASK-07 | Phase 3 | Complete |
 | LOOM-01 | Phase 4 | Pending |
 | LOOM-02 | Phase 4 | Pending |
 | LOOM-03 | Phase 4 | Pending |
