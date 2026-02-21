@@ -3,27 +3,30 @@ import SwiftUI
 // MARK: - ViewMode
 
 enum ViewMode: String, CaseIterable {
-    case day = "Day"
+    case today = "Today"   // unified event+task timeline (replaces .day)
     case week = "Week"
 }
 
 // MARK: - ContentView
 
 /// Main app view — Morgen-inspired layout:
-/// - Day mode: mini month at top + day timeline below
+/// - Today mode: mini month at top + unified event+task timeline below
 /// - Week mode: week header row replaces mini month, week timeline fills remaining space
 struct ContentView: View {
     @StateObject private var viewModel = CalendarViewModel()
+    @StateObject private var taskViewModel = TaskViewModel()
 
-    @State private var viewMode: ViewMode = .day
+    @State private var viewMode: ViewMode = .today
     @State private var showCreateSheet = false
+    @State private var showTaskCreateSheet = false
     @State private var selectedEvent: LoomEvent? = nil
+    @State private var selectedTask: LoomTask? = nil
     @State private var createPrefilledDate: Date? = nil
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Segmented Day/Week control
+                // Segmented Today/Week control
                 Picker("View", selection: $viewMode) {
                     ForEach(ViewMode.allCases, id: \.self) { mode in
                         Text(mode.rawValue).tag(mode)
@@ -33,9 +36,9 @@ struct ContentView: View {
                 .padding(.horizontal)
                 .padding(.vertical, 6)
 
-                // Day mode: show mini month for date picking
+                // Today mode: show mini month for date picking
                 // Week mode: mini month hidden — week header is the navigation
-                if viewMode == .day {
+                if viewMode == .today {
                     MiniMonthView(
                         viewModel: viewModel,
                         onDateLongPress: { date in
@@ -48,11 +51,12 @@ struct ContentView: View {
 
                 // Timeline
                 switch viewMode {
-                case .day:
-                    DayTimelineView(
-                        events: viewModel.timedEvents(for: viewModel.selectedDate),
-                        allDayEvents: viewModel.allDayEvents(for: viewModel.selectedDate),
+                case .today:
+                    TodayView(
+                        calendarViewModel: viewModel,
+                        taskViewModel: taskViewModel,
                         onEventTap: { event in selectedEvent = event },
+                        onTaskTap: { task in selectedTask = task },
                         onEventDragMove: { event, pointsDelta in
                             handleDragMove(event: event, pointsDelta: pointsDelta)
                         }
@@ -60,6 +64,7 @@ struct ContentView: View {
                 case .week:
                     WeekTimelineView(
                         viewModel: viewModel,
+                        taskViewModel: taskViewModel,
                         onEventTap: { event in selectedEvent = event }
                     )
                 }
@@ -70,7 +75,18 @@ struct ContentView: View {
             #endif
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button(action: { showCreateSheet = true }) {
+                    Menu {
+                        Button {
+                            showCreateSheet = true
+                        } label: {
+                            Label("New Event", systemImage: "calendar.badge.plus")
+                        }
+                        Button {
+                            showTaskCreateSheet = true
+                        } label: {
+                            Label("New Task", systemImage: "checkmark.circle")
+                        }
+                    } label: {
                         Image(systemName: "plus")
                     }
                 }
@@ -85,12 +101,19 @@ struct ContentView: View {
         }
         .task {
             viewModel.startSubscription()
+            taskViewModel.startSubscription()
         }
         .sheet(isPresented: $showCreateSheet) {
             EventCreationView(
                 viewModel: viewModel,
                 isPresented: $showCreateSheet,
                 prefilledDate: createPrefilledDate
+            )
+        }
+        .sheet(isPresented: $showTaskCreateSheet) {
+            TaskCreationView(
+                taskViewModel: taskViewModel,
+                isPresented: $showTaskCreateSheet
             )
         }
         .sheet(item: $selectedEvent) { event in
@@ -100,6 +123,16 @@ struct ContentView: View {
                 isPresented: .init(
                     get: { selectedEvent != nil },
                     set: { if !$0 { selectedEvent = nil } }
+                )
+            )
+        }
+        .sheet(item: $selectedTask) { task in
+            TaskDetailView(
+                task: task,
+                taskViewModel: taskViewModel,
+                isPresented: .init(
+                    get: { selectedTask != nil },
+                    set: { if !$0 { selectedTask = nil } }
                 )
             )
         }

@@ -5,6 +5,7 @@ import SwiftUI
 /// Mini month is hidden in week mode to maximize timeline space.
 struct WeekTimelineView: View {
     @ObservedObject var viewModel: CalendarViewModel
+    @ObservedObject var taskViewModel: TaskViewModel
     var onEventTap: (LoomEvent) -> Void = { _ in }
 
     // MARK: - Layout Constants
@@ -268,5 +269,5 @@ struct WeekTimelineView: View {
 }
 
 #Preview {
-    WeekTimelineView(viewModel: CalendarViewModel())
+    WeekTimelineView(viewModel: CalendarViewModel(), taskViewModel: TaskViewModel())
 }

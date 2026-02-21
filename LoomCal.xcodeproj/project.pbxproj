@@ -33,6 +33,7 @@
 		T1A2B3C4D5E6F70123456801 /* TaskRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1A2B3C4D5E6F70123456800 /* TaskRowView.swift */; };
 		T1A2B3C4D5E6F70123456803 /* TaskCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1A2B3C4D5E6F70123456802 /* TaskCreationView.swift */; };
 		T1A2B3C4D5E6F70123456805 /* TaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1A2B3C4D5E6F70123456804 /* TaskDetailView.swift */; };
+		T3A4B5C6D7E8F90345678901 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = T3A4B5C6D7E8F90345678900 /* TodayView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +64,7 @@
 		T1A2B3C4D5E6F70123456800 /* TaskRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowView.swift; sourceTree = "<group>"; };
 		T1A2B3C4D5E6F70123456802 /* TaskCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCreationView.swift; sourceTree = "<group>"; };
 		T1A2B3C4D5E6F70123456804 /* TaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailView.swift; sourceTree = "<group>"; };
+		T3A4B5C6D7E8F90345678900 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +105,7 @@
 				F1A2B3C4D5E6F70123456720 /* Calendar */,
 				F2A3B4C5D6E7F80234567810 /* Events */,
 				T1A2B3C4D5E6F70123456810 /* Tasks */,
+				T3A4B5C6D7E8F90345678910 /* Today */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -172,6 +175,14 @@
 				T1A2B3C4D5E6F70123456804 /* TaskDetailView.swift */,
 			);
 			path = Tasks;
+			sourceTree = "<group>";
+		};
+		T3A4B5C6D7E8F90345678910 /* Today */ = {
+			isa = PBXGroup;
+			children = (
+				T3A4B5C6D7E8F90345678900 /* TodayView.swift */,
+			);
+			path = Today;
 			sourceTree = "<group>";
 		};
 		F1A2B3C4D5E6F70123456730 /* ViewModels */ = {
@@ -291,6 +302,7 @@
 				T1A2B3C4D5E6F70123456801 /* TaskRowView.swift in Sources */,
 				T1A2B3C4D5E6F70123456803 /* TaskCreationView.swift in Sources */,
 				T1A2B3C4D5E6F70123456805 /* TaskDetailView.swift in Sources */,
+				T3A4B5C6D7E8F90345678901 /* TodayView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
