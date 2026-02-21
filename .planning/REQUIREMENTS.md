@@ -19,8 +19,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **TASK-01**: User can create tasks with title, due date, and priority
 - [x] **TASK-02**: User can edit task details
-- [ ] **TASK-03**: User can mark tasks as complete
-- [ ] **TASK-04**: User can delete tasks
+- [x] **TASK-03**: User can mark tasks as complete
+- [x] **TASK-04**: User can delete tasks
 - [x] **TASK-05**: Task due dates appear as markers on calendar views
 - [x] **TASK-06**: User can drag a task onto a calendar slot to time-block it
 - [ ] **TASK-07**: Today view shows current-day events and tasks due today
@@ -106,8 +106,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CALV-05 | Phase 2 | Complete |
 | TASK-01 | Phase 3 | Complete |
 | TASK-02 | Phase 3 | Complete |
-| TASK-03 | Phase 3 | Pending |
-| TASK-04 | Phase 3 | Pending |
+| TASK-03 | Phase 3 | Complete |
+| TASK-04 | Phase 3 | Complete |
 | TASK-05 | Phase 3 | Complete |
 | TASK-06 | Phase 3 | Complete |
 | TASK-07 | Phase 3 | Pending |

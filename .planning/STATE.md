@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 3 of 8 (Task System)
-Plan: 1 of 4 in current phase — COMPLETE
-Status: Phase 3 in progress — plan 03-01 executed (schema + models + TaskViewModel)
-Last activity: 2026-02-21 — Plan 03-01 complete (3 min)
+Plan: 2 of 4 in current phase — COMPLETE
+Status: Phase 3 in progress — plan 03-02 executed (task CRUD UI: TaskRowView, TaskCreationView, TaskDetailView)
+Last activity: 2026-02-21 — Plan 03-02 complete (4 min)
 
-Progress: [███░░░░░░░] 30%
+Progress: [████░░░░░░] 35%
 
 ## Performance Metrics
 
@@ -29,11 +29,11 @@ Progress: [███░░░░░░░] 30%
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 15 min | 5 min |
 | 02-calendar-views | 3 | 25 min | 8 min |
-| 03-task-system | 1 | 3 min | 3 min |
+| 03-task-system | 2 | 7 min | 3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (4 min), 02-03 (~15 min incl. post-checkpoint fixes), 03-01 (3 min)
-- Trend: 3-7 min per plan; schema/model plans are fastest
+- Last 5 plans: 02-03 (~15 min incl. post-checkpoint fixes), 03-01 (3 min), 03-02 (4 min)
+- Trend: 3-7 min per plan; UI view plans slightly longer than schema/model plans
 
 *Updated after each plan completion*
 
@@ -74,6 +74,9 @@ Recent decisions affecting current work:
 - [Plan 03-01]: hasDueTime:boolean separates date-only tasks from time-specific tasks within same dueDate field
 - [Plan 03-01]: taskId on events table links time-blocked calendar events back to source task
 - [Plan 03-01]: LoomTask.Identifiable via computed var id: String { _id } — matches LoomEvent pattern
+- [Plan 03-02]: TaskRowView uses .buttonStyle(.plain) on completion circle — prevents row-tap interference
+- [Plan 03-02]: TaskDetailView saveChanges uses explicit Color.secondary/Color.blue to avoid HierarchicalShapeStyle ambiguity
+- [Plan 03-02]: hasDueDate=false→dueDate=nil; hasDueDate+!hasDueTime→Calendar.startOfDay — consistent with TaskViewModel date filtering
 
 ### Pending Todos
 
@@ -91,5 +94,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Phase 3 plan 03-01 complete — Convex schema migrated, Swift models updated, TaskViewModel created
-Resume file: Continue Phase 3 — run plan 03-02 (task list view)
+Stopped at: Phase 3 plan 03-02 complete — TaskRowView, TaskCreationView, TaskDetailView created and building
+Resume file: Continue Phase 3 — run plan 03-03 (TodayView task list integration)
