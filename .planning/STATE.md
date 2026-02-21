@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** One app where you see everything on your plate — calendars, tasks, projects — and chat with Loom to actively manage your day.
-**Current focus:** Phase 4 — Loom Chat (1 of 3 plans complete)
+**Current focus:** Phase 4 — Loom Chat (2 of 3 plans complete)
 
 ## Current Position
 
 Phase: 4 of 8 (Loom Chat)
-Plan: 1 of 3 in current phase — COMPLETE
-Status: Phase 4 Plan 1 COMPLETE — Convex AI reply pipeline (internalAction + Anthropic SDK) and ChatViewModel (subscription, send, timeout, offline) built and verified
-Last activity: 2026-02-21 — Plan 04-01 complete (3 min)
+Plan: 2 of 3 in current phase — COMPLETE
+Status: Phase 4 Plan 2 COMPLETE — Five Chat UI views (ChatView, ChatBubbleView, TypingIndicatorView, ChatInputBar, SuggestionChipsView) built with swift-markdown-ui; BUILD SUCCEEDED
+Last activity: 2026-02-21 — Plan 04-02 complete (6 min)
 
-Progress: [█████░░░░░] 47%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: 5.4 min
-- Total execution time: 0.90 hours
+- Total execution time: 0.95 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [█████░░░░░] 47%
 | 02-calendar-views | 3 | 25 min | 8 min |
 | 03-task-system | 4 | 17 min | 4.25 min |
 | 03.1-audit-gap-closure | 1 | 3 min | 3 min |
-| 04-loom-chat | 1 | 3 min | 3 min |
+| 04-loom-chat | 2 | 9 min | 4.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-03 (5 min), 03-04 (5 min), 03.1-01 (3 min), 04-01 (3 min)
-- Trend: 3-5 min per plan; consistent velocity
+- Last 5 plans: 03-04 (5 min), 03.1-01 (3 min), 04-01 (3 min), 04-02 (6 min)
+- Trend: 3-6 min per plan; consistent velocity
 
 *Updated after each plan completion*
 
@@ -91,6 +91,10 @@ Recent decisions affecting current work:
 - [Plan 04-01]: listForAI takes last 50 messages — safety guard against unbounded context; Phase 6+ for smarter trimming
 - [Plan 04-01]: 8-second Task.sleep timeout with cancellation — no DispatchQueue, pure Swift concurrency
 - [Plan 04-01]: pendingMessageContent tracks content string not DB ID — optimistic update before subscription delivers real document
+- [Phase 04-02]: swift-markdown-ui 2.0.0+ added via pbxproj SPM — MarkdownUI renders in Loom bubbles only
+- [Phase 04-02]: @ObservedObject for ChatViewModel in ChatView — owned at ContentView level, passed down to prevent state reset on tab switch
+- [Phase 04-02]: FlowLayout custom Layout protocol for chip wrapping — pure SwiftUI, no UIKit
+- [Phase 04-02]: 5-minute gap threshold for message grouping with today/yesterday/date formatting
 
 ### Pending Todos
 
@@ -110,5 +114,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Phase 4 plan 04-01 complete — AI reply pipeline and ChatViewModel built; TypeScript and Swift both build clean
-Resume file: Continue to Phase 4 Plan 2 — Chat UI views (ChatView, message bubbles, input bar, retry bubble)
+Stopped at: Phase 4 plan 04-02 complete — Chat UI views built (ChatView, ChatBubbleView, TypingIndicatorView, ChatInputBar, SuggestionChipsView); swift-markdown-ui added; BUILD SUCCEEDED
+Resume file: Continue to Phase 4 Plan 3 — integrate ChatView into ContentView TabView
