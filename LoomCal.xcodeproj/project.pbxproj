@@ -9,6 +9,13 @@
 /* Begin PBXBuildFile section */
 		12FA6D2EF6D946E3AB7D3D0F /* StudioEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D11F15AA89546D588127322 /* StudioEvent.swift */; };
 		1965BEB40C25491DB960F4F2 /* ConvexEnv.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAC04D985614080945480C4 /* ConvexEnv.swift */; };
+		C4001A00000000000000AA01 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000AA01 /* ChatViewModel.swift */; };
+		C4001A00000000000000BB01 /* ChatBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB01 /* ChatBubbleView.swift */; };
+		C4001A00000000000000BB02 /* TypingIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB02 /* TypingIndicatorView.swift */; };
+		C4001A00000000000000BB03 /* SuggestionChipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB03 /* SuggestionChipsView.swift */; };
+		C4001A00000000000000BB04 /* ChatInputBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB04 /* ChatInputBar.swift */; };
+		C4001A00000000000000BB05 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB05 /* ChatView.swift */; };
+		C4001A00000000000000CC01 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = C4001D00000000000000CC01 /* MarkdownUI */; };
 		A1B2C3D4E5F601234567890A /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F601234567890B /* EventKitService.swift */; };
 		F2A3B4C5D6E7F80234567800 /* NLEventParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A3B4C5D6E7F80234567801 /* NLEventParser.swift */; };
 		F2A3B4C5D6E7F80234567802 /* EventCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A3B4C5D6E7F80234567803 /* EventCreationView.swift */; };
@@ -38,6 +45,12 @@
 
 /* Begin PBXFileReference section */
 		18E08922E37743DA92C7B62F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C4001B00000000000000AA01 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
+		C4001B00000000000000BB01 /* ChatBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubbleView.swift; sourceTree = "<group>"; };
+		C4001B00000000000000BB02 /* TypingIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicatorView.swift; sourceTree = "<group>"; };
+		C4001B00000000000000BB03 /* SuggestionChipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionChipsView.swift; sourceTree = "<group>"; };
+		C4001B00000000000000BB04 /* ChatInputBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInputBar.swift; sourceTree = "<group>"; };
+		C4001B00000000000000BB05 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F601234567890B /* EventKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitService.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F601234567890C /* LoomCal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LoomCal.entitlements; sourceTree = "<group>"; };
 		1EAC04D985614080945480C4 /* ConvexEnv.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvexEnv.swift; sourceTree = "<group>"; };
@@ -74,6 +87,7 @@
 			files = (
 				9AEEEFCA556F480DB9918D32 /* ConvexMobile in Frameworks */,
 				F1A2B3C4D5E6F70123456703 /* HorizonCalendar in Frameworks */,
+				C4001A00000000000000CC01 /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,8 +120,21 @@
 				F2A3B4C5D6E7F80234567810 /* Events */,
 				T1A2B3C4D5E6F70123456810 /* Tasks */,
 				T3A4B5C6D7E8F90345678910 /* Today */,
+				C4001E00000000000000DD01 /* Chat */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		C4001E00000000000000DD01 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				C4001B00000000000000BB01 /* ChatBubbleView.swift */,
+				C4001B00000000000000BB02 /* TypingIndicatorView.swift */,
+				C4001B00000000000000BB03 /* SuggestionChipsView.swift */,
+				C4001B00000000000000BB04 /* ChatInputBar.swift */,
+				C4001B00000000000000BB05 /* ChatView.swift */,
+			);
+			path = Chat;
 			sourceTree = "<group>";
 		};
 		394E7A8823514523A58E4E9E /* LoomCal */ = {
@@ -190,6 +217,7 @@
 			children = (
 				F1A2B3C4D5E6F70123456700 /* CalendarViewModel.swift */,
 				F4A5B6C7D8E9F00345678900 /* TaskViewModel.swift */,
+				C4001B00000000000000AA01 /* ChatViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -221,6 +249,7 @@
 			packageProductDependencies = (
 				0E4E9BFFC7444A7D9D90AF8B /* ConvexMobile */,
 				F1A2B3C4D5E6F70123456702 /* HorizonCalendar */,
+				C4001D00000000000000CC01 /* MarkdownUI */,
 			);
 			productName = LoomCal;
 			productReference = DFFBADEB5C554067AEADFE73 /* LoomCal.app */;
@@ -253,6 +282,7 @@
 			packageReferences = (
 				AB3EFF0D88864AC1995F8B06 /* XCRemoteSwiftPackageReference "convex-swift" */,
 				F1A2B3C4D5E6F70123456704 /* XCRemoteSwiftPackageReference "HorizonCalendar" */,
+				C4001C00000000000000CC01 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
 			productRefGroup = FF610BD8E24B484B9ADAF5AD /* Products */;
 			projectDirPath = "";
@@ -289,6 +319,7 @@
 				A1B2C3D4E5F601234567890A /* EventKitService.swift in Sources */,
 				F1A2B3C4D5E6F70123456701 /* CalendarViewModel.swift in Sources */,
 				F4A5B6C7D8E9F00345678901 /* TaskViewModel.swift in Sources */,
+				C4001A00000000000000AA01 /* ChatViewModel.swift in Sources */,
 				F1A2B3C4D5E6F70123456711 /* MiniMonthView.swift in Sources */,
 				F1A2B3C4D5E6F70123456713 /* DayTimelineView.swift in Sources */,
 				F1A2B3C4D5E6F70123456715 /* TimelineEventCard.swift in Sources */,
@@ -303,6 +334,11 @@
 				T1A2B3C4D5E6F70123456803 /* TaskCreationView.swift in Sources */,
 				T1A2B3C4D5E6F70123456805 /* TaskDetailView.swift in Sources */,
 				T3A4B5C6D7E8F90345678901 /* TodayView.swift in Sources */,
+				C4001A00000000000000BB01 /* ChatBubbleView.swift in Sources */,
+				C4001A00000000000000BB02 /* TypingIndicatorView.swift in Sources */,
+				C4001A00000000000000BB03 /* SuggestionChipsView.swift in Sources */,
+				C4001A00000000000000BB04 /* ChatInputBar.swift in Sources */,
+				C4001A00000000000000BB05 /* ChatView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -512,6 +548,14 @@
 				minimumVersion = 1.11.0;
 			};
 		};
+		C4001C00000000000000CC01 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -524,6 +568,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F1A2B3C4D5E6F70123456704 /* XCRemoteSwiftPackageReference "HorizonCalendar" */;
 			productName = HorizonCalendar;
+		};
+		C4001D00000000000000CC01 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4001C00000000000000CC01 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
