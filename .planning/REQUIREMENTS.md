@@ -135,4 +135,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-20*
-*Last updated: 2026-02-20 after roadmap creation — all 28 requirements mapped*
+*Last updated: 2026-02-21 after Phase 3.1 audit gap closure — CALV-01 through CALV-05 and TASK-06 verified with complete evidence*

@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Convex schema, data model, real-time sync backbone, and source-of-truth ownership rules
 - [x] **Phase 2: Calendar Views** - Day and week calendar views with Convex-native event CRUD
 - [x] **Phase 3: Task System** - Full task CRUD, today view, task markers on calendar, and time-blocking (completed 2026-02-21)
-- [ ] **Phase 3.1: Audit Gap Closure** - Retroactive Phase 2 verification, CALV-02 doc fix, WeekView isTimeBlock fix (INSERTED)
+- [x] **Phase 3.1: Audit Gap Closure** - Retroactive Phase 2 verification, CALV-02 doc fix, WeekView isTimeBlock fix (INSERTED, completed 2026-02-21)
 - [ ] **Phase 4: Loom Chat** - In-app chat with Loom, message history, graceful offline degradation
 - [ ] **Phase 5: Loom Calendar and Task Actions** - Loom creates, edits, and deletes events and tasks via Convex MCP
 - [ ] **Phase 6: AI Daily Planning** - Loom-generated daily plans with required user approval before any mutation commits
@@ -69,9 +69,9 @@ Plans:
 **Plans:** 4/4 plans complete
 Plans:
 - [x] 03-01-PLAN.md — Schema migration (priority, hasDueTime, taskId), Swift models, TaskViewModel
-- [ ] 03-02-PLAN.md — Task CRUD UI: TaskRowView, TaskCreationView, TaskDetailView
-- [ ] 03-03-PLAN.md — Today view (unified event+task timeline), ContentView restructure, week view task dots
-- [ ] 03-04-PLAN.md — Drag-to-time-block, time-block visual distinction, human verification
+- [x] 03-02-PLAN.md — Task CRUD UI: TaskRowView, TaskCreationView, TaskDetailView
+- [x] 03-03-PLAN.md — Today view (unified event+task timeline), ContentView restructure, week view task dots
+- [x] 03-04-PLAN.md — Drag-to-time-block, time-block visual distinction, human verification
 
 ### Phase 3.1: Audit Gap Closure (INSERTED)
 **Goal**: Close all gaps from v1.0 milestone audit — retroactive Phase 2 verification, documentation fixes, and WeekView integration fix
@@ -83,9 +83,9 @@ Plans:
   2. CALV-02 checkbox is marked [x] in REQUIREMENTS.md with traceability status Complete
   3. WeekTimelineView renders time-blocked events with orange styling (isTimeBlock passed to TimelineEventCard)
   4. 03-02-SUMMARY.md has requirements-completed frontmatter field listing TASK-04
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
-- [ ] 03.1-01-PLAN.md — Wire isTimeBlock in Day/Week views, rename verification file, add summary frontmatter
+- [x] 03.1-01-PLAN.md — Wire isTimeBlock in Day/Week views, rename verification file, add summary frontmatter
 
 ### Phase 4: Loom Chat
 **Goal**: Users can have a real-time conversation with Loom inside the app, see message history, and the app handles Loom being unreachable without blocking any core functionality
@@ -155,7 +155,7 @@ Note: Phase 4 (Loom Chat) depends only on Phase 1 and can proceed in parallel wi
 | 1. Foundation | 3/3 | Complete    | 2026-02-20 |
 | 2. Calendar Views | 3/3 | Complete | 2026-02-20 |
 | 3. Task System | 4/4 | Complete    | 2026-02-21 |
-| 3.1 Audit Gap Closure | 0/1 | Not started | - |
+| 3.1 Audit Gap Closure | 1/1 | Complete     | 2026-02-21 |
 | 4. Loom Chat | 0/TBD | Not started | - |
 | 5. Loom Calendar and Task Actions | 0/TBD | Not started | - |
 | 6. AI Daily Planning | 0/TBD | Not started | - |

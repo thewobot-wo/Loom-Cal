@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** One app where you see everything on your plate — calendars, tasks, projects — and chat with Loom to actively manage your day.
-**Current focus:** Phase 3 — Task System
+**Current focus:** Phase 3.1 — Audit Gap Closure (COMPLETE) → Phase 4 — Loom Chat
 
 ## Current Position
 
-Phase: 3 of 8 (Task System)
-Plan: 4 of 4 in current phase — COMPLETE
-Status: Phase 3 COMPLETE — all 4 plans executed; drag-to-time-block, complete task system human-verified
-Last activity: 2026-02-21 — Plan 03-04 complete (5 min)
+Phase: 3.1 of 8 (Audit Gap Closure)
+Plan: 1 of 1 in current phase — COMPLETE
+Status: Phase 3.1 COMPLETE — all audit gaps closed; isTimeBlock wired in DayTimelineView and WeekTimelineView; 02-VERIFICATION.md renamed; 03-02-SUMMARY.md requirements traceability added
+Last activity: 2026-02-21 — Plan 03.1-01 complete (3 min)
 
 Progress: [█████░░░░░] 44%
 
@@ -30,9 +30,10 @@ Progress: [█████░░░░░] 44%
 | 01-foundation | 3 | 15 min | 5 min |
 | 02-calendar-views | 3 | 25 min | 8 min |
 | 03-task-system | 4 | 17 min | 4.25 min |
+| 03.1-audit-gap-closure | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (3 min), 03-02 (4 min), 03-03 (5 min), 03-04 (5 min)
+- Last 5 plans: 03-02 (4 min), 03-03 (5 min), 03-04 (5 min), 03.1-01 (3 min)
 - Trend: 3-5 min per plan; consistent velocity
 
 *Updated after each plan completion*
@@ -83,6 +84,7 @@ Recent decisions affecting current work:
 - [Plan 03-04]: TimelineContentOriginKey PreferenceKey computes scroll offset without iOS 26+ ScrollPosition.y
 - [Plan 03-04]: isTimeBlock param on TimelineEventCard switches orange/blue styling — single view, single styling source
 - [Plan 03-04]: Orange for time-blocked events, blue for regular events — task-linked visual hierarchy
+- [Plan 03.1-01]: No task icon in WeekTimelineView narrow columns — orange accent bar alone provides sufficient visual distinction (columns can be as narrow as 40pt)
 
 ### Pending Todos
 
@@ -100,5 +102,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Phase 3 plan 03-04 complete — drag-to-time-block, visual distinction, undo banner, Phase 3 human-verified
+Stopped at: Phase 3.1 plan 03.1-01 complete — audit gap closure done; isTimeBlock wired, 02-VERIFICATION.md renamed, requirements traceability added
 Resume file: Continue to Phase 4 — Loom AI chat (requires Loom MCP write access configured)
