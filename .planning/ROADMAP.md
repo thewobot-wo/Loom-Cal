@@ -97,7 +97,11 @@ Plans:
   3. The chat panel shows full message history from the current session in chronological order
   4. When Loom is unreachable, the app shows a clear "Loom unavailable" status indicator — the chat input is disabled with an explanation, and all calendar and task features remain fully functional
   5. After sending a message, the app does not block or show an infinite spinner — it shows a pending state for a maximum of 8 seconds before showing an error if no reply arrives
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 04-01-PLAN.md — Convex AI reply pipeline (Anthropic SDK, internalAction, scheduler) + ChatViewModel
+- [ ] 04-02-PLAN.md — Chat UI views (iMessage bubbles, Markdown, typing indicator, input bar, suggestion chips)
+- [ ] 04-03-PLAN.md — ContentView TabView refactor, ChatFAB, end-to-end verification
 
 ### Phase 5: Loom Calendar and Task Actions
 **Goal**: Loom can create, edit, and delete events and tasks via Convex MCP, and all changes appear in the app in real-time
@@ -156,7 +160,7 @@ Note: Phase 4 (Loom Chat) depends only on Phase 1 and can proceed in parallel wi
 | 2. Calendar Views | 3/3 | Complete | 2026-02-20 |
 | 3. Task System | 4/4 | Complete    | 2026-02-21 |
 | 3.1 Audit Gap Closure | 1/1 | Complete   | 2026-02-21 |
-| 4. Loom Chat | 0/TBD | Not started | - |
+| 4. Loom Chat | 0/3 | Not started | - |
 | 5. Loom Calendar and Task Actions | 0/TBD | Not started | - |
 | 6. AI Daily Planning | 0/TBD | Not started | - |
 | 7. Natural Language Entry | 0/TBD | Not started | - |
