@@ -27,10 +27,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Loom AI
 
-- [ ] **LOOM-01**: User can send messages to Loom via in-app chat
-- [ ] **LOOM-02**: User receives Loom responses in-app in real-time
-- [ ] **LOOM-03**: Chat interface displays message history
-- [ ] **LOOM-04**: App degrades gracefully when Loom is unreachable (clear status, no blocking)
+- [x] **LOOM-01**: User can send messages to Loom via in-app chat
+- [x] **LOOM-02**: User receives Loom responses in-app in real-time
+- [x] **LOOM-03**: Chat interface displays message history
+- [x] **LOOM-04**: App degrades gracefully when Loom is unreachable (clear status, no blocking)
 - [ ] **LOOM-05**: Loom can create events via Convex MCP, reflected in app in real-time
 - [ ] **LOOM-06**: Loom can edit and delete events via Convex MCP
 - [ ] **LOOM-07**: Loom can create and manage tasks via Convex MCP
@@ -111,10 +111,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TASK-05 | Phase 3 | Complete |
 | TASK-06 | Phase 3 | Complete |
 | TASK-07 | Phase 3 | Complete |
-| LOOM-01 | Phase 4 | Pending |
-| LOOM-02 | Phase 4 | Pending |
-| LOOM-03 | Phase 4 | Pending |
-| LOOM-04 | Phase 4 | Pending |
+| LOOM-01 | Phase 4 | Complete |
+| LOOM-02 | Phase 4 | Complete |
+| LOOM-03 | Phase 4 | Complete |
+| LOOM-04 | Phase 4 | Complete |
 | LOOM-05 | Phase 5 | Pending |
 | LOOM-06 | Phase 5 | Pending |
 | LOOM-07 | Phase 5 | Pending |

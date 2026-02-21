@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** One app where you see everything on your plate — calendars, tasks, projects — and chat with Loom to actively manage your day.
-**Current focus:** Phase 3.1 — Audit Gap Closure (COMPLETE) → Phase 4 — Loom Chat
+**Current focus:** Phase 4 — Loom Chat (1 of 3 plans complete)
 
 ## Current Position
 
-Phase: 3.1 of 8 (Audit Gap Closure)
-Plan: 1 of 1 in current phase — COMPLETE
-Status: Phase 3.1 COMPLETE — all audit gaps closed; isTimeBlock wired in DayTimelineView and WeekTimelineView; 02-VERIFICATION.md renamed; 03-02-SUMMARY.md requirements traceability added
-Last activity: 2026-02-21 — Plan 03.1-01 complete (3 min)
+Phase: 4 of 8 (Loom Chat)
+Plan: 1 of 3 in current phase — COMPLETE
+Status: Phase 4 Plan 1 COMPLETE — Convex AI reply pipeline (internalAction + Anthropic SDK) and ChatViewModel (subscription, send, timeout, offline) built and verified
+Last activity: 2026-02-21 — Plan 04-01 complete (3 min)
 
-Progress: [█████░░░░░] 44%
+Progress: [█████░░░░░] 47%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 5.67 min
-- Total execution time: 0.85 hours
+- Total plans completed: 10
+- Average duration: 5.4 min
+- Total execution time: 0.90 hours
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [█████░░░░░] 44%
 | 02-calendar-views | 3 | 25 min | 8 min |
 | 03-task-system | 4 | 17 min | 4.25 min |
 | 03.1-audit-gap-closure | 1 | 3 min | 3 min |
+| 04-loom-chat | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (4 min), 03-03 (5 min), 03-04 (5 min), 03.1-01 (3 min)
+- Last 5 plans: 03-03 (5 min), 03-04 (5 min), 03.1-01 (3 min), 04-01 (3 min)
 - Trend: 3-5 min per plan; consistent velocity
 
 *Updated after each plan completion*
@@ -85,11 +86,18 @@ Recent decisions affecting current work:
 - [Plan 03-04]: isTimeBlock param on TimelineEventCard switches orange/blue styling — single view, single styling source
 - [Plan 03-04]: Orange for time-blocked events, blue for regular events — task-linked visual hierarchy
 - [Plan 03.1-01]: No task icon in WeekTimelineView narrow columns — orange accent bar alone provides sufficient visual distinction (columns can be as narrow as 40pt)
+- [Plan 04-01]: internalAction for generateReply — prevents external calls, enforces single write path for assistant messages
+- [Plan 04-01]: ctx.scheduler.runAfter(0) triggers AI reply asynchronously from send mutation — decouples latency
+- [Plan 04-01]: listForAI takes last 50 messages — safety guard against unbounded context; Phase 6+ for smarter trimming
+- [Plan 04-01]: 8-second Task.sleep timeout with cancellation — no DispatchQueue, pure Swift concurrency
+- [Plan 04-01]: pendingMessageContent tracks content string not DB ID — optimistic update before subscription delivers real document
 
 ### Pending Todos
 
 - User must run `npx convex dev` to link Convex project and deploy schema/functions
 - User must set SUPABASE_EVENTS_URL and SUPABASE_ANON_KEY in Convex Dashboard environment variables
+- User must set ANTHROPIC_API_KEY in Convex Dashboard → Settings → Environment Variables (required for Loom AI replies)
+- Optionally set LOOM_MODEL in Convex Dashboard (default: claude-haiku-4-5, or claude-sonnet-4-5 for better reasoning)
 
 ### Blockers/Concerns
 
@@ -102,5 +110,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Phase 3.1 plan 03.1-01 complete — audit gap closure done; isTimeBlock wired, 02-VERIFICATION.md renamed, requirements traceability added
-Resume file: Continue to Phase 4 — Loom AI chat (requires Loom MCP write access configured)
+Stopped at: Phase 4 plan 04-01 complete — AI reply pipeline and ChatViewModel built; TypeScript and Swift both build clean
+Resume file: Continue to Phase 4 Plan 2 — Chat UI views (ChatView, message bubbles, input bar, retry bubble)
