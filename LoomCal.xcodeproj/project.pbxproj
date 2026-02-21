@@ -22,6 +22,7 @@
 		9AEEEFCA556F480DB9918D32 /* ConvexMobile in Frameworks */ = {isa = PBXBuildFile; productRef = 0E4E9BFFC7444A7D9D90AF8B /* ConvexMobile */; };
 		D915E861CA664BE082311BC5 /* LoomEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CD0C89A47E94DE0B14FEC60 /* LoomEvent.swift */; };
 		F1A2B3C4D5E6F70123456701 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456700 /* CalendarViewModel.swift */; };
+		F4A5B6C7D8E9F00345678901 /* TaskViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A5B6C7D8E9F00345678900 /* TaskViewModel.swift */; };
 		F1A2B3C4D5E6F70123456703 /* HorizonCalendar in Frameworks */ = {isa = PBXBuildFile; platformFilters = (ios, ); productRef = F1A2B3C4D5E6F70123456702 /* HorizonCalendar */; };
 		F1A2B3C4D5E6F70123456711 /* MiniMonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456710 /* MiniMonthView.swift */; };
 		F1A2B3C4D5E6F70123456713 /* DayTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456712 /* DayTimelineView.swift */; };
@@ -45,6 +46,7 @@
 		CF164E410628480EB1EB0286 /* LoomCalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoomCalApp.swift; sourceTree = "<group>"; };
 		DFFBADEB5C554067AEADFE73 /* LoomCal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoomCal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1A2B3C4D5E6F70123456700 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
+		F4A5B6C7D8E9F00345678900 /* TaskViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewModel.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E6F70123456710 /* MiniMonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMonthView.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E6F70123456712 /* DayTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimelineView.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E6F70123456714 /* TimelineEventCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEventCard.swift; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 			isa = PBXGroup;
 			children = (
 				F1A2B3C4D5E6F70123456700 /* CalendarViewModel.swift */,
+				F4A5B6C7D8E9F00345678900 /* TaskViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 				862F350F167445A7959E9E7C /* ContentView.swift in Sources */,
 				A1B2C3D4E5F601234567890A /* EventKitService.swift in Sources */,
 				F1A2B3C4D5E6F70123456701 /* CalendarViewModel.swift in Sources */,
+				F4A5B6C7D8E9F00345678901 /* TaskViewModel.swift in Sources */,
 				F1A2B3C4D5E6F70123456711 /* MiniMonthView.swift in Sources */,
 				F1A2B3C4D5E6F70123456713 /* DayTimelineView.swift in Sources */,
 				F1A2B3C4D5E6F70123456715 /* TimelineEventCard.swift in Sources */,

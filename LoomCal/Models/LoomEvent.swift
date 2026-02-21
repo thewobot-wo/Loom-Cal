@@ -21,4 +21,5 @@ struct LoomEvent: Decodable, Identifiable {
     let rrule: String?                 // RRULE recurrence string
     let recurrenceGroupId: String?
     let attachments: [String]?
+    let taskId: String?                // non-nil when event is a time-block for a task
 }
