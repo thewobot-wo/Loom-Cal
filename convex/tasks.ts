@@ -12,17 +12,18 @@ export const list = query({
 
 /**
  * Create a new task.
- * flagged is a boolean — there are no priority tiers.
+ * priority is high/medium/low union literal — there are no boolean flags.
+ * hasDueTime is true when dueDate includes a specific time component.
  * dueDate is v.int64() UTC milliseconds when set.
  */
 export const create = mutation({
   args: {
     title: v.string(),
     dueDate: v.optional(v.int64()),
-    flagged: v.boolean(),
+    priority: v.union(v.literal("high"), v.literal("medium"), v.literal("low")),
+    hasDueTime: v.boolean(),
     completed: v.boolean(),
     notes: v.optional(v.string()),
-    attachments: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("tasks", args);
@@ -38,7 +39,8 @@ export const update = mutation({
     id: v.id("tasks"),
     title: v.optional(v.string()),
     dueDate: v.optional(v.int64()),
-    flagged: v.optional(v.boolean()),
+    priority: v.optional(v.union(v.literal("high"), v.literal("medium"), v.literal("low"))),
+    hasDueTime: v.optional(v.boolean()),
     completed: v.optional(v.boolean()),
     notes: v.optional(v.string()),
     attachments: v.optional(v.array(v.string())),

@@ -14,6 +14,7 @@ export const list = query({
  * Create a new event.
  * IMPORTANT: v.int64() fields (start, duration) must be passed as BigInt from TypeScript callers.
  * Swift callers via ConvexMobile send Int which the SDK converts appropriately.
+ * taskId is optional — set when this event is a time-block for a task.
  */
 export const create = mutation({
   args: {
@@ -30,6 +31,7 @@ export const create = mutation({
     rrule: v.optional(v.string()),
     recurrenceGroupId: v.optional(v.string()),
     attachments: v.optional(v.array(v.string())),
+    taskId: v.optional(v.id("tasks")),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("events", args);
@@ -56,6 +58,7 @@ export const update = mutation({
     rrule: v.optional(v.string()),
     recurrenceGroupId: v.optional(v.string()),
     attachments: v.optional(v.array(v.string())),
+    taskId: v.optional(v.id("tasks")),
   },
   handler: async (ctx, { id, ...updates }) => {
     await ctx.db.patch(id, updates);

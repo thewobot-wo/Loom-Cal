@@ -27,20 +27,24 @@ export default defineSchema({
     rrule: v.optional(v.string()),                // RRULE string for recurrence (UI deferred)
     recurrenceGroupId: v.optional(v.string()),    // links recurring instances
     attachments: v.optional(v.array(v.string())), // file references (upload UI deferred)
+    taskId: v.optional(v.id("tasks")),            // links time-blocked events to source task
   })
     .index("by_calendar", ["calendarId"])
-    .index("by_start", ["start"]),
+    .index("by_start", ["start"])
+    .index("by_task_id", ["taskId"]),
 
   tasks: defineTable({
     title: v.string(),
     dueDate: v.optional(v.int64()),               // UTC milliseconds
-    flagged: v.boolean(),                         // boolean flag only — NOT priority tiers
+    priority: v.union(v.literal("high"), v.literal("medium"), v.literal("low")),  // priority is high/medium/low union literal
+    hasDueTime: v.boolean(),                      // true when dueDate includes specific time
     completed: v.boolean(),
     notes: v.optional(v.string()),                // markdown plain text
     attachments: v.optional(v.array(v.string())), // file references (upload UI deferred)
   })
     .index("by_due_date", ["dueDate"])
-    .index("by_completed", ["completed"]),
+    .index("by_completed", ["completed"])
+    .index("by_priority", ["priority"]),
 
   chat_messages: defineTable({
     role: v.union(v.literal("user"), v.literal("assistant")),
