@@ -15,6 +15,7 @@
 		C4001A00000000000000BB03 /* SuggestionChipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB03 /* SuggestionChipsView.swift */; };
 		C4001A00000000000000BB04 /* ChatInputBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB04 /* ChatInputBar.swift */; };
 		C4001A00000000000000BB05 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB05 /* ChatView.swift */; };
+		C4001A00000000000000BB06 /* ChatFAB.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB06 /* ChatFAB.swift */; };
 		C4001A00000000000000CC01 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = C4001D00000000000000CC01 /* MarkdownUI */; };
 		A1B2C3D4E5F601234567890A /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F601234567890B /* EventKitService.swift */; };
 		F2A3B4C5D6E7F80234567800 /* NLEventParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A3B4C5D6E7F80234567801 /* NLEventParser.swift */; };
@@ -51,6 +52,7 @@
 		C4001B00000000000000BB03 /* SuggestionChipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionChipsView.swift; sourceTree = "<group>"; };
 		C4001B00000000000000BB04 /* ChatInputBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInputBar.swift; sourceTree = "<group>"; };
 		C4001B00000000000000BB05 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		C4001B00000000000000BB06 /* ChatFAB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFAB.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F601234567890B /* EventKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitService.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F601234567890C /* LoomCal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LoomCal.entitlements; sourceTree = "<group>"; };
 		1EAC04D985614080945480C4 /* ConvexEnv.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvexEnv.swift; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 				C4001B00000000000000BB03 /* SuggestionChipsView.swift */,
 				C4001B00000000000000BB04 /* ChatInputBar.swift */,
 				C4001B00000000000000BB05 /* ChatView.swift */,
+				C4001B00000000000000BB06 /* ChatFAB.swift */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -339,6 +342,7 @@
 				C4001A00000000000000BB03 /* SuggestionChipsView.swift in Sources */,
 				C4001A00000000000000BB04 /* ChatInputBar.swift in Sources */,
 				C4001A00000000000000BB05 /* ChatView.swift in Sources */,
+				C4001A00000000000000BB06 /* ChatFAB.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
