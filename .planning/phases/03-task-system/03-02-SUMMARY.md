@@ -3,6 +3,7 @@ phase: 03-task-system
 plan: 02
 subsystem: ui
 tags: [swiftui, tasks, views, crud]
+requirements-completed: [TASK-01, TASK-02, TASK-03, TASK-04]
 
 # Dependency graph
 requires:
