@@ -2,10 +2,14 @@ import SwiftUI
 
 /// Fantastical-inspired event card for the day timeline.
 /// Displays event title and formatted 12-hour start time.
-/// Visual style: rounded rectangle, blue tint, left accent bar, subtle shadow.
+/// Regular events: blue accent bar + blue background.
+/// Time-blocked events (isTimeBlock: true): orange accent bar + orange background + task icon.
 /// Supports long-press + drag gesture for drag-to-move functionality.
 struct TimelineEventCard: View {
     let event: LoomEvent
+    /// True when this event is a time-block linked to a task (event.taskId != nil).
+    /// Changes styling to orange to visually distinguish from regular blue events.
+    var isTimeBlock: Bool = false
     var onTap: () -> Void = {}
     /// Called with vertical point delta (positive = down, negative = up) on drag end.
     var onDragMove: ((CGFloat) -> Void)?
@@ -28,6 +32,17 @@ struct TimelineEventCard: View {
         Self.timeFormatter.string(from: startDate)
     }
 
+    /// Accent bar color — orange for time-blocks, blue for regular events
+    private var accentColor: Color {
+        isTimeBlock ? Color.orange.opacity(0.8) : Color.blue
+    }
+
+    /// Background fill color
+    private var backgroundColor: Color {
+        isTimeBlock ? Color.orange.opacity(isDragging ? 0.18 : 0.08)
+                    : Color.blue.opacity(isDragging ? 0.25 : 0.15)
+    }
+
     var body: some View {
         Button(action: {
             // Only fire tap when not in drag mode
@@ -36,18 +51,27 @@ struct TimelineEventCard: View {
             }
         }) {
             HStack(spacing: 0) {
-                // Leading blue accent bar
+                // Leading accent bar — orange for time-blocks, blue for regular
                 RoundedRectangle(cornerRadius: 2)
-                    .fill(Color.blue)
+                    .fill(accentColor)
                     .frame(width: 4)
 
                 // Event content
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(event.title)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.primary)
-                        .lineLimit(2)
+                    HStack(spacing: 4) {
+                        // Task icon for time-blocked events
+                        if isTimeBlock {
+                            Image(systemName: "checkmark.square")
+                                .font(.system(size: 10))
+                                .foregroundStyle(Color.orange.opacity(0.8))
+                        }
+
+                        Text(event.title)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.primary)
+                            .lineLimit(2)
+                    }
 
                     Text(formattedTime)
                         .font(.caption)
@@ -60,7 +84,7 @@ struct TimelineEventCard: View {
             }
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.blue.opacity(isDragging ? 0.25 : 0.15))
+                    .fill(backgroundColor)
             )
             .shadow(color: .black.opacity(isDragging ? 0.18 : 0.08), radius: isDragging ? 8 : 4, y: 2)
             .opacity(isDragging ? 0.8 : 1.0)
@@ -101,21 +125,26 @@ struct TimelineEventCard: View {
 }
 
 #Preview {
-    // Approximate 60 minutes from now in ms
-    let nowMs = Int(Date().timeIntervalSince1970 * 1000)
-    let sampleEvent = try! JSONDecoder().decode(LoomEvent.self, from: """
-    {
-      "_id": "preview-id",
-      "calendarId": "personal",
-      "title": "Team Standup",
-      "start": \(nowMs),
-      "duration": 30,
-      "timezone": "America/New_York",
-      "isAllDay": false
-    }
-    """.data(using: .utf8)!)
+    VStack(spacing: 16) {
+        // Approximate 60 minutes from now in ms
+        let nowMs = Int(Date().timeIntervalSince1970 * 1000)
+        let sampleEvent = try! JSONDecoder().decode(LoomEvent.self, from: """
+        {
+          "_id": "preview-id",
+          "calendarId": "personal",
+          "title": "Team Standup",
+          "start": \(nowMs),
+          "duration": 30,
+          "timezone": "America/New_York",
+          "isAllDay": false
+        }
+        """.data(using: .utf8)!)
 
-    TimelineEventCard(event: sampleEvent)
-        .frame(width: 280, height: 60)
-        .padding()
+        TimelineEventCard(event: sampleEvent)
+            .frame(width: 280, height: 60)
+
+        TimelineEventCard(event: sampleEvent, isTimeBlock: true)
+            .frame(width: 280, height: 60)
+    }
+    .padding()
 }
