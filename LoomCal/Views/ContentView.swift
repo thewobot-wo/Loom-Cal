@@ -246,7 +246,15 @@ struct ContentView: View {
 
             NavigationStack {
                 ChatView(chatViewModel: chatViewModel)
-                    .navigationTitle("Loom")
+                    .toolbar {
+                        ToolbarItem(placement: .principal) {
+                            Image("LoomAvatar")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 32, height: 32)
+                                .clipShape(Circle())
+                        }
+                    }
                     #if !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
                     #endif

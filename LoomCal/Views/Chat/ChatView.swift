@@ -64,6 +64,12 @@ struct ChatView: View {
                         .padding(.bottom, 4)
                     }
                     .defaultScrollAnchor(.bottom)
+                    .scrollDismissesKeyboard(.interactively)
+                    .onTapGesture {
+                        #if canImport(UIKit)
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                        #endif
+                    }
                     .onChange(of: chatViewModel.messages.count) {
                         withAnimation {
                             if let lastId = chatViewModel.messages.last?.id {
@@ -100,16 +106,6 @@ struct ChatView: View {
 
     private var timeoutBubble: some View {
         HStack(alignment: .bottom, spacing: 8) {
-            Circle()
-                .fill(Color.purple.gradient)
-                .frame(width: 28, height: 28)
-                .overlay(
-                    Text("L")
-                        .font(.caption)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                )
-
             VStack(alignment: .leading, spacing: 4) {
                 Text("Loom didn't respond. Tap to retry.")
                     .font(.subheadline)

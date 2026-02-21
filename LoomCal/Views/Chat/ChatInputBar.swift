@@ -5,35 +5,32 @@ struct ChatInputBar: View {
     let isEnabled: Bool
     let onSend: () -> Void
 
+    private var canSend: Bool {
+        isEnabled && !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .bottom, spacing: 12) {
             TextField(
                 isEnabled ? "Message Loom..." : "Loom is offline",
-                text: $text
+                text: $text,
+                axis: .vertical
             )
+            .lineLimit(1...6)
             .textFieldStyle(.plain)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(Color.gray.opacity(0.1))
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .disabled(!isEnabled)
-            .onSubmit {
-                if isEnabled && !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    onSend()
-                }
-            }
 
             // Send button
             Button(action: onSend) {
                 Image(systemName: "arrow.up.circle.fill")
                     .font(.title2)
-                    .foregroundStyle(
-                        text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !isEnabled
-                            ? Color.gray
-                            : Color.accentColor
-                    )
+                    .foregroundStyle(canSend ? Color.accentColor : Color.gray)
             }
-            .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !isEnabled)
+            .disabled(!canSend)
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
