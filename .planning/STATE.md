@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 3 of 8 (Task System)
-Plan: 3 of 4 in current phase — COMPLETE
-Status: Phase 3 in progress — plan 03-03 executed (TodayView, ContentView Today mode, WeekTimelineView task dots)
-Last activity: 2026-02-21 — Plan 03-03 complete (5 min)
+Plan: 4 of 4 in current phase — COMPLETE
+Status: Phase 3 COMPLETE — all 4 plans executed; drag-to-time-block, complete task system human-verified
+Last activity: 2026-02-21 — Plan 03-04 complete (5 min)
 
-Progress: [████░░░░░░] 38%
+Progress: [█████░░░░░] 44%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 5.75 min
-- Total execution time: 0.77 hours
+- Total plans completed: 9
+- Average duration: 5.67 min
+- Total execution time: 0.85 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [████░░░░░░] 38%
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 15 min | 5 min |
 | 02-calendar-views | 3 | 25 min | 8 min |
-| 03-task-system | 3 | 12 min | 4 min |
+| 03-task-system | 4 | 17 min | 4.25 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (3 min), 03-02 (4 min), 03-03 (5 min)
+- Last 5 plans: 03-01 (3 min), 03-02 (4 min), 03-03 (5 min), 03-04 (5 min)
 - Trend: 3-5 min per plan; consistent velocity
 
 *Updated after each plan completion*
@@ -79,6 +79,10 @@ Recent decisions affecting current work:
 - [Plan 03-02]: hasDueDate=false→dueDate=nil; hasDueDate+!hasDueTime→Calendar.startOfDay — consistent with TaskViewModel date filtering
 - [Phase 03]: TodayView uses TimelineItem enum for type-erased event+task interleaving in ZStack timeline
 - [Phase 03]: Toolbar + button upgraded to Menu (New Event / New Task) — single entry point for both creation flows
+- [Plan 03-04]: LongPressGesture(0.2s).sequenced(before: DragGesture(global)) — drag source above ScrollView, avoids scroll conflict
+- [Plan 03-04]: TimelineContentOriginKey PreferenceKey computes scroll offset without iOS 26+ ScrollPosition.y
+- [Plan 03-04]: isTimeBlock param on TimelineEventCard switches orange/blue styling — single view, single styling source
+- [Plan 03-04]: Orange for time-blocked events, blue for regular events — task-linked visual hierarchy
 
 ### Pending Todos
 
@@ -96,5 +100,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Phase 3 plan 03-03 complete — TodayView, ContentView Today mode, WeekTimelineView task dots building
-Resume file: Continue Phase 3 — run plan 03-04 (task filtering/sorting)
+Stopped at: Phase 3 plan 03-04 complete — drag-to-time-block, visual distinction, undo banner, Phase 3 human-verified
+Resume file: Continue to Phase 4 — Loom AI chat (requires Loom MCP write access configured)

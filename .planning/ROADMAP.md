@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Convex schema, data model, real-time sync backbone, and source-of-truth ownership rules
 - [x] **Phase 2: Calendar Views** - Day and week calendar views with Convex-native event CRUD
-- [ ] **Phase 3: Task System** - Full task CRUD, today view, task markers on calendar, and time-blocking
+- [x] **Phase 3: Task System** - Full task CRUD, today view, task markers on calendar, and time-blocking (completed 2026-02-21)
 - [ ] **Phase 4: Loom Chat** - In-app chat with Loom, message history, graceful offline degradation
 - [ ] **Phase 5: Loom Calendar and Task Actions** - Loom creates, edits, and deletes events and tasks via Convex MCP
 - [ ] **Phase 6: AI Daily Planning** - Loom-generated daily plans with required user approval before any mutation commits
@@ -65,7 +65,7 @@ Plans:
   3. Tasks with due dates appear as markers on the day and week calendar views on their due date
   4. User can drag a task from the task list onto a calendar time slot to time-block it — a calendar event is created for that slot linked to the task
   5. The Today view shows all of the current day's calendar events and all tasks due today in a single unified list
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 - [x] 03-01-PLAN.md — Schema migration (priority, hasDueTime, taskId), Swift models, TaskViewModel
 - [ ] 03-02-PLAN.md — Task CRUD UI: TaskRowView, TaskCreationView, TaskDetailView
@@ -139,7 +139,7 @@ Note: Phase 4 (Loom Chat) depends only on Phase 1 and can proceed in parallel wi
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete    | 2026-02-20 |
 | 2. Calendar Views | 3/3 | Complete | 2026-02-20 |
-| 3. Task System | 3/4 | In Progress|  |
+| 3. Task System | 4/4 | Complete   | 2026-02-21 |
 | 4. Loom Chat | 0/TBD | Not started | - |
 | 5. Loom Calendar and Task Actions | 0/TBD | Not started | - |
 | 6. AI Daily Planning | 0/TBD | Not started | - |
