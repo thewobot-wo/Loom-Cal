@@ -123,6 +123,8 @@ struct WeekTimelineView: View {
                     let isSelected = calendar.isDate(date, inSameDayAs: viewModel.selectedDate)
                     let dayNum = calendar.component(.day, from: date)
 
+                    let dayTasks = taskViewModel.tasks(dueOn: date).filter { !$0.completed }
+
                     VStack(spacing: 3) {
                         Text(Self.dayNameFormatter.string(from: date).uppercased())
                             .font(.system(size: 11, weight: .medium))
@@ -139,6 +141,20 @@ struct WeekTimelineView: View {
                                     Circle().strokeBorder(.blue, lineWidth: 1.5)
                                 }
                             }
+
+                        // Task dots — up to 3, colored by priority (max 3 per CONTEXT.md)
+                        if !dayTasks.isEmpty {
+                            HStack(spacing: 2) {
+                                ForEach(Array(dayTasks.prefix(3))) { task in
+                                    Circle()
+                                        .fill(task.priorityColor)
+                                        .frame(width: 5, height: 5)
+                                }
+                            }
+                        } else {
+                            // Fixed-height spacer to maintain consistent header height
+                            Color.clear.frame(height: 5)
+                        }
                     }
                     .frame(width: columnWidth)
                     .contentShape(Rectangle())
