@@ -83,7 +83,9 @@ Plans:
   2. CALV-02 checkbox is marked [x] in REQUIREMENTS.md with traceability status Complete
   3. WeekTimelineView renders time-blocked events with orange styling (isTimeBlock passed to TimelineEventCard)
   4. 03-02-SUMMARY.md has requirements-completed frontmatter field listing TASK-04
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 03.1-01-PLAN.md — Wire isTimeBlock in Day/Week views, rename verification file, add summary frontmatter
 
 ### Phase 4: Loom Chat
 **Goal**: Users can have a real-time conversation with Loom inside the app, see message history, and the app handles Loom being unreachable without blocking any core functionality
@@ -153,7 +155,7 @@ Note: Phase 4 (Loom Chat) depends only on Phase 1 and can proceed in parallel wi
 | 1. Foundation | 3/3 | Complete    | 2026-02-20 |
 | 2. Calendar Views | 3/3 | Complete | 2026-02-20 |
 | 3. Task System | 4/4 | Complete    | 2026-02-21 |
-| 3.1 Audit Gap Closure | 0/TBD | Not started | - |
+| 3.1 Audit Gap Closure | 0/1 | Not started | - |
 | 4. Loom Chat | 0/TBD | Not started | - |
 | 5. Loom Calendar and Task Actions | 0/TBD | Not started | - |
 | 6. AI Daily Planning | 0/TBD | Not started | - |
