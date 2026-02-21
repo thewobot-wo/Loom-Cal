@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** One app where you see everything on your plate — calendars, tasks, projects — and chat with Loom to actively manage your day.
-**Current focus:** Phase 2 — Calendar Views
+**Current focus:** Phase 3 — Task System
 
 ## Current Position
 
-Phase: 2 of 8 (Calendar Views)
-Plan: 3 of 3 in current phase — COMPLETE
-Status: Phase 2 complete — all 3 plans executed, checkpoint approved
-Last activity: 2026-02-20 — Plan 02-03 complete with post-checkpoint fixes (macOS guards, scroll fix, end time pickers, alert delete, week view redesign)
+Phase: 3 of 8 (Task System)
+Plan: 1 of 4 in current phase — COMPLETE
+Status: Phase 3 in progress — plan 03-01 executed (schema + models + TaskViewModel)
+Last activity: 2026-02-21 — Plan 03-01 complete (3 min)
 
-Progress: [█████░░░░░] 25%
+Progress: [███░░░░░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 7 min
-- Total execution time: 0.67 hours
+- Total plans completed: 7
+- Average duration: 6 min
+- Total execution time: 0.72 hours
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [█████░░░░░] 25%
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 15 min | 5 min |
 | 02-calendar-views | 3 | 25 min | 8 min |
+| 03-task-system | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (4 min), 02-01 (6 min), 02-02 (4 min), 02-03 (~15 min incl. post-checkpoint fixes)
-- Trend: 4-7 min per plan; 02-03 longer due to human checkpoint + 5 post-checkpoint fixes
+- Last 5 plans: 02-02 (4 min), 02-03 (~15 min incl. post-checkpoint fixes), 03-01 (3 min)
+- Trend: 3-7 min per plan; schema/model plans are fastest
 
 *Updated after each plan completion*
 
@@ -69,6 +70,10 @@ Recent decisions affecting current work:
 - [Plan 02-03]: .alert replaces .confirmationDialog for delete — more reliable in nested sheet contexts
 - [Plan 02-03]: HorizonCalendar needs platformFilters = (ios, ) — UIKit dependency fails macOS build
 - [Plan 02-03]: Cross-platform colors: Color.gray.opacity(0.15) replaces Color(.systemGray5), .background replaces Color(.systemBackground)
+- [Plan 03-01]: priority union (high/medium/low) replaces flagged:boolean — enables sorting/filtering by tier
+- [Plan 03-01]: hasDueTime:boolean separates date-only tasks from time-specific tasks within same dueDate field
+- [Plan 03-01]: taskId on events table links time-blocked calendar events back to source task
+- [Plan 03-01]: LoomTask.Identifiable via computed var id: String { _id } — matches LoomEvent pattern
 
 ### Pending Todos
 
@@ -85,6 +90,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-20
-Stopped at: Phase 2 complete — all 3 plans executed, checkpoint approved, post-checkpoint fixes applied
-Resume file: Phase 3 ready to plan — run `/gsd:plan-phase 3`
+Last session: 2026-02-21
+Stopped at: Phase 3 plan 03-01 complete — Convex schema migrated, Swift models updated, TaskViewModel created
+Resume file: Continue Phase 3 — run plan 03-02 (task list view)

@@ -17,12 +17,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Tasks
 
-- [ ] **TASK-01**: User can create tasks with title, due date, and priority
-- [ ] **TASK-02**: User can edit task details
+- [x] **TASK-01**: User can create tasks with title, due date, and priority
+- [x] **TASK-02**: User can edit task details
 - [ ] **TASK-03**: User can mark tasks as complete
 - [ ] **TASK-04**: User can delete tasks
-- [ ] **TASK-05**: Task due dates appear as markers on calendar views
-- [ ] **TASK-06**: User can drag a task onto a calendar slot to time-block it
+- [x] **TASK-05**: Task due dates appear as markers on calendar views
+- [x] **TASK-06**: User can drag a task onto a calendar slot to time-block it
 - [ ] **TASK-07**: Today view shows current-day events and tasks due today
 
 ### Loom AI
@@ -104,12 +104,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CALV-03 | Phase 2 | Complete |
 | CALV-04 | Phase 2 | Complete |
 | CALV-05 | Phase 2 | Complete |
-| TASK-01 | Phase 3 | Pending |
-| TASK-02 | Phase 3 | Pending |
+| TASK-01 | Phase 3 | Complete |
+| TASK-02 | Phase 3 | Complete |
 | TASK-03 | Phase 3 | Pending |
 | TASK-04 | Phase 3 | Pending |
-| TASK-05 | Phase 3 | Pending |
-| TASK-06 | Phase 3 | Pending |
+| TASK-05 | Phase 3 | Complete |
+| TASK-06 | Phase 3 | Complete |
 | TASK-07 | Phase 3 | Pending |
 | LOOM-01 | Phase 4 | Pending |
 | LOOM-02 | Phase 4 | Pending |

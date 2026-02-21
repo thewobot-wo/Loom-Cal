@@ -67,7 +67,7 @@ Plans:
   5. The Today view shows all of the current day's calendar events and all tasks due today in a single unified list
 **Plans:** 4 plans
 Plans:
-- [ ] 03-01-PLAN.md — Schema migration (priority, hasDueTime, taskId), Swift models, TaskViewModel
+- [x] 03-01-PLAN.md — Schema migration (priority, hasDueTime, taskId), Swift models, TaskViewModel
 - [ ] 03-02-PLAN.md — Task CRUD UI: TaskRowView, TaskCreationView, TaskDetailView
 - [ ] 03-03-PLAN.md — Today view (unified event+task timeline), ContentView restructure, week view task dots
 - [ ] 03-04-PLAN.md — Drag-to-time-block, time-block visual distinction, human verification
@@ -139,7 +139,7 @@ Note: Phase 4 (Loom Chat) depends only on Phase 1 and can proceed in parallel wi
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete    | 2026-02-20 |
 | 2. Calendar Views | 3/3 | Complete | 2026-02-20 |
-| 3. Task System | 0/4 | Planned | - |
+| 3. Task System | 1/4 | In progress | - |
 | 4. Loom Chat | 0/TBD | Not started | - |
 | 5. Loom Calendar and Task Actions | 0/TBD | Not started | - |
 | 6. AI Daily Planning | 0/TBD | Not started | - |
