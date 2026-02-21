@@ -10,7 +10,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Calendar Views
 
 - [x] **CALV-01**: User can view events in a day calendar view
-- [ ] **CALV-02**: User can view events in a week calendar view
+- [x] **CALV-02**: User can view events in a week calendar view
 - [x] **CALV-03**: User can create events with title, date/time, and duration
 - [x] **CALV-04**: User can edit existing events (title, time, duration)
 - [x] **CALV-05**: User can delete events
@@ -100,7 +100,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CALV-01 | Phase 2 | Complete |
-| CALV-02 | Phase 2 | Pending |
+| CALV-02 | Phase 2 | Complete |
 | CALV-03 | Phase 2 | Complete |
 | CALV-04 | Phase 2 | Complete |
 | CALV-05 | Phase 2 | Complete |
