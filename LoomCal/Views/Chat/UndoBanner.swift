@@ -50,5 +50,5 @@ struct UndoBanner: View {
         )
         .padding(.bottom, 8)
     }
-    .background(Color(.systemBackground))
+    .background(.background)
 }

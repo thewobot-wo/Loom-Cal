@@ -128,17 +128,17 @@ struct WeekTimelineView: View {
                     VStack(spacing: 3) {
                         Text(Self.dayNameFormatter.string(from: date).uppercased())
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(isToday ? .blue : .secondary)
+                            .foregroundStyle(isToday ? LoomColors.todayAccent : .secondary)
 
                         Text("\(dayNum)")
                             .font(.system(size: 16, weight: isToday || isSelected ? .bold : .medium))
-                            .foregroundStyle(isSelected ? .white : isToday ? .blue : .primary)
+                            .foregroundStyle(isSelected ? .white : isToday ? LoomColors.todayAccent : .primary)
                             .frame(width: 30, height: 30)
                             .background {
                                 if isSelected {
-                                    Circle().fill(.blue)
+                                    Circle().fill(LoomColors.selectedDateFill)
                                 } else if isToday {
-                                    Circle().strokeBorder(.blue, lineWidth: 1.5)
+                                    Circle().strokeBorder(LoomColors.todayAccent, lineWidth: 1.5)
                                 }
                             }
 
@@ -235,8 +235,8 @@ struct WeekTimelineView: View {
         let yPos = yOffsetForStart(event.start)
         let eventHeight = max(CGFloat(event.duration) / 60.0 * pointsPerHour, 16)
         let isTimeBlock = event.taskId != nil
-        let accentColor: Color = isTimeBlock ? Color.orange.opacity(0.8) : Color.blue
-        let bgColor: Color = isTimeBlock ? Color.orange.opacity(0.12) : Color.blue.opacity(0.12)
+        let accentColor: Color = isTimeBlock ? LoomColors.timeBlockAccent.opacity(0.8) : LoomColors.eventAccent
+        let bgColor: Color = isTimeBlock ? LoomColors.timeBlockAccent.opacity(0.12) : LoomColors.eventAccent.opacity(0.12)
         let isHighlighted = viewModel.highlightedEventId == event._id
 
         Button(action: { onEventTap(event) }) {

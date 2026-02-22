@@ -40,11 +40,17 @@
 		F1A2B3C4D5E6F70123456715 /* TimelineEventCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456714 /* TimelineEventCard.swift */; };
 		F1A2B3C4D5E6F70123456717 /* NowIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456716 /* NowIndicatorView.swift */; };
 		F1A2B3C4D5E6F70123456719 /* AllDayBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F70123456718 /* AllDayBannerView.swift */; };
+		1156F3011D13B9FAF3D9757F /* CollapsibleCalendarHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12BB19432F9BE498FFCB406 /* CollapsibleCalendarHeader.swift */; };
+		FAC2D727CDA603ABCE8A5061 /* DayEventListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D36D50C190958FDAE69110A /* DayEventListView.swift */; };
 		F3A4B5C6D7E8F90345678901 /* WeekTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A4B5C6D7E8F90345678900 /* WeekTimelineView.swift */; };
 		T1A2B3C4D5E6F70123456801 /* TaskRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1A2B3C4D5E6F70123456800 /* TaskRowView.swift */; };
 		T1A2B3C4D5E6F70123456803 /* TaskCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1A2B3C4D5E6F70123456802 /* TaskCreationView.swift */; };
 		T1A2B3C4D5E6F70123456805 /* TaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1A2B3C4D5E6F70123456804 /* TaskDetailView.swift */; };
 		T3A4B5C6D7E8F90345678901 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = T3A4B5C6D7E8F90345678900 /* TodayView.swift */; };
+		L00MC0L0R5000000000A0001 /* LoomColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00MC0L0R5000000000B0001 /* LoomColors.swift */; };
+		L00MC0L0R5000000000A0002 /* CalendarToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00MC0L0R5000000000B0002 /* CalendarToolbar.swift */; };
+		L00MC0L0R5000000000A0003 /* MonthGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00MC0L0R5000000000B0003 /* MonthGridView.swift */; };
+		L00MC0L0R5000000000A0004 /* MacCalendarLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00MC0L0R5000000000B0004 /* MacCalendarLayout.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -77,6 +83,8 @@
 		F1A2B3C4D5E6F70123456714 /* TimelineEventCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEventCard.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E6F70123456716 /* NowIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowIndicatorView.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E6F70123456718 /* AllDayBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllDayBannerView.swift; sourceTree = "<group>"; };
+		B12BB19432F9BE498FFCB406 /* CollapsibleCalendarHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollapsibleCalendarHeader.swift; sourceTree = "<group>"; };
+		8D36D50C190958FDAE69110A /* DayEventListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayEventListView.swift; sourceTree = "<group>"; };
 		F3A4B5C6D7E8F90345678900 /* WeekTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekTimelineView.swift; sourceTree = "<group>"; };
 		F2A3B4C5D6E7F80234567801 /* NLEventParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NLEventParser.swift; sourceTree = "<group>"; };
 		F2A3B4C5D6E7F80234567803 /* EventCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCreationView.swift; sourceTree = "<group>"; };
@@ -86,6 +94,10 @@
 		T1A2B3C4D5E6F70123456802 /* TaskCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCreationView.swift; sourceTree = "<group>"; };
 		T1A2B3C4D5E6F70123456804 /* TaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailView.swift; sourceTree = "<group>"; };
 		T3A4B5C6D7E8F90345678900 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		L00MC0L0R5000000000B0001 /* LoomColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoomColors.swift; sourceTree = "<group>"; };
+		L00MC0L0R5000000000B0002 /* CalendarToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarToolbar.swift; sourceTree = "<group>"; };
+		L00MC0L0R5000000000B0003 /* MonthGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthGridView.swift; sourceTree = "<group>"; };
+		L00MC0L0R5000000000B0004 /* MacCalendarLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCalendarLayout.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,11 +168,20 @@
 				F1A2B3C4D5E6F70123456730 /* ViewModels */,
 				27A6C047C20C4A11BFB6585F /* Views */,
 				0224D9F38C3B4A25A684F1CD /* Services */,
+				L00MC0L0R5000000000C0001 /* Theme */,
 				8A616D88800F4FFA9AF9F693 /* Assets.xcassets */,
 				18E08922E37743DA92C7B62F /* Info.plist */,
 				A1B2C3D4E5F601234567890C /* LoomCal.entitlements */,
 			);
 			path = LoomCal;
+			sourceTree = "<group>";
+		};
+		L00MC0L0R5000000000C0001 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				L00MC0L0R5000000000B0001 /* LoomColors.swift */,
+			);
+			path = Theme;
 			sourceTree = "<group>";
 		};
 		90452C32DF9145C7B94D5C0A = {
@@ -191,7 +212,12 @@
 				F1A2B3C4D5E6F70123456714 /* TimelineEventCard.swift */,
 				F1A2B3C4D5E6F70123456716 /* NowIndicatorView.swift */,
 				F1A2B3C4D5E6F70123456718 /* AllDayBannerView.swift */,
+				B12BB19432F9BE498FFCB406 /* CollapsibleCalendarHeader.swift */,
+				8D36D50C190958FDAE69110A /* DayEventListView.swift */,
 				F3A4B5C6D7E8F90345678900 /* WeekTimelineView.swift */,
+				L00MC0L0R5000000000B0002 /* CalendarToolbar.swift */,
+				L00MC0L0R5000000000B0003 /* MonthGridView.swift */,
+				L00MC0L0R5000000000B0004 /* MacCalendarLayout.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -338,6 +364,8 @@
 				F1A2B3C4D5E6F70123456715 /* TimelineEventCard.swift in Sources */,
 				F1A2B3C4D5E6F70123456717 /* NowIndicatorView.swift in Sources */,
 				F1A2B3C4D5E6F70123456719 /* AllDayBannerView.swift in Sources */,
+				1156F3011D13B9FAF3D9757F /* CollapsibleCalendarHeader.swift in Sources */,
+				FAC2D727CDA603ABCE8A5061 /* DayEventListView.swift in Sources */,
 				F2A3B4C5D6E7F80234567800 /* NLEventParser.swift in Sources */,
 				F2A3B4C5D6E7F80234567802 /* EventCreationView.swift in Sources */,
 				F2A3B4C5D6E7F80234567804 /* EventDetailView.swift in Sources */,
@@ -355,6 +383,10 @@
 				C4001A00000000000000BB06 /* ChatFAB.swift in Sources */,
 				C4001A00000000000000BB07 /* ActionConfirmationCard.swift in Sources */,
 				C4001A00000000000000BB08 /* UndoBanner.swift in Sources */,
+				L00MC0L0R5000000000A0001 /* LoomColors.swift in Sources */,
+				L00MC0L0R5000000000A0002 /* CalendarToolbar.swift in Sources */,
+				L00MC0L0R5000000000A0003 /* MonthGridView.swift in Sources */,
+				L00MC0L0R5000000000A0004 /* MacCalendarLayout.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

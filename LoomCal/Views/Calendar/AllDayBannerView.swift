@@ -19,7 +19,7 @@ struct AllDayBannerView: View {
                             .padding(.vertical, 4)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.blue.opacity(0.12))
+                                    .fill(LoomColors.eventAccent.opacity(0.12))
                             )
                     }
                 }

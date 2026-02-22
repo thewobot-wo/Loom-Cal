@@ -27,11 +27,11 @@ struct MiniMonthView: View {
             },
             onDateLongPress: onDateLongPress
         )
-        .frame(height: 260)
+        .frame(height: 350)
         .background(Color(.systemBackground))
         #else
-        MacMiniMonthView(viewModel: viewModel, onDateLongPress: onDateLongPress)
-            .frame(height: 260)
+        MacMiniMonthView(viewModel: viewModel)
+            .frame(height: 350)
         #endif
     }
 }
@@ -39,17 +39,20 @@ struct MiniMonthView: View {
 // MARK: - macOS Fallback
 
 #if os(macOS)
-/// Simple LazyVGrid-based month calendar for macOS where HorizonCalendar (UIKit) is unavailable.
-private struct MacMiniMonthView: View {
+/// Compact LazyVGrid-based month calendar for macOS sidebar.
+/// Has independent month navigation so user can browse without changing selectedDate.
+struct MacMiniMonthView: View {
     @ObservedObject var viewModel: CalendarViewModel
-    var onDateLongPress: ((Date) -> Void)?
+    var taskViewModel: TaskViewModel?
 
+    @State private var displayedMonth: Date = .now
+
+    private let calendar = Calendar.current
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
     private let weekdaySymbols = Calendar.current.shortWeekdaySymbols
 
     private var monthDates: [Date?] {
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month], from: viewModel.selectedDate)
+        let components = calendar.dateComponents([.year, .month], from: displayedMonth)
         guard let monthStart = calendar.date(from: components),
               let range = calendar.range(of: .day, in: .month, for: monthStart) else { return [] }
 
@@ -66,57 +69,109 @@ private struct MacMiniMonthView: View {
     }
 
     var body: some View {
-        VStack(spacing: 8) {
-            // Month/year header
-            Text(viewModel.selectedDate, format: .dateTime.month(.wide).year())
-                .font(.headline)
+        VStack(spacing: 6) {
+            // Month navigation header
+            HStack {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth) ?? displayedMonth
+                    }
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+
+                Spacer()
+
+                Text(displayedMonth, format: .dateTime.month(.wide).year())
+                    .font(.subheadline.weight(.semibold))
+
+                Spacer()
+
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
+                    }
+                } label: {
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 12)
+            .padding(.top, 10)
 
             // Weekday headers
-            LazyVGrid(columns: columns, spacing: 4) {
+            LazyVGrid(columns: columns, spacing: 2) {
                 ForEach(weekdaySymbols, id: \.self) { symbol in
                     Text(symbol)
-                        .font(.caption2)
+                        .font(.system(size: 10))
                         .foregroundStyle(.secondary)
                 }
             }
+            .padding(.horizontal, 8)
 
             // Day grid
-            LazyVGrid(columns: columns, spacing: 4) {
+            LazyVGrid(columns: columns, spacing: 2) {
                 ForEach(Array(monthDates.enumerated()), id: \.offset) { _, date in
                     if let date = date {
-                        let isSelected = Calendar.current.isDate(date, inSameDayAs: viewModel.selectedDate)
-                        let isToday = Calendar.current.isDateInToday(date)
-                        let hasEvents = !viewModel.timedEvents(for: date).isEmpty || !viewModel.allDayEvents(for: date).isEmpty
+                        let isSelected = calendar.isDate(date, inSameDayAs: viewModel.selectedDate)
+                        let isToday = calendar.isDateInToday(date)
+                        let hasEvents = !viewModel.events(for: date).isEmpty
+                        let hasTasks = taskViewModel?.tasks(dueOn: date).isEmpty == false
 
                         Button {
                             viewModel.selectedDate = date
                         } label: {
-                            VStack(spacing: 2) {
-                                Text("\(Calendar.current.component(.day, from: date))")
-                                    .font(.system(size: 14, weight: isSelected || isToday ? .bold : .regular))
-                                    .foregroundStyle(isSelected ? .white : isToday ? .blue : .primary)
-                                    .frame(width: 28, height: 28)
+                            VStack(spacing: 1) {
+                                Text("\(calendar.component(.day, from: date))")
+                                    .font(.system(size: 12, weight: isSelected || isToday ? .bold : .regular))
+                                    .foregroundStyle(isSelected ? .white : isToday ? LoomColors.todayAccent : .primary)
+                                    .frame(width: 24, height: 24)
                                     .background {
                                         if isSelected {
-                                            Circle().fill(.blue)
+                                            Circle().fill(LoomColors.selectedDateFill)
+                                        } else if isToday {
+                                            Circle().stroke(LoomColors.todayAccent, lineWidth: 1)
                                         }
                                     }
 
-                                Circle()
-                                    .fill(isSelected ? .white.opacity(0.8) : .blue)
-                                    .frame(width: 4, height: 4)
-                                    .opacity(hasEvents ? 1 : 0)
+                                HStack(spacing: 2) {
+                                    if hasEvents {
+                                        Circle()
+                                            .fill(isSelected ? Color.white.opacity(0.8) : LoomColors.eventDot)
+                                            .frame(width: 3, height: 3)
+                                    }
+                                    if hasTasks {
+                                        Circle()
+                                            .fill(isSelected ? Color.white.opacity(0.8) : LoomColors.taskDot)
+                                            .frame(width: 3, height: 3)
+                                    }
+                                }
+                                .frame(height: 3)
                             }
                         }
                         .buttonStyle(.plain)
                     } else {
                         Color.clear
-                            .frame(height: 34)
+                            .frame(height: 28)
                     }
                 }
             }
+            .padding(.horizontal, 8)
         }
-        .padding(.horizontal)
+        .frame(height: 240)
+        .onAppear {
+            displayedMonth = viewModel.selectedDate
+        }
+        .onChange(of: viewModel.selectedDate) { _, newDate in
+            if !calendar.isDate(newDate, equalTo: displayedMonth, toGranularity: .month) {
+                displayedMonth = newDate
+            }
+        }
     }
 }
 #endif
@@ -325,12 +380,12 @@ final class MiniDayCellView: UIView, CalendarItemViewRepresentable {
         view.numberLabel.text = "\(viewModel.dayNumber)"
 
         if viewModel.isSelected {
-            view.circleView.backgroundColor = .systemBlue
+            view.circleView.backgroundColor = LoomColors.coralUI
             view.numberLabel.textColor = .white
             view.numberLabel.font = .systemFont(ofSize: 16, weight: .bold)
         } else if viewModel.isToday {
             view.circleView.backgroundColor = .clear
-            view.numberLabel.textColor = .systemBlue
+            view.numberLabel.textColor = LoomColors.coralUI
             view.numberLabel.font = .systemFont(ofSize: 16, weight: .semibold)
         } else {
             view.circleView.backgroundColor = .clear
@@ -339,7 +394,7 @@ final class MiniDayCellView: UIView, CalendarItemViewRepresentable {
         }
 
         view.dotView.isHidden = !viewModel.hasEvents
-        view.dotView.backgroundColor = viewModel.isSelected ? .white.withAlphaComponent(0.8) : .systemBlue
+        view.dotView.backgroundColor = viewModel.isSelected ? .white.withAlphaComponent(0.8) : LoomColors.coralUI
     }
 }
 

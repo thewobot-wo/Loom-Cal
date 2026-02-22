@@ -1,6 +1,22 @@
 import SwiftUI
 import ConvexMobile
 
+// MARK: - CalendarViewMode
+
+/// View mode for the main calendar content area (macOS toolbar picker).
+enum CalendarViewMode: String, CaseIterable, Identifiable {
+    case day, week, month
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .day:   return "Day"
+        case .week:  return "Week"
+        case .month: return "Month"
+        }
+    }
+}
+
 // CalendarViewModel is the single source of truth for all calendar state.
 // It owns the Convex subscription, the selected date, and all CRUD mutations.
 // All calendar views observe this via @ObservedObject or @StateObject.
@@ -14,6 +30,9 @@ class CalendarViewModel: ObservableObject {
 
     /// Currently selected/viewed date — drives DayTimelineView and MiniMonthView
     @Published var selectedDate: Date = .now
+
+    /// Current view mode — Day/Week/Month (used by macOS toolbar picker)
+    @Published var viewMode: CalendarViewMode = .week
 
     /// True while waiting for first subscription result
     @Published var isLoading: Bool = true
@@ -139,5 +158,39 @@ class CalendarViewModel: ObservableObject {
     /// Navigates the calendar view to the given date (e.g., after Loom creates an event).
     func navigateToDate(_ date: Date) {
         selectedDate = date
+    }
+
+    /// Move forward by one unit (day/week/month) based on current viewMode.
+    func navigateForward() {
+        let cal = Calendar.current
+        switch viewMode {
+        case .day:   selectedDate = cal.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
+        case .week:  selectedDate = cal.date(byAdding: .weekOfYear, value: 1, to: selectedDate) ?? selectedDate
+        case .month: selectedDate = cal.date(byAdding: .month, value: 1, to: selectedDate) ?? selectedDate
+        }
+    }
+
+    /// Move backward by one unit (day/week/month) based on current viewMode.
+    func navigateBackward() {
+        let cal = Calendar.current
+        switch viewMode {
+        case .day:   selectedDate = cal.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
+        case .week:  selectedDate = cal.date(byAdding: .weekOfYear, value: -1, to: selectedDate) ?? selectedDate
+        case .month: selectedDate = cal.date(byAdding: .month, value: -1, to: selectedDate) ?? selectedDate
+        }
+    }
+
+    /// Formatted title string for the toolbar based on current viewMode and selectedDate.
+    var toolbarTitle: String {
+        let formatter = DateFormatter()
+        switch viewMode {
+        case .day:
+            formatter.dateFormat = "EEEE, MMMM d, yyyy"
+        case .week:
+            formatter.dateFormat = "MMMM yyyy"
+        case .month:
+            formatter.dateFormat = "MMMM yyyy"
+        }
+        return formatter.string(from: selectedDate)
     }
 }

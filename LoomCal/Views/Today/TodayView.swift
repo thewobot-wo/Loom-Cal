@@ -275,7 +275,7 @@ struct TodayView: View {
                             // Drag preview indicator line — shows target time slot during drag
                             if let indicatorY = dragIndicatorY {
                                 Rectangle()
-                                    .fill(Color.orange.opacity(0.5))
+                                    .fill(LoomColors.timeBlockAccent.opacity(0.5))
                                     .frame(width: contentWidth, height: 2)
                                     .offset(x: labelWidth, y: indicatorY)
                                     .allowsHitTesting(false)
@@ -390,7 +390,7 @@ struct TodayView: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Capsule().fill(Color.blue))
+                        .background(Capsule().fill(LoomColors.coral))
 
                     Spacer()
 
@@ -425,7 +425,7 @@ struct TodayView: View {
                         } label: {
                             Text("Show all (\(unscheduledTasks.count))")
                                 .font(.caption)
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(LoomColors.interactiveText)
                                 .padding(.vertical, 8)
                                 .frame(maxWidth: .infinity)
                         }
@@ -467,7 +467,7 @@ struct TodayView: View {
             }
             .font(.subheadline)
             .fontWeight(.semibold)
-            .foregroundStyle(.blue)
+            .foregroundStyle(LoomColors.interactiveText)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)

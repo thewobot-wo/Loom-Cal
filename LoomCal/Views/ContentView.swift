@@ -1,12 +1,5 @@
 import SwiftUI
 
-// MARK: - ViewMode
-
-enum ViewMode: String, CaseIterable {
-    case today = "Today"   // unified event+task timeline (replaces .day)
-    case week = "Week"
-}
-
 // MARK: - TaskListTabView
 
 /// Simple full task list for the Tasks tab.
@@ -145,66 +138,58 @@ struct ContentView: View {
     @StateObject private var taskViewModel = TaskViewModel()
     @StateObject private var chatViewModel = ChatViewModel()
 
-    @State private var viewMode: ViewMode = .today
     @State private var showCreateSheet = false
     @State private var showTaskCreateSheet = false
     @State private var selectedEvent: LoomEvent? = nil
     @State private var selectedTask: LoomTask? = nil
-    @State private var createPrefilledDate: Date? = nil
 
     var body: some View {
         TabView {
             // MARK: Tab 1 — Calendar
 
             NavigationStack {
-                VStack(spacing: 0) {
-                    // Segmented Today/Week control
-                    Picker("View", selection: $viewMode) {
-                        ForEach(ViewMode.allCases, id: \.self) { mode in
-                            Text(mode.rawValue).tag(mode)
+                #if os(macOS)
+                MacCalendarLayout(
+                    calendarViewModel: viewModel,
+                    taskViewModel: taskViewModel,
+                    onEventTap: { event in selectedEvent = event },
+                    onTaskTap: { task in selectedTask = task }
+                )
+                .navigationTitle("Loom Cal")
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Menu {
+                            Button {
+                                showCreateSheet = true
+                            } label: {
+                                Label("New Event", systemImage: "calendar.badge.plus")
+                            }
+                            Button {
+                                showTaskCreateSheet = true
+                            } label: {
+                                Label("New Task", systemImage: "checkmark.circle")
+                            }
+                        } label: {
+                            Image(systemName: "plus")
                         }
                     }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal)
-                    .padding(.vertical, 6)
-
-                    // Today mode: show mini month for date picking
-                    // Week mode: mini month hidden — week header is the navigation
-                    if viewMode == .today {
-                        MiniMonthView(
-                            viewModel: viewModel,
-                            onDateLongPress: { date in
-                                createPrefilledDate = date
-                                showCreateSheet = true
-                            }
-                        )
-                        Divider()
-                    }
-
-                    // Timeline
-                    switch viewMode {
-                    case .today:
-                        TodayView(
-                            calendarViewModel: viewModel,
-                            taskViewModel: taskViewModel,
-                            onEventTap: { event in selectedEvent = event },
-                            onTaskTap: { task in selectedTask = task },
-                            onEventDragMove: { event, pointsDelta in
-                                handleDragMove(event: event, pointsDelta: pointsDelta)
-                            }
-                        )
-                    case .week:
-                        WeekTimelineView(
-                            viewModel: viewModel,
-                            taskViewModel: taskViewModel,
-                            onEventTap: { event in selectedEvent = event }
-                        )
-                    }
+                }
+                #else
+                VStack(spacing: 0) {
+                    CollapsibleCalendarHeader(
+                        calendarViewModel: viewModel,
+                        taskViewModel: taskViewModel
+                    )
+                    Divider()
+                    DayEventListView(
+                        calendarViewModel: viewModel,
+                        taskViewModel: taskViewModel,
+                        onEventTap: { event in selectedEvent = event },
+                        onTaskTap: { task in selectedTask = task }
+                    )
                 }
                 .navigationTitle("Loom Cal")
-                #if !os(macOS)
                 .navigationBarTitleDisplayMode(.inline)
-                #endif
                 .toolbar {
                     ToolbarItem(placement: .primaryAction) {
                         Menu {
@@ -230,6 +215,7 @@ struct ContentView: View {
                         }
                     }
                 }
+                #endif
             }
             .tabItem {
                 Label("Calendar", systemImage: "calendar")
@@ -277,8 +263,7 @@ struct ContentView: View {
         .sheet(isPresented: $showCreateSheet) {
             EventCreationView(
                 viewModel: viewModel,
-                isPresented: $showCreateSheet,
-                prefilledDate: createPrefilledDate
+                isPresented: $showCreateSheet
             )
         }
         .sheet(isPresented: $showTaskCreateSheet) {
@@ -307,9 +292,6 @@ struct ContentView: View {
                 )
             )
         }
-        .onChange(of: showCreateSheet) { _, isShowing in
-            if !isShowing { createPrefilledDate = nil }
-        }
         // MARK: FAB overlay (iOS only)
         #if !os(macOS)
         .overlay(alignment: .bottomTrailing) {
@@ -320,18 +302,6 @@ struct ContentView: View {
         #endif
     }
 
-    // MARK: - Drag to Move
-
-    private func handleDragMove(event: LoomEvent, pointsDelta: CGFloat) {
-        let pointsPerHour: CGFloat = 60.0
-        let rawMinutesDelta = pointsDelta / pointsPerHour * 60.0
-        let minutesDelta = Int(round(rawMinutesDelta / 15.0)) * 15
-        let originalStart = Date(timeIntervalSince1970: TimeInterval(event.start) / 1000)
-        let newStart = originalStart.addingTimeInterval(Double(minutesDelta) * 60)
-        Task {
-            try? await viewModel.updateEvent(id: event._id, start: newStart)
-        }
-    }
 }
 
 #Preview {

@@ -191,7 +191,7 @@ server.tool(
       content: [
         {
           type: "text",
-          text: `Proposed: ${summary}. The user will see a confirmation card in the app.`,
+          text: `Done. Confirmation card sent to user.`,
         },
       ],
     };
@@ -260,7 +260,7 @@ server.tool(
     );
 
     return {
-      content: [{ type: "text", text: `Proposed: ${summary}. Awaiting confirmation.` }],
+      content: [{ type: "text", text: `Done. Confirmation card sent to user.` }],
     };
   },
 );
@@ -289,7 +289,7 @@ server.tool(
     );
 
     return {
-      content: [{ type: "text", text: `Proposed: ${summary}. Awaiting confirmation.` }],
+      content: [{ type: "text", text: `Done. Confirmation card sent to user.` }],
     };
   },
 );
@@ -342,7 +342,7 @@ server.tool(
     );
 
     return {
-      content: [{ type: "text", text: `Proposed: ${summary}. Awaiting confirmation.` }],
+      content: [{ type: "text", text: `Done. Confirmation card sent to user.` }],
     };
   },
 );
@@ -405,7 +405,7 @@ server.tool(
     );
 
     return {
-      content: [{ type: "text", text: `Proposed: ${summary}. Awaiting confirmation.` }],
+      content: [{ type: "text", text: `Done. Confirmation card sent to user.` }],
     };
   },
 );
@@ -434,7 +434,7 @@ server.tool(
     );
 
     return {
-      content: [{ type: "text", text: `Proposed: ${summary}. Awaiting confirmation.` }],
+      content: [{ type: "text", text: `Done. Confirmation card sent to user.` }],
     };
   },
 );

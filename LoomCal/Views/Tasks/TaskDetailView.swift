@@ -90,7 +90,7 @@ struct TaskDetailView: View {
                     Button(task.completed ? "Mark Incomplete" : "Mark Complete") {
                         toggleComplete()
                     }
-                    .foregroundStyle(task.completed ? Color.secondary : Color.blue)
+                    .foregroundStyle(task.completed ? Color.secondary : LoomColors.interactiveText)
 
                     Button("Delete Task", role: .destructive) {
                         showDeleteAlert = true

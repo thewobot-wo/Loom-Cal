@@ -67,15 +67,15 @@ struct TimelineEventCard: View {
         Self.timeFormatter.string(from: startDate)
     }
 
-    /// Accent bar color — orange for time-blocks, blue for regular events
+    /// Accent bar color — gold for time-blocks, blue-gray for regular events
     private var accentColor: Color {
-        isTimeBlock ? Color.orange.opacity(0.8) : Color.blue
+        isTimeBlock ? LoomColors.timeBlockAccent.opacity(0.8) : LoomColors.eventAccent
     }
 
     /// Background fill color
     private var backgroundColor: Color {
-        isTimeBlock ? Color.orange.opacity(isDragging ? 0.18 : 0.08)
-                    : Color.blue.opacity(isDragging ? 0.25 : 0.15)
+        isTimeBlock ? LoomColors.timeBlockAccent.opacity(isDragging ? 0.18 : 0.08)
+                    : LoomColors.eventAccent.opacity(isDragging ? 0.25 : 0.15)
     }
 
     var body: some View {
@@ -98,7 +98,7 @@ struct TimelineEventCard: View {
                         if isTimeBlock {
                             Image(systemName: "checkmark.square")
                                 .font(.system(size: 10))
-                                .foregroundStyle(Color.orange.opacity(0.8))
+                                .foregroundStyle(LoomColors.timeBlockAccent.opacity(0.8))
                         }
 
                         Text(event.title)

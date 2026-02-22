@@ -22,7 +22,7 @@ extension LoomTask {
         switch priority {
         case "high":   return .red
         case "medium": return .yellow
-        default:       return Color.blue.opacity(0.6)  // low or unrecognized
+        default:       return LoomColors.eventDefault.opacity(0.6)  // low or unrecognized
         }
     }
 
