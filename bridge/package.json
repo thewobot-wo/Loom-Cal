@@ -1,0 +1,14 @@
+{
+  "name": "loom-bridge",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Loom Bridge and Convex MCP server for OpenClaw",
+  "scripts": {
+    "bridge": "node loom-bridge.mjs",
+    "mcp": "node convex-mcp-server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.24.0"
+  }
+}

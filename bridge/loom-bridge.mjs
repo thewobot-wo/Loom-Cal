@@ -5,8 +5,11 @@
  *
  * Polls Convex for pending user messages, fetches calendar/task context,
  * forwards messages to the local OpenClaw gateway with a system prompt,
- * extracts action JSON from Loom's reply, and posts either a pending action
- * card or a plain reply back to Convex.
+ * and posts Loom's text reply back to Convex.
+ *
+ * Mutations (create/edit/delete events and tasks) are handled separately
+ * by the Convex MCP server (convex-mcp-server.mjs) which OpenClaw calls
+ * as tools. This bridge only handles chat message relay.
  *
  * Usage:
  *   OPENCLAW_TOKEN=<gateway-token> node loom-bridge.mjs
@@ -31,38 +34,6 @@ if (!OPENCLAW_TOKEN) {
 }
 
 let processing = false;
-
-// ---------------------------------------------------------------------------
-// Action extraction
-// ---------------------------------------------------------------------------
-
-/**
- * Parse Loom's reply for an embedded ACTION JSON block.
- *
- * Expected format at end of reply:
- *
- *   ACTION:
- *   ```json
- *   { "type": "create_event", "displaySummary": "...", "payload": { ... } }
- *   ```
- *
- * Returns { action, displayText } where:
- *   - action is the parsed JSON object (or null if not found/invalid)
- *   - displayText is the reply with the ACTION block stripped
- */
-function extractAction(replyText) {
-  const match = replyText.match(/ACTION:\s*```json\s*([\s\S]*?)```/);
-  if (!match) return { action: null, displayText: replyText.trim() };
-
-  try {
-    const action = JSON.parse(match[1].trim());
-    const displayText = replyText.replace(/ACTION:\s*```json[\s\S]*?```/g, "").trim();
-    return { action, displayText };
-  } catch (e) {
-    console.error("[bridge] Failed to parse action JSON:", e.message);
-    return { action: null, displayText: replyText.trim() };
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Context fetching
@@ -114,7 +85,7 @@ function formatTimestamp(ms) {
 
 /**
  * Build the system prompt for Loom, injecting current calendar and task context.
- * Instructs Loom on how to propose actions using the ACTION JSON envelope pattern.
+ * Tool usage instructions are minimal — OpenClaw provides tool schemas automatically.
  */
 function buildSystemPrompt(context) {
   const { events = [], tasks = [] } = context;
@@ -147,7 +118,10 @@ function buildSystemPrompt(context) {
       .join("\n");
   }
 
-  return `You are Loom, a calendar and task assistant.
+  return `You are Loom, a calendar and task assistant for the Loom Cal app.
+
+## Current Date/Time
+${new Date().toLocaleString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "long" })}
 
 ## Current Calendar (next 7 days)
 ${eventsSection}
@@ -155,64 +129,27 @@ ${eventsSection}
 ## Active Tasks
 ${tasksSection}
 
-## Your Capabilities
-You can create, edit, and delete events and tasks on behalf of the user. When asked to take action:
-1. Always propose the action first — never act without showing a preview
-2. Include the user-visible summary in "displaySummary" for the confirmation card
+## How You Work
+You have tools to create, edit, and delete calendar events and tasks. When the user asks you to make a change:
+1. Use the appropriate tool — it will create a confirmation card in the app
+2. The user confirms or cancels in the app before any change takes effect
 3. Reference existing items by their [id: ...] when editing or deleting
-
-## Action Format
-When you want to perform a calendar or task action, include this block at the END of your reply:
-
-ACTION:
-\`\`\`json
-{
-  "type": "create_event" | "update_event" | "delete_event" | "create_task" | "update_task" | "delete_task",
-  "displaySummary": "Human-readable summary for the confirmation card (e.g. 'Add Dentist on Tue Mar 5 at 3pm')",
-  "payload": {
-    // For create_event:
-    //   title (string, required), start (string ms, required), duration (string minutes, required),
-    //   timezone (string, required), isAllDay (boolean, required), calendarId (string, default "personal"),
-    //   location (string, optional), notes (string, optional), url (string, optional)
-    //
-    // For update_event:
-    //   id (string, required — from [id: ...] above), plus any fields to change,
-    //   previousValues (object with old values for diff display)
-    //
-    // For delete_event:
-    //   id (string, required)
-    //
-    // For create_task:
-    //   title (string, required), priority ("high"|"medium"|"low", required),
-    //   hasDueTime (boolean, required), completed (false, required),
-    //   dueDate (string ms, optional), notes (string, optional)
-    //
-    // For update_task:
-    //   id (string, required), plus any fields to change,
-    //   previousValues (object with old values for diff display)
-    //
-    // For delete_task:
-    //   id (string, required)
-  }
-}
-\`\`\`
+4. If multiple items match, list them and ask which one
 
 ## Rules
-- Timestamps in payloads MUST be string-encoded milliseconds (e.g. "1708988400000"), not numbers
-- Duration MUST be string-encoded minutes (e.g. "60")
-- Default calendarId to "personal" if not specified by the user
-- Default to all-day event (isAllDay: true, duration: "0") when no time is given
-- If multiple events/tasks match the user's request, list them as numbered options and ask which one
-- For creates with missing optional fields: create with what you have and mention what's missing
-- Do NOT include the ACTION block if you are just answering a question or asking for clarification`;
+- Default to calendar "personal" when none specified
+- Default to 60-minute events unless told otherwise
+- When no time is given, create an all-day event
+- Use ISO 8601 with timezone offset for dates (e.g. "2026-02-26T15:00:00-08:00")
+- Be concise and friendly in your replies`;
 }
 
 // ---------------------------------------------------------------------------
-// Convex posting functions
+// Convex posting
 // ---------------------------------------------------------------------------
 
 /**
- * Post Loom's plain text reply to Convex (no action detected).
+ * Post Loom's text reply to Convex.
  */
 async function postLoomReply(content) {
   const headers = { "Content-Type": "application/json" };
@@ -228,33 +165,6 @@ async function postLoomReply(content) {
     console.error(`[bridge] Convex reply post failed: ${postRes.status}`);
   } else {
     console.log("[bridge] Reply delivered successfully");
-  }
-}
-
-/**
- * Post a pending action card to Convex.
- * Falls back to posting a plain text reply if the pending-action endpoint fails.
- */
-async function postPendingAction(displayText, action) {
-  const headers = { "Content-Type": "application/json" };
-  if (WEBHOOK_SECRET) headers["Authorization"] = `Bearer ${WEBHOOK_SECRET}`;
-
-  try {
-    const res = await fetch(`${CONVEX_SITE_URL}/loom-pending-action`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ displayText, action }),
-    });
-
-    if (!res.ok) {
-      console.error(`[bridge] Pending action post failed: ${res.status} — falling back to plain reply`);
-      await postLoomReply(displayText);
-    } else {
-      console.log(`[bridge] Pending action delivered: ${action.type}`);
-    }
-  } catch (err) {
-    console.error(`[bridge] Pending action error: ${err.message} — falling back to plain reply`);
-    await postLoomReply(displayText);
   }
 }
 
@@ -323,18 +233,8 @@ async function poll() {
       return;
     }
 
-    console.log(`[bridge] Loom replied (${replyText.length} chars), parsing for action...`);
-
-    // Extract action JSON from reply (if present)
-    const { action, displayText } = extractAction(replyText);
-
-    if (action) {
-      console.log(`[bridge] Action detected: ${action.type}`);
-      await postPendingAction(displayText, action);
-    } else {
-      console.log(`[bridge] No action detected, posting plain reply...`);
-      await postLoomReply(displayText);
-    }
+    console.log(`[bridge] Loom replied (${replyText.length} chars), posting to Convex...`);
+    await postLoomReply(replyText);
   } catch (err) {
     console.error(`[bridge] Error: ${err.message}`);
   } finally {
@@ -346,6 +246,7 @@ console.log(`[bridge] Loom Bridge started`);
 console.log(`[bridge] OpenClaw: ${OPENCLAW_URL}`);
 console.log(`[bridge] Convex:   ${CONVEX_SITE_URL}`);
 console.log(`[bridge] Polling every ${POLL_INTERVAL}ms`);
+console.log(`[bridge] Actions handled by Convex MCP server (separate process)`);
 console.log("");
 
 setInterval(poll, POLL_INTERVAL);
