@@ -5,6 +5,11 @@ import ConvexMobile
 class TaskViewModel: ObservableObject {
     @Published var tasks: [LoomTask] = []
     @Published var isLoading: Bool = true
+
+    /// ID of the task to highlight after a Loom action mutation — drives flash animation in views.
+    /// Automatically cleared after 2 seconds by flashHighlight(taskId:).
+    @Published var highlightedTaskId: String? = nil
+
     private var subscriptionTask: Task<Void, Never>?
 
     func startSubscription() {
@@ -118,6 +123,20 @@ class TaskViewModel: ObservableObject {
     func deleteTask(id: String) async throws {
         let args: [String: ConvexEncodable?] = ["id": id]
         try await convex.mutation("tasks:remove", with: args)
+    }
+
+    // MARK: - Highlight Feedback
+
+    /// Highlights a task briefly (2 seconds) to draw attention after a Loom action mutation.
+    /// Views observe highlightedTaskId to apply a visual emphasis.
+    func flashHighlight(taskId: String) {
+        highlightedTaskId = taskId
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            withAnimation {
+                self.highlightedTaskId = nil
+            }
+        }
     }
 
     /// Create a time-block event linked to a task

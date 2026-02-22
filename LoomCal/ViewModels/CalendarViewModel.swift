@@ -18,6 +18,10 @@ class CalendarViewModel: ObservableObject {
     /// True while waiting for first subscription result
     @Published var isLoading: Bool = true
 
+    /// ID of the event to highlight after a Loom action mutation — drives flash animation in views.
+    /// Automatically cleared after 2 seconds by flashHighlight(eventId:).
+    @Published var highlightedEventId: String? = nil
+
     // MARK: - Private
 
     /// Task handle for the subscription loop — cancel before re-subscribing
@@ -114,5 +118,26 @@ class CalendarViewModel: ObservableObject {
     func deleteEvent(id: String) async throws {
         let args: [String: ConvexEncodable?] = ["id": id]
         try await convex.mutation("events:remove", with: args)
+    }
+
+    // MARK: - Highlight Feedback
+
+    /// Highlights an event briefly (2 seconds) to draw attention after a Loom action mutation.
+    /// Views observe highlightedEventId to apply a visual emphasis.
+    func flashHighlight(eventId: String) {
+        highlightedEventId = eventId
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            withAnimation {
+                self.highlightedEventId = nil
+            }
+        }
+    }
+
+    // MARK: - Navigation
+
+    /// Navigates the calendar view to the given date (e.g., after Loom creates an event).
+    func navigateToDate(_ date: Date) {
+        selectedDate = date
     }
 }

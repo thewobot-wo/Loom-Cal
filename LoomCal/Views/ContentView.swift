@@ -264,6 +264,9 @@ struct ContentView: View {
             }
         }
         .task {
+            // Wire ViewModel references so ChatViewModel can execute mutations on confirm.
+            chatViewModel.calendarViewModel = viewModel
+            chatViewModel.taskViewModel = taskViewModel
             viewModel.startSubscription()
             taskViewModel.startSubscription()
             chatViewModel.startSubscription()
