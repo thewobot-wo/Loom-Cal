@@ -45,13 +45,15 @@ class ChatViewModel: ObservableObject {
                 self.messages = result
                 self.isLoading = false
 
-                // If a new assistant message arrived, clear pending state and timeout
+                // If a new assistant or pending_action message arrived, clear pending state and timeout
                 if result.count > previousCount,
                    let lastMessage = result.last,
-                   lastMessage.role == "assistant" {
+                   (lastMessage.role == "assistant" || lastMessage.role == "pending_action") {
                     self.pendingMessageContent = nil
                     self.timeoutTask?.cancel()
                     self.timeoutTask = nil
+                    // Clear timed-out message IDs — Loom is responding
+                    self.timedOutMessageIds.removeAll()
                     // Loom replied successfully — mark available
                     if !self.isLoomAvailable {
                         self.isLoomAvailable = true
@@ -86,7 +88,7 @@ class ChatViewModel: ObservableObject {
         Task {
             do {
                 try await convex.mutation("chatMessages:send", with: args)
-                // Mutation succeeded — start the 8-second reply timeout
+                // Mutation succeeded — start the reply timeout
                 self.startReplyTimeout()
             } catch {
                 // Mutation failed — Loom/Convex unreachable
@@ -106,9 +108,9 @@ class ChatViewModel: ObservableObject {
     private func startReplyTimeout() {
         timeoutTask?.cancel()
         timeoutTask = Task {
-            try? await Task.sleep(for: .seconds(8))
+            try? await Task.sleep(for: .seconds(30))
             guard !Task.isCancelled else { return }
-            // No reply arrived within 8 seconds
+            // No reply arrived within 30 seconds (tool calls can be slow)
             self.isLoomAvailable = false
             if let content = self.pendingMessageContent {
                 self.timedOutMessageIds.insert(content)
@@ -119,24 +121,46 @@ class ChatViewModel: ObservableObject {
 
     // MARK: - Action Lifecycle
 
-    /// Confirms a pending action: marks it confirmed in Convex, executes the corresponding
-    /// mutation via CalendarViewModel or TaskViewModel, and starts the undo timer.
+    /// Confirms a pending action: executes the mutation FIRST via CalendarViewModel or TaskViewModel,
+    /// then marks it confirmed in Convex only on success, and starts the undo timer.
     func confirmAction(_ message: ChatMessage) {
         guard message.isPendingAction,
               let action = message.decodedAction
         else { return }
 
+        // Guard: verify required ViewModel is available before attempting execution
+        if action.isEventAction && calendarViewModel == nil {
+            Task {
+                let errorArgs: [String: ConvexEncodable?] = [
+                    "role": "assistant",
+                    "content": "Calendar isn't ready yet — please wait a moment and try again."
+                ]
+                try? await convex.mutation("chatMessages:send", with: errorArgs)
+            }
+            return
+        }
+        if action.isTaskAction && taskViewModel == nil {
+            Task {
+                let errorArgs: [String: ConvexEncodable?] = [
+                    "role": "assistant",
+                    "content": "Tasks aren't ready yet — please wait a moment and try again."
+                ]
+                try? await convex.mutation("chatMessages:send", with: errorArgs)
+            }
+            return
+        }
+
         Task {
             do {
-                // 1. Mark confirmed in Convex before executing the mutation
+                // 1. Execute the action mutation FIRST — capture created ID if applicable
+                let createdId = try await self.executeAction(action)
+
+                // 2. Mark confirmed in Convex ONLY after successful execution
                 let statusArgs: [String: ConvexEncodable?] = [
                     "id": message._id,
                     "actionStatus": "confirmed"
                 ]
                 try await convex.mutation("chatMessages:updateActionStatus", with: statusArgs)
-
-                // 2. Execute the action mutation and capture created ID if applicable
-                let createdId = try await self.executeAction(action)
 
                 // 3. Start undo timer (not started for delete actions — data is gone)
                 if !action.isDelete {
@@ -144,6 +168,13 @@ class ChatViewModel: ObservableObject {
                 }
 
             } catch {
+                // Execution failed — mark as failed (leave card actionable for retry)
+                let failArgs: [String: ConvexEncodable?] = [
+                    "id": message._id,
+                    "actionStatus": "cancelled"
+                ]
+                try? await convex.mutation("chatMessages:updateActionStatus", with: failArgs)
+
                 // Surface the failure as an assistant error message
                 let errorArgs: [String: ConvexEncodable?] = [
                     "role": "assistant",

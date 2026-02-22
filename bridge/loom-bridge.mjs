@@ -146,6 +146,90 @@ You have tools to create, edit, and delete calendar events and tasks. When the u
 }
 
 // ---------------------------------------------------------------------------
+// ACTION text fallback parsing
+// ---------------------------------------------------------------------------
+
+/**
+ * Detect and extract an ACTION: JSON block from Loom's reply text.
+ * Safety net for when Loom outputs raw ACTION text instead of calling MCP tools.
+ *
+ * Expected format (anywhere in the text):
+ *   ACTION: { "type": "create_event", "displaySummary": "...", "payload": {...} }
+ *
+ * Returns { action, cleanText } if found, or null if no ACTION block present.
+ */
+function detectActionBlock(text) {
+  const actionIdx = text.indexOf("ACTION:");
+  if (actionIdx === -1) return null;
+
+  // Extract everything after "ACTION:" up to end of text or next double-newline
+  const afterAction = text.substring(actionIdx + "ACTION:".length).trim();
+
+  // Find the JSON object — look for balanced braces
+  const jsonStart = afterAction.indexOf("{");
+  if (jsonStart === -1) return null;
+
+  let depth = 0;
+  let jsonEnd = -1;
+  for (let i = jsonStart; i < afterAction.length; i++) {
+    if (afterAction[i] === "{") depth++;
+    else if (afterAction[i] === "}") {
+      depth--;
+      if (depth === 0) {
+        jsonEnd = i;
+        break;
+      }
+    }
+  }
+  if (jsonEnd === -1) return null;
+
+  const jsonStr = afterAction.substring(jsonStart, jsonEnd + 1);
+  let action;
+  try {
+    action = JSON.parse(jsonStr);
+  } catch {
+    console.error("[bridge] Failed to parse ACTION JSON:", jsonStr.substring(0, 200));
+    return null;
+  }
+
+  // Validate required fields
+  if (!action.type || !action.payload) {
+    console.error("[bridge] ACTION block missing required fields (type, payload)");
+    return null;
+  }
+
+  // Strip the entire ACTION block from the text
+  const fullBlock = text.substring(actionIdx, actionIdx + "ACTION:".length + jsonEnd + 1);
+  const cleanText = text.replace(fullBlock, "").trim();
+
+  return { action, cleanText };
+}
+
+/**
+ * Post a pending action to Convex (for the iOS confirmation card).
+ * Called when an ACTION block is detected in Loom's reply text.
+ */
+async function postPendingAction(action, displayText) {
+  const headers = { "Content-Type": "application/json" };
+  if (WEBHOOK_SECRET) headers["Authorization"] = `Bearer ${WEBHOOK_SECRET}`;
+
+  const res = await fetch(`${CONVEX_SITE_URL}/loom-pending-action`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      displayText: displayText || action.displaySummary || "Action proposed",
+      action,
+    }),
+  });
+
+  if (!res.ok) {
+    console.error(`[bridge] Pending action post failed: ${res.status}`);
+  } else {
+    console.log("[bridge] Pending action delivered successfully");
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Convex posting
 // ---------------------------------------------------------------------------
 
@@ -235,7 +319,19 @@ async function poll() {
     }
 
     console.log(`[bridge] Loom replied (${replyText.length} chars), posting to Convex...`);
-    await postLoomReply(replyText);
+
+    // Check for ACTION: block fallback (when Loom doesn't use MCP tools)
+    const actionResult = detectActionBlock(replyText);
+    if (actionResult) {
+      console.log(`[bridge] ACTION block detected (type: ${actionResult.action.type}), creating confirmation card...`);
+      await postPendingAction(actionResult.action, actionResult.cleanText || undefined);
+      // Post cleaned text as the chat reply (may be empty if ACTION was the whole message)
+      if (actionResult.cleanText) {
+        await postLoomReply(actionResult.cleanText);
+      }
+    } else {
+      await postLoomReply(replyText);
+    }
   } catch (err) {
     console.error(`[bridge] Error: ${err.message}`);
   } finally {

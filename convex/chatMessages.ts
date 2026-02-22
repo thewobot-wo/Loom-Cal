@@ -68,6 +68,48 @@ export const writePendingAction = internalMutation({
     action: v.string(),   // JSON string of the action payload
   },
   handler: async (ctx, { content, action }) => {
+    // Dedup: skip if a matching pending_action was created in the last 30 seconds.
+    // Prevents duplicates when Loom calls the same MCP tool multiple times.
+    const thirtySecondsAgo = BigInt(Date.now() - 30_000);
+    const recentPending = await ctx.db
+      .query("chat_messages")
+      .withIndex("by_sent_at")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("role"), "pending_action"),
+          q.eq(q.field("actionStatus"), "pending"),
+          q.gte(q.field("sentAt"), thirtySecondsAgo)
+        )
+      )
+      .collect();
+
+    // Check if any recent pending action has the same type and payload title
+    let parsedAction: { type?: string; payload?: { title?: string } } | null = null;
+    try {
+      parsedAction = JSON.parse(action);
+    } catch {
+      // If action can't be parsed, proceed with insert (no dedup possible)
+    }
+
+    if (parsedAction) {
+      const isDuplicate = recentPending.some((msg) => {
+        try {
+          const existing = JSON.parse(msg.action as string);
+          return (
+            existing.type === parsedAction!.type &&
+            existing.payload?.title === parsedAction!.payload?.title
+          );
+        } catch {
+          return false;
+        }
+      });
+
+      if (isDuplicate) {
+        // Skip — duplicate action card already exists
+        return;
+      }
+    }
+
     await ctx.db.insert("chat_messages", {
       role: "pending_action",
       content,
