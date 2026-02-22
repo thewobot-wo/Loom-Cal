@@ -1,15 +1,15 @@
 ---
 phase: 04-loom-chat
 plan: 01
-subsystem: backend-ai-pipeline + swift-viewmodel
-tags: [convex, anthropic, chat, ai, swift, viewmodel]
+subsystem: backend-data-layer + swift-viewmodel
+tags: [convex, chat, swift, viewmodel, bridge, openclaw]
 dependency_graph:
   requires: []
-  provides: [chat-ai-pipeline, chat-viewmodel]
+  provides: [chat-data-layer, chat-viewmodel]
   affects: [04-02-chat-ui]
 tech_stack:
-  added: ["@anthropic-ai/sdk ^0.78.0"]
-  patterns: ["internalAction for AI calls", "ctx.scheduler.runAfter for async AI scheduling", "Task.sleep cancellation for timeout"]
+  added: []
+  patterns: ["Bridge polling pattern for AI replies", "Convex HTTP endpoints for external integration", "Task.sleep cancellation for timeout"]
 key_files:
   created:
     - LoomCal/ViewModels/ChatViewModel.swift

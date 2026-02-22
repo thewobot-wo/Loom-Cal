@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Calendar Views** - Day and week calendar views with Convex-native event CRUD
 - [x] **Phase 3: Task System** - Full task CRUD, today view, task markers on calendar, and time-blocking (completed 2026-02-21)
 - [x] **Phase 3.1: Audit Gap Closure** - Retroactive Phase 2 verification, CALV-02 doc fix, WeekView isTimeBlock fix (INSERTED, completed 2026-02-21)
-- [ ] **Phase 4: Loom Chat** - In-app chat with Loom, message history, graceful offline degradation
+- [x] **Phase 4: Loom Chat** - In-app chat with Loom via OpenClaw bridge, message history, graceful offline degradation (completed 2026-02-21)
 - [ ] **Phase 5: Loom Calendar and Task Actions** - Loom creates, edits, and deletes events and tasks via Convex MCP
 - [ ] **Phase 6: AI Daily Planning** - Loom-generated daily plans with required user approval before any mutation commits
 - [ ] **Phase 7: Natural Language Entry** - In-app natural language event and task creation
@@ -97,11 +97,11 @@ Plans:
   3. The chat panel shows full message history from the current session in chronological order
   4. When Loom is unreachable, the app shows a clear "Loom unavailable" status indicator — the chat input is disabled with an explanation, and all calendar and task features remain fully functional
   5. After sending a message, the app does not block or show an infinite spinner — it shows a pending state for a maximum of 8 seconds before showing an error if no reply arrives
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
-- [ ] 04-01-PLAN.md — Convex AI reply pipeline (Anthropic SDK, internalAction, scheduler) + ChatViewModel
-- [ ] 04-02-PLAN.md — Chat UI views (iMessage bubbles, Markdown, typing indicator, input bar, suggestion chips)
-- [ ] 04-03-PLAN.md — ContentView TabView refactor, ChatFAB, end-to-end verification
+- [x] 04-01-PLAN.md — Chat data layer (chatMessages CRUD, listForLoom, writeAssistantReply) + ChatViewModel
+- [x] 04-02-PLAN.md — Chat UI views (iMessage bubbles, Markdown, typing indicator, input bar, suggestion chips)
+- [x] 04-03-PLAN.md — TabView integration, ChatFAB, OpenClaw bridge pattern, avatar images, UI polish
 
 ### Phase 5: Loom Calendar and Task Actions
 **Goal**: Loom can create, edit, and delete events and tasks via Convex MCP, and all changes appear in the app in real-time
@@ -160,7 +160,7 @@ Note: Phase 4 (Loom Chat) depends only on Phase 1 and can proceed in parallel wi
 | 2. Calendar Views | 3/3 | Complete | 2026-02-20 |
 | 3. Task System | 4/4 | Complete    | 2026-02-21 |
 | 3.1 Audit Gap Closure | 1/1 | Complete   | 2026-02-21 |
-| 4. Loom Chat | 2/3 | In Progress|  |
+| 4. Loom Chat | 3/3 | Complete | 2026-02-21 |
 | 5. Loom Calendar and Task Actions | 0/TBD | Not started | - |
 | 6. AI Daily Planning | 0/TBD | Not started | - |
 | 7. Natural Language Entry | 0/TBD | Not started | - |

@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** One app where you see everything on your plate — calendars, tasks, projects — and chat with Loom to actively manage your day.
-**Current focus:** Phase 4 — Loom Chat (Plan 3 in progress — at human-verify checkpoint)
+**Current focus:** Phase 4 complete — ready for Phase 5
 
 ## Current Position
 
-Phase: 4 of 8 (Loom Chat)
-Plan: 3 of 3 in current phase — IN PROGRESS (paused at checkpoint:human-verify after Task 1)
-Status: Phase 4 Plan 3 Task 1 COMMITTED (bb8aa42) — ContentView refactored to TabView (Calendar/Tasks/Chat tabs), ChatFAB added; awaiting human end-to-end verification
-Last activity: 2026-02-21 — Plan 04-03 Task 1 complete (TabView + ChatFAB)
+Phase: 4 of 8 (Loom Chat) — COMPLETE
+Plan: 3 of 3 — ALL COMPLETE
+Status: Phase 4 verified and closed. Loom Chat working end-to-end via OpenClaw bridge pattern.
+Last activity: 2026-02-21 — Phase 4 UI polish committed (17af26a), tracking updated
 
-Progress: [█████░░░░░] 50%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
@@ -31,11 +31,11 @@ Progress: [█████░░░░░] 50%
 | 02-calendar-views | 3 | 25 min | 8 min |
 | 03-task-system | 4 | 17 min | 4.25 min |
 | 03.1-audit-gap-closure | 1 | 3 min | 3 min |
-| 04-loom-chat | 2 | 9 min | 4.5 min |
+| 04-loom-chat | 3 | ~40 min | ~13 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-04 (5 min), 03.1-01 (3 min), 04-01 (3 min), 04-02 (6 min)
-- Trend: 3-6 min per plan; consistent velocity
+- Last 5 plans: 03.1-01 (3 min), 04-01 (3 min), 04-02 (6 min), 04-03 (~30 min with architecture pivot)
+- Note: 04-03 included 3 architecture iterations (Telegram → direct gateway → bridge pattern)
 
 *Updated after each plan completion*
 
@@ -86,9 +86,9 @@ Recent decisions affecting current work:
 - [Plan 03-04]: isTimeBlock param on TimelineEventCard switches orange/blue styling — single view, single styling source
 - [Plan 03-04]: Orange for time-blocked events, blue for regular events — task-linked visual hierarchy
 - [Plan 03.1-01]: No task icon in WeekTimelineView narrow columns — orange accent bar alone provides sufficient visual distinction (columns can be as narrow as 40pt)
-- [Plan 04-01]: internalAction for generateReply — prevents external calls, enforces single write path for assistant messages
-- [Plan 04-01]: ctx.scheduler.runAfter(0) triggers AI reply asynchronously from send mutation — decouples latency
-- [Plan 04-01]: listForAI takes last 50 messages — safety guard against unbounded context; Phase 6+ for smarter trimming
+- [Plan 04-01]: Bridge pattern for Loom replies — local polling script connects OpenClaw gateway to Convex HTTP endpoints (Convex cloud can't reach Tailscale Funnel)
+- [Plan 04-01]: No scheduler in send mutation — bridge handles the full AI reply flow externally via /pending-messages and /loom-reply
+- [Plan 04-01]: listForLoom takes last 50 messages — safety guard against unbounded context; Phase 6+ for smarter trimming
 - [Plan 04-01]: 8-second Task.sleep timeout with cancellation — no DispatchQueue, pure Swift concurrency
 - [Plan 04-01]: pendingMessageContent tracks content string not DB ID — optimistic update before subscription delivers real document
 - [Phase 04-02]: swift-markdown-ui 2.0.0+ added via pbxproj SPM — MarkdownUI renders in Loom bubbles only
@@ -100,19 +100,19 @@ Recent decisions affecting current work:
 
 - User must run `npx convex dev` to link Convex project and deploy schema/functions
 - User must set SUPABASE_EVENTS_URL and SUPABASE_ANON_KEY in Convex Dashboard environment variables
-- User must set ANTHROPIC_API_KEY in Convex Dashboard → Settings → Environment Variables (required for Loom AI replies)
-- Optionally set LOOM_MODEL in Convex Dashboard (default: claude-haiku-4-5, or claude-sonnet-4-5 for better reasoning)
+- Bridge script (`bridge/loom-bridge.mjs`) must run on Loom machine for AI replies (DONE — user confirmed working)
+- Optional: clean up unused Convex env vars (TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, LOOM_GATEWAY_URL, LOOM_GATEWAY_TOKEN)
 
 ### Blockers/Concerns
 
 - [Phase 2 - RESOLVED]: HorizonCalendar 1.16.0 with platformFilters = (ios, ); macOS uses LazyVGrid fallback via #if canImport(UIKit) guard
 - [Phase 1 - RESOLVED]: ConvexMobile 0.8.0 confirmed compatible with Xcode 16.2 / iOS 18.6 SDK
-- [Phase 4]: Loom MCP must have write access to `chat_messages` Convex table — coordinate Loom config before Phase 4 planning
+- [Phase 4 - RESOLVED]: Loom communicates via bridge pattern (polling script on Loom machine) — no direct Convex access needed
 - [Phase 5]: Convex background subscription behavior on iOS not documented — test in Phase 4/5 before notification implementation
 - [Phase 1 - User Action Required]: npx convex dev must be run interactively to link Convex project and generate real _generated/ files
 
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Phase 4 plan 04-03 Task 1 committed (bb8aa42) — paused at checkpoint:human-verify (Task 2) for end-to-end Loom Chat verification
-Resume file: After human approves verification, continue Phase 4 Plan 3 Task 2 completion → write 04-03-SUMMARY.md and finalize phase
+Stopped at: Phase 4 complete — all plans executed, verified end-to-end, tracking updated
+Resume: Ready for Phase 5 (Loom Calendar and Task Actions) when user is ready
