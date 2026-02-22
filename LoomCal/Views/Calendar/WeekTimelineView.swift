@@ -237,6 +237,7 @@ struct WeekTimelineView: View {
         let isTimeBlock = event.taskId != nil
         let accentColor: Color = isTimeBlock ? Color.orange.opacity(0.8) : Color.blue
         let bgColor: Color = isTimeBlock ? Color.orange.opacity(0.12) : Color.blue.opacity(0.12)
+        let isHighlighted = viewModel.highlightedEventId == event._id
 
         Button(action: { onEventTap(event) }) {
             HStack(spacing: 0) {
@@ -261,6 +262,7 @@ struct WeekTimelineView: View {
             )
         }
         .buttonStyle(.plain)
+        .highlightPulse(active: isHighlighted)
         .frame(width: columnWidth - 3, height: eventHeight)
         .offset(x: 1.5, y: yPos)
     }

@@ -59,7 +59,8 @@ struct TaskListTabView: View {
                             onComplete: {
                                 Task { try? await taskViewModel.toggleComplete(task: task) }
                             },
-                            onTap: { selectedTask = task }
+                            onTap: { selectedTask = task },
+                            isHighlighted: taskViewModel.highlightedTaskId == task._id
                         )
                         .listRowInsets(EdgeInsets())
                         .listRowSeparator(.hidden)
@@ -77,7 +78,8 @@ struct TaskListTabView: View {
                                 onComplete: {
                                     Task { try? await taskViewModel.toggleComplete(task: task) }
                                 },
-                                onTap: { selectedTask = task }
+                                onTap: { selectedTask = task },
+                                isHighlighted: taskViewModel.highlightedTaskId == task._id
                             )
                             .listRowInsets(EdgeInsets())
                             .listRowSeparator(.hidden)

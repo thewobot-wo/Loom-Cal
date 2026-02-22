@@ -1,5 +1,38 @@
 import SwiftUI
 
+// MARK: - HighlightPulseModifier
+
+/// Applies a pulsing accent border overlay when isHighlighted is true.
+/// Used by TimelineEventCard and TaskRowView to visually feedback after Loom mutations.
+struct HighlightPulseModifier: ViewModifier {
+    let isHighlighted: Bool
+    @State private var pulseOpacity: Double = 0
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                if isHighlighted {
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(Color.accentColor, lineWidth: 2)
+                        .opacity(pulseOpacity)
+                        .onAppear {
+                            withAnimation(.easeInOut(duration: 0.5).repeatCount(3, autoreverses: true)) {
+                                pulseOpacity = 1.0
+                            }
+                        }
+                }
+            }
+    }
+}
+
+extension View {
+    /// Applies a pulsing accent-color border when active is true.
+    /// Called on TimelineEventCard and TaskRowView after Loom mutations.
+    func highlightPulse(active: Bool) -> some View {
+        modifier(HighlightPulseModifier(isHighlighted: active))
+    }
+}
+
 /// Fantastical-inspired event card for the day timeline.
 /// Displays event title and formatted 12-hour start time.
 /// Regular events: blue accent bar + blue background.
@@ -10,6 +43,8 @@ struct TimelineEventCard: View {
     /// True when this event is a time-block linked to a task (event.taskId != nil).
     /// Changes styling to orange to visually distinguish from regular blue events.
     var isTimeBlock: Bool = false
+    /// True when this event matches CalendarViewModel.highlightedEventId — triggers pulse animation.
+    var isHighlighted: Bool = false
     var onTap: () -> Void = {}
     /// Called with vertical point delta (positive = down, negative = up) on drag end.
     var onDragMove: ((CGFloat) -> Void)?
@@ -90,6 +125,7 @@ struct TimelineEventCard: View {
             .opacity(isDragging ? 0.8 : 1.0)
         }
         .buttonStyle(.plain)
+        .highlightPulse(active: isHighlighted)
         .offset(y: dragOffset)
         .gesture(
             // Long-press activates drag mode to prevent accidental drags.

@@ -72,6 +72,7 @@ private struct DraggableTaskRow: View {
     @Binding var dragState: TaskDragState?
     var onComplete: () -> Void = {}
     var onTap: () -> Void = {}
+    var isHighlighted: Bool = false
 
     @State private var dragOffset: CGSize = .zero
     @State private var isDragging: Bool = false
@@ -80,7 +81,8 @@ private struct DraggableTaskRow: View {
         TaskRowView(
             task: task,
             onComplete: onComplete,
-            onTap: onTap
+            onTap: onTap,
+            isHighlighted: isHighlighted
         )
         .offset(dragOffset)
         .opacity(isDragging ? 0.7 : 1.0)
@@ -410,7 +412,8 @@ struct TodayView: View {
                             onComplete: {
                                 handleTaskComplete(task)
                             },
-                            onTap: { onTaskTap(task) }
+                            onTap: { onTaskTap(task) },
+                            isHighlighted: taskViewModel.highlightedTaskId == task._id
                         )
                         Divider().padding(.leading, 44)
                     }
@@ -516,6 +519,7 @@ struct TodayView: View {
             TimelineEventCard(
                 event: item.event,
                 isTimeBlock: item.event.taskId != nil,
+                isHighlighted: calendarViewModel.highlightedEventId == item.event._id,
                 onTap: { onEventTap(item.event) },
                 onDragMove: { delta in
                     onEventDragMove?(item.event, delta)

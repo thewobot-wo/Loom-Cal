@@ -8,6 +8,8 @@ struct DayTimelineView: View {
     let allDayEvents: [LoomEvent]
     var onEventTap: (LoomEvent) -> Void = { _ in }
     var onEventDragMove: ((LoomEvent, CGFloat) -> Void)?
+    /// ID of the event to highlight with a pulse animation (from CalendarViewModel.highlightedEventId).
+    var highlightedEventId: String? = nil
 
     // MARK: - Layout Constants
 
@@ -115,6 +117,7 @@ struct DayTimelineView: View {
             TimelineEventCard(
                 event: item.event,
                 isTimeBlock: item.event.taskId != nil,
+                isHighlighted: highlightedEventId == item.event._id,
                 onTap: { onEventTap(item.event) },
                 onDragMove: { delta in
                     onEventDragMove?(item.event, delta)

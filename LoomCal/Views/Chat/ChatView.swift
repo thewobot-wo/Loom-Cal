@@ -42,8 +42,17 @@ struct ChatView: View {
                                     .padding(.top, 8)
 
                                 ForEach(group.messages) { message in
-                                    ChatBubbleView(message: message)
+                                    if message.role == "pending_action" {
+                                        ActionConfirmationCard(
+                                            message: message,
+                                            onConfirm: { chatViewModel.confirmAction(message) },
+                                            onCancel: { chatViewModel.cancelAction(message) }
+                                        )
                                         .id(message.id)
+                                    } else {
+                                        ChatBubbleView(message: message)
+                                            .id(message.id)
+                                    }
                                 }
                             }
 
@@ -85,6 +94,17 @@ struct ChatView: View {
                         }
                     }
                 }
+            }
+
+            // Undo banner — appears above divider during the undo window
+            if let undo = chatViewModel.activeUndoAction {
+                UndoBanner(
+                    displaySummary: undo.action.displaySummary,
+                    secondsRemaining: chatViewModel.undoSecondsRemaining,
+                    onUndo: { chatViewModel.undoAction() }
+                )
+                .animation(.easeInOut(duration: 0.2), value: chatViewModel.activeUndoAction != nil)
+                .padding(.bottom, 4)
             }
 
             Divider()

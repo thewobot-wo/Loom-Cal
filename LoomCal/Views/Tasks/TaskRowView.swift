@@ -7,6 +7,8 @@ struct TaskRowView: View {
     let task: LoomTask
     var onComplete: () -> Void
     var onTap: () -> Void
+    /// True when this task matches TaskViewModel.highlightedTaskId — triggers pulse animation.
+    var isHighlighted: Bool = false
 
     var body: some View {
         HStack(spacing: 0) {
@@ -55,5 +57,6 @@ struct TaskRowView: View {
         .onTapGesture {
             onTap()
         }
+        .highlightPulse(active: isHighlighted)
     }
 }
