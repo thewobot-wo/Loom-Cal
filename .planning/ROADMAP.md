@@ -115,7 +115,7 @@ Plans:
   5. When user asks Loom to complete or delete a task, the task list updates in real-time to reflect the change
 **Plans:** 3 plans
 Plans:
-- [ ] 05-01-PLAN.md — Convex schema extension, context/action HTTP endpoints, bridge upgrade with system prompt and action parsing
+- [x] 05-01-PLAN.md — Convex schema extension, context/action HTTP endpoints, bridge upgrade with system prompt and action parsing
 - [ ] 05-02-PLAN.md — Swift models (ChatMessage extension, LoomAction), ChatViewModel confirm/cancel/undo, highlight support
 - [ ] 05-03-PLAN.md — ActionConfirmationCard, UndoBanner, ChatView integration, highlight pulse animation, end-to-end verification
 
@@ -165,7 +165,7 @@ Note: Phase 4 (Loom Chat) depends only on Phase 1 and can proceed in parallel wi
 | 3. Task System | 4/4 | Complete    | 2026-02-21 |
 | 3.1 Audit Gap Closure | 1/1 | Complete   | 2026-02-21 |
 | 4. Loom Chat | 3/3 | Complete | 2026-02-21 |
-| 5. Loom Calendar and Task Actions | 0/3 | Planned | - |
+| 5. Loom Calendar and Task Actions | 1/3 | In Progress | - |
 | 6. AI Daily Planning | 0/TBD | Not started | - |
 | 7. Natural Language Entry | 0/TBD | Not started | - |
 | 8. Platform Polish | 0/TBD | Not started | - |

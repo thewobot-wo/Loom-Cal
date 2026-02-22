@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** One app where you see everything on your plate — calendars, tasks, projects — and chat with Loom to actively manage your day.
-**Current focus:** Phase 4 complete — ready for Phase 5
+**Current focus:** Phase 5 in progress — plan 1 of 3 complete
 
 ## Current Position
 
-Phase: 4 of 8 (Loom Chat) — COMPLETE
-Plan: 3 of 3 — ALL COMPLETE
-Status: Phase 4 verified and closed. Loom Chat working end-to-end via OpenClaw bridge pattern.
-Last activity: 2026-02-21 — Phase 4 UI polish committed (17af26a), tracking updated
+Phase: 5 of 8 (Loom Calendar and Task Actions) — IN PROGRESS
+Plan: 1 of 3 — 05-01 COMPLETE
+Status: 05-01 done — Convex backend schema, endpoints, and bridge extended for action support. Ready for 05-02 (iOS confirmation flow).
+Last activity: 2026-02-22 — 05-01 executed (d0f44aa, 2b04162), tracking updated
 
-Progress: [██████░░░░] 60%
+Progress: [███████░░░] 65%
 
 ## Performance Metrics
 
@@ -32,9 +32,10 @@ Progress: [██████░░░░] 60%
 | 03-task-system | 4 | 17 min | 4.25 min |
 | 03.1-audit-gap-closure | 1 | 3 min | 3 min |
 | 04-loom-chat | 3 | ~40 min | ~13 min |
+| 05-loom-calendar-and-task-actions | 1/3 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.1-01 (3 min), 04-01 (3 min), 04-02 (6 min), 04-03 (~30 min with architecture pivot)
+- Last 5 plans: 04-01 (3 min), 04-02 (6 min), 04-03 (~30 min), 05-01 (3 min)
 - Note: 04-03 included 3 architecture iterations (Telegram → direct gateway → bridge pattern)
 
 *Updated after each plan completion*
@@ -95,6 +96,11 @@ Recent decisions affecting current work:
 - [Phase 04-02]: @ObservedObject for ChatViewModel in ChatView — owned at ContentView level, passed down to prevent state reset on tab switch
 - [Phase 04-02]: FlowLayout custom Layout protocol for chip wrapping — pure SwiftUI, no UIKit
 - [Phase 04-02]: 5-minute gap threshold for message grouping with today/yesterday/date formatting
+- [Plan 05-01]: pending_action as a role value (not separate table) — keeps chat stream unified in one Convex subscription
+- [Plan 05-01]: ACTION JSON-in-text envelope — reliable fallback since OpenClaw doesn't pass tools to custom OpenAI-compatible endpoints
+- [Plan 05-01]: fetchContext called fresh per message (not cached) — prevents stale context for conflict detection
+- [Plan 05-01]: Filter pending_action messages from /pending-messages — prevents infinite reply loop when action card is last message
+- [Plan 05-01]: Timestamps in ACTION payloads as string-encoded ms — avoids JSON number precision issues for v.int64()
 
 ### Pending Todos
 
@@ -113,6 +119,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-21
-Stopped at: Phase 4 complete — all plans executed, verified end-to-end, tracking updated
-Resume: Ready for Phase 5 (Loom Calendar and Task Actions) when user is ready
+Last session: 2026-02-22
+Stopped at: Completed 05-01-PLAN.md — Convex backend + bridge extended for Loom action support
+Resume: Ready for 05-02 (iOS confirmation flow: ActionConfirmationCard, ChatViewModel action methods, undo timer)
