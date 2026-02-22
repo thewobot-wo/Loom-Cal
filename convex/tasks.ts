@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 
 /**
@@ -59,5 +59,30 @@ export const remove = mutation({
   },
   handler: async (ctx, { id }) => {
     await ctx.db.delete(id);
+  },
+});
+
+/**
+ * Internal query: fetch all incomplete tasks for Loom context.
+ * Used by the bridge to inject task context into Loom's system prompt.
+ * Returns a lightweight subset of fields relevant for Loom decision-making.
+ */
+export const listForLoom = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const tasks = await ctx.db
+      .query("tasks")
+      .withIndex("by_completed", (q) => q.eq("completed", false))
+      .collect();
+
+    return tasks.map((t) => ({
+      _id: t._id,
+      title: t.title,
+      dueDate: t.dueDate,
+      priority: t.priority,
+      hasDueTime: t.hasDueTime,
+      completed: t.completed,
+      notes: t.notes,
+    }));
   },
 });

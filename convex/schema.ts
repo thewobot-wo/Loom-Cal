@@ -47,9 +47,16 @@ export default defineSchema({
     .index("by_priority", ["priority"]),
 
   chat_messages: defineTable({
-    role: v.union(v.literal("user"), v.literal("assistant")),
+    role: v.union(v.literal("user"), v.literal("assistant"), v.literal("pending_action")),
     content: v.string(),
     sentAt: v.int64(),                            // UTC milliseconds
+    action: v.optional(v.string()),               // JSON string of the action payload (set for pending_action messages)
+    actionStatus: v.optional(v.union(
+      v.literal("pending"),
+      v.literal("confirmed"),
+      v.literal("cancelled"),
+      v.literal("undone"),
+    )),                                           // lifecycle state of an action card
   })
     .index("by_sent_at", ["sentAt"]),
 

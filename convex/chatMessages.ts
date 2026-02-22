@@ -1,5 +1,4 @@
 import { mutation, query, internalMutation, internalQuery } from "./_generated/server";
-import { internal } from "./_generated/api";
 import { v } from "convex/values";
 
 /**
@@ -55,5 +54,44 @@ export const writeAssistantReply = internalMutation({
       content,
       sentAt: BigInt(Date.now()),
     });
+  },
+});
+
+/**
+ * Internal mutation: write a pending action card to the chat_messages table.
+ * Called by the bridge via /loom-pending-action when Loom proposes a calendar or task action.
+ * The iOS client renders this as a confirmation card (not a plain bubble).
+ */
+export const writePendingAction = internalMutation({
+  args: {
+    content: v.string(),  // Loom's natural language text (ACTION block stripped)
+    action: v.string(),   // JSON string of the action payload
+  },
+  handler: async (ctx, { content, action }) => {
+    await ctx.db.insert("chat_messages", {
+      role: "pending_action",
+      content,
+      action,
+      actionStatus: "pending",
+      sentAt: BigInt(Date.now()),
+    });
+  },
+});
+
+/**
+ * Mutation: update the lifecycle status of an action card.
+ * Called from iOS when the user taps Confirm, Cancel, or Undo on an action card.
+ */
+export const updateActionStatus = mutation({
+  args: {
+    id: v.id("chat_messages"),
+    actionStatus: v.union(
+      v.literal("confirmed"),
+      v.literal("cancelled"),
+      v.literal("undone"),
+    ),
+  },
+  handler: async (ctx, { id, actionStatus }) => {
+    await ctx.db.patch(id, { actionStatus });
   },
 });
