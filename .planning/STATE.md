@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** One app where you see everything on your plate — calendars, tasks, projects — and chat with Loom to actively manage your day.
-**Current focus:** Phase 5 in progress — plan 1 of 3 complete
+**Current focus:** Phase 5 in progress — plan 2 of 3 complete
 
 ## Current Position
 
 Phase: 5 of 8 (Loom Calendar and Task Actions) — IN PROGRESS
-Plan: 1 of 3 — 05-01 COMPLETE
-Status: 05-01 done — Convex backend schema, endpoints, and bridge extended for action support. Ready for 05-02 (iOS confirmation flow).
-Last activity: 2026-02-22 — 05-01 executed (d0f44aa, 2b04162), tracking updated
+Plan: 2 of 3 — 05-02 COMPLETE
+Status: 05-02 done — iOS action model and ViewModel logic (ChatMessage extension, LoomAction struct, confirm/cancel/undo, highlight). Ready for 05-03 (ActionConfirmationCard UI).
+Last activity: 2026-02-22 — 05-02 executed (0f4b9d5, 410fff6), tracking updated
 
-Progress: [███████░░░] 65%
+Progress: [████████░░] 70%
 
 ## Performance Metrics
 
@@ -32,7 +32,7 @@ Progress: [███████░░░] 65%
 | 03-task-system | 4 | 17 min | 4.25 min |
 | 03.1-audit-gap-closure | 1 | 3 min | 3 min |
 | 04-loom-chat | 3 | ~40 min | ~13 min |
-| 05-loom-calendar-and-task-actions | 1/3 | 3 min | 3 min |
+| 05-loom-calendar-and-task-actions | 2/3 | 7 min | 3.5 min |
 
 **Recent Trend:**
 - Last 5 plans: 04-01 (3 min), 04-02 (6 min), 04-03 (~30 min), 05-01 (3 min)
@@ -101,6 +101,10 @@ Recent decisions affecting current work:
 - [Plan 05-01]: fetchContext called fresh per message (not cached) — prevents stale context for conflict detection
 - [Plan 05-01]: Filter pending_action messages from /pending-messages — prevents infinite reply loop when action card is last message
 - [Plan 05-01]: Timestamps in ACTION payloads as string-encoded ms — avoids JSON number precision issues for v.int64()
+- [Plan 05-02]: ActionValue enum decodes Bool before Int — JSON booleans would decode as Int 0/1 otherwise
+- [Plan 05-02]: Undo not started for delete actions — data is irrecoverably gone; undo scoped to create/update in Phase 5
+- [Plan 05-02]: New item ID captured via subscription snapshot diff (6x 500ms polls) — ConvexMobile mutation returns Void
+- [Plan 05-02]: calendarViewModel/taskViewModel stored as optional vars on ChatViewModel, wired in ContentView .task{}
 
 ### Pending Todos
 
@@ -120,5 +124,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 05-01-PLAN.md — Convex backend + bridge extended for Loom action support
-Resume: Ready for 05-02 (iOS confirmation flow: ActionConfirmationCard, ChatViewModel action methods, undo timer)
+Stopped at: Completed 05-02-PLAN.md — iOS action model and ViewModel logic (ChatMessage, LoomAction, ChatViewModel confirm/cancel/undo, highlight)
+Resume: Ready for 05-03 (ActionConfirmationCard UI — confirmation card view, undo banner, highlight animation in calendar/task views)

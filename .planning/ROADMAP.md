@@ -113,7 +113,7 @@ Plans:
   3. When user asks Loom to delete an event, it disappears from the calendar after Loom confirms the deletion
   4. When user asks Loom to create a task, the task appears in the task list in real-time with correct title, due date, and priority as specified
   5. When user asks Loom to complete or delete a task, the task list updates in real-time to reflect the change
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 Plans:
 - [x] 05-01-PLAN.md — Convex schema extension, context/action HTTP endpoints, bridge upgrade with system prompt and action parsing
 - [ ] 05-02-PLAN.md — Swift models (ChatMessage extension, LoomAction), ChatViewModel confirm/cancel/undo, highlight support
@@ -165,7 +165,7 @@ Note: Phase 4 (Loom Chat) depends only on Phase 1 and can proceed in parallel wi
 | 3. Task System | 4/4 | Complete    | 2026-02-21 |
 | 3.1 Audit Gap Closure | 1/1 | Complete   | 2026-02-21 |
 | 4. Loom Chat | 3/3 | Complete | 2026-02-21 |
-| 5. Loom Calendar and Task Actions | 1/3 | In Progress | - |
+| 5. Loom Calendar and Task Actions | 2/3 | In Progress|  |
 | 6. AI Daily Planning | 0/TBD | Not started | - |
 | 7. Natural Language Entry | 0/TBD | Not started | - |
 | 8. Platform Polish | 0/TBD | Not started | - |
