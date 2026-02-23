@@ -7,7 +7,7 @@ Fresh milestone covering phases 5-8. Goal: Loom can act on the user's behalf —
 | Phase | Name | Plans | Status |
 |-------|------|-------|--------|
 | 5 | Loom Calendar & Task Actions | 3/3 | Complete |
-| 6 | AI Daily Planning | 1/2 | In Progress |
+| 6 | AI Daily Planning | 2/2 | Complete |
 | 7 | Natural Language Entry | 0/TBD | Not Started |
 | 8 | Platform Polish | 0/TBD | Not Started |
 
@@ -46,8 +46,8 @@ Fresh milestone covering phases 5-8. Goal: Loom can act on the user's behalf —
 4. User can reject/dismiss plan and calendar remains unchanged
 
 **Plans:**
-- [ ] 06-01 — Bridge daily planning support, DailyPlanProposal model, ChatViewModel batch approve/reject/undo
-- [ ] 06-02 — DailyPlanCard UI, ChatView integration, end-to-end verification
+- [x] 06-01 — Bridge daily planning support, DailyPlanProposal model, ChatViewModel batch approve/reject/undo
+- [x] 06-02 — DailyPlanCard UI, ChatView integration, end-to-end verification
 
 ### Phase 7: Natural Language Entry
 

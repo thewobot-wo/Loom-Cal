@@ -3,28 +3,28 @@
 ## Current Position
 
 **Milestone:** v0.1 — Loom Intelligence
-**Phase:** 6 of 8 (AI Daily Planning) — In Progress
-**Plan:** 06-02 applied, awaiting UNIFY
-**Status:** APPLY complete, ready for UNIFY
-**Last activity:** 2026-02-22
+**Phase:** 7 of 8 (Natural Language Entry) — Not Started
+**Plan:** Not started
+**Status:** Ready to plan
+**Last activity:** 2026-02-22 — Phase 6 complete, transitioned to Phase 7
 
 Progress:
 - Milestone: [█████████░] 90%
-- Phase 6: [██████████] 100% (plan 2 of 2 applied)
+- Phase 7: [░░░░░░░░░░] 0%
 
 ## Loop Position
 
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ○     [Apply complete, ready for UNIFY]
+  ○        ○        ○     [Ready for new PLAN]
 ```
 
 ## Velocity
 
 **Carried from `.planning/STATE.md`:**
-- Total plans completed: 18 (across phases 1-6)
-- Average duration: ~6.8 min/plan
+- Total plans completed: 19 (across phases 1-6)
+- Average duration: ~6.7 min/plan
 - Total execution time: ~2.1 hours
 
 **By Phase:**
@@ -37,7 +37,7 @@ PLAN ──▶ APPLY ──▶ UNIFY
 | 03.1 Audit Gap Closure | 1 | 3 min | 3 min |
 | 04 Loom Chat | 3 | ~40 min | ~13 min |
 | 05 Loom Actions | 3 | ~10 min | ~3.3 min |
-| 06 AI Daily Planning | 1 | ~15 min | ~15 min |
+| 06 AI Daily Planning | 2 | ~20 min | ~10 min |
 
 ## Recent Decisions
 
@@ -45,6 +45,7 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - **PlannedBlock flexible Codable** — handles both String and Int for start/duration
 - **Separate DailyPlanProposal type** — parallel to LoomAction, not extending it
 - **Daily plans create events only** — tasks are inputs (context), not outputs
+- **isDailyPlan routing guard** — checked before generic pending_action in ChatView
 
 ## Pending Todos
 
@@ -58,6 +59,6 @@ PLAN ──▶ APPLY ──▶ UNIFY
 ## Session Continuity
 
 **Last session:** 2026-02-22
-**Stopped at:** Plan 06-02 applied successfully
-**Next action:** Run /paul:unify .paul/phases/06-ai-daily-planning/06-02-PLAN.md
-**Resume file:** .paul/phases/06-ai-daily-planning/06-02-PLAN.md
+**Stopped at:** Phase 6 complete, ready to plan Phase 7
+**Next action:** /paul:plan for Phase 7 (Natural Language Entry)
+**Resume file:** .paul/ROADMAP.md
