@@ -137,3 +137,15 @@ export const updateActionStatus = mutation({
     await ctx.db.patch(id, { actionStatus });
   },
 });
+
+/**
+ * Delete all chat messages — "clear chat" action.
+ */
+export const clearAll = mutation({
+  handler: async (ctx) => {
+    const all = await ctx.db.query("chat_messages").collect();
+    for (const msg of all) {
+      await ctx.db.delete(msg._id);
+    }
+  },
+});

@@ -105,6 +105,13 @@ class ChatViewModel: ObservableObject {
         sendMessage(content)
     }
 
+    /// Clear all chat messages.
+    func clearChat() {
+        Task {
+            try? await convex.mutation("chatMessages:clearAll", with: [:])
+        }
+    }
+
     private func startReplyTimeout() {
         timeoutTask?.cancel()
         timeoutTask = Task {

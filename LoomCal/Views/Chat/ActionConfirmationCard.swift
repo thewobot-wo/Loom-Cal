@@ -20,29 +20,29 @@ struct ActionConfirmationCard: View {
     }
 
     var body: some View {
+        // Resolved/cancelled cards collapse to a single compact line
+        if actionStatus != "pending" {
+            collapsedCard
+        } else {
+            expandedCard
+        }
+    }
+
+    /// Full card with details and Confirm/Cancel buttons — shown only while pending.
+    private var expandedCard: some View {
         HStack(alignment: .top, spacing: 0) {
-            // Left-align like Loom bubbles, slight indent
             VStack(alignment: .leading, spacing: 10) {
                 if let action = action {
-                    // Header: icon + action type label
                     actionHeader(action: action)
 
-                    // Summary
                     Text(action.displaySummary)
                         .font(.body)
                         .foregroundStyle(.primary)
 
-                    // Type-specific detail fields
                     actionDetails(action: action)
 
-                    // Action buttons (pending only) or status label
-                    if actionStatus == "pending" {
-                        actionButtons
-                    } else {
-                        statusLabel
-                    }
+                    actionButtons
                 } else {
-                    // Fallback if action payload can't decode
                     Text(message.content)
                         .font(.body)
                         .foregroundStyle(.secondary)
@@ -58,9 +58,51 @@ struct ActionConfirmationCard: View {
                     )
             )
             .padding(.leading, 8)
-            .padding(.trailing, 60) // don't stretch full width
+            .padding(.trailing, 60)
 
             Spacer(minLength: 0)
+        }
+    }
+
+    /// Compact single-line summary after confirmation/cancellation — keeps chat clean.
+    private var collapsedCard: some View {
+        HStack(alignment: .top, spacing: 0) {
+            HStack(spacing: 6) {
+                statusIcon
+                Text(action?.displaySummary ?? message.content)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.gray.opacity(0.05))
+            )
+            .padding(.leading, 8)
+
+            Spacer(minLength: 0)
+        }
+    }
+
+    @ViewBuilder
+    private var statusIcon: some View {
+        switch actionStatus {
+        case "confirmed":
+            Image(systemName: "checkmark.circle.fill")
+                .font(.caption)
+                .foregroundStyle(.green)
+        case "cancelled":
+            Image(systemName: "xmark.circle.fill")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        case "undone":
+            Image(systemName: "arrow.uturn.backward.circle.fill")
+                .font(.caption)
+                .foregroundStyle(.orange)
+        default:
+            EmptyView()
         }
     }
 
@@ -254,14 +296,24 @@ struct ActionConfirmationCard: View {
 
     private var actionButtons: some View {
         HStack(spacing: 10) {
-            Button(action: onConfirm) {
-                Text("Confirm")
+            Button {
+                #if canImport(UIKit)
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                #endif
+                onConfirm()
+            } label: {
+                Label("Confirm", systemImage: "checkmark")
                     .font(.subheadline)
                     .fontWeight(.semibold)
             }
             .buttonStyle(.borderedProminent)
 
-            Button(action: onCancel) {
+            Button {
+                #if canImport(UIKit)
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                #endif
+                onCancel()
+            } label: {
                 Text("Cancel")
                     .font(.subheadline)
             }
@@ -273,36 +325,7 @@ struct ActionConfirmationCard: View {
         .padding(.top, 2)
     }
 
-    private var statusLabel: some View {
-        HStack(spacing: 6) {
-            switch actionStatus {
-            case "confirmed":
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                Text("Confirmed")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.green)
-            case "cancelled":
-                Image(systemName: "xmark.circle.fill")
-                    .foregroundStyle(.secondary)
-                Text("Cancelled")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.secondary)
-            case "undone":
-                Image(systemName: "arrow.uturn.backward.circle.fill")
-                    .foregroundStyle(.orange)
-                Text("Undone")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.orange)
-            default:
-                EmptyView()
-            }
-        }
-        .padding(.top, 2)
-    }
+    // statusLabel removed — collapsed cards handle resolved states
 
     // MARK: - Date / Duration Formatters
 

@@ -242,6 +242,18 @@ struct ContentView: View {
                                 .frame(width: 32, height: 32)
                                 .clipShape(Circle())
                         }
+                        ToolbarItem(placement: .automatic) {
+                            Menu {
+                                Button(role: .destructive) {
+                                    chatViewModel.clearChat()
+                                } label: {
+                                    Label("Clear Chat", systemImage: "trash")
+                                }
+                            } label: {
+                                Image(systemName: "ellipsis.circle")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
                     }
                     #if !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)

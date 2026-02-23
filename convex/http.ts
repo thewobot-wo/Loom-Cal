@@ -123,7 +123,14 @@ http.route({
       ctx.runQuery(internal.tasks.listForLoom, {}),
     ]);
 
-    return new Response(JSON.stringify({ events, tasks }), {
+    // BigInt fields (v.int64) can't be serialized by JSON.stringify —
+    // convert them to strings so the bridge can parse them.
+    const safeStringify = (data: unknown) =>
+      JSON.stringify(data, (_key, value) =>
+        typeof value === "bigint" ? value.toString() : value
+      );
+
+    return new Response(safeStringify({ events, tasks }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

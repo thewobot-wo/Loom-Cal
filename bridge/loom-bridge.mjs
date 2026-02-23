@@ -12,28 +12,34 @@
  * as tools. This bridge only handles chat message relay.
  *
  * Usage:
- *   OPENCLAW_TOKEN=<gateway-token> node loom-bridge.mjs
+ *   OPENCLAW_PASSWORD=<password> node loom-bridge.mjs
  *
  * Environment variables:
- *   OPENCLAW_TOKEN  — OpenClaw gateway auth token (required)
- *   OPENCLAW_URL    — Gateway URL (default: http://127.0.0.1:18789)
- *   CONVEX_SITE_URL — Convex HTTP endpoint base (default: https://kindhearted-goldfish-658.convex.site)
- *   POLL_INTERVAL   — Polling interval in ms (default: 2000)
- *   WEBHOOK_SECRET  — Optional shared secret for Convex endpoints
+ *   OPENCLAW_PASSWORD — OpenClaw gateway password (required; set gateway to password auth mode)
+ *   OPENCLAW_TOKEN    — Deprecated alias for OPENCLAW_PASSWORD (still works)
+ *   OPENCLAW_URL      — Gateway URL (default: http://127.0.0.1:18789)
+ *   CONVEX_SITE_URL   — Convex HTTP endpoint base (default: https://kindhearted-goldfish-658.convex.site)
+ *   POLL_INTERVAL     — Polling interval in ms (default: 2000)
+ *   WEBHOOK_SECRET    — Optional shared secret for Convex endpoints
  */
 
 const OPENCLAW_URL = process.env.OPENCLAW_URL || "http://127.0.0.1:18789";
-const OPENCLAW_TOKEN = process.env.OPENCLAW_TOKEN;
+const OPENCLAW_PASSWORD = process.env.OPENCLAW_PASSWORD || process.env.OPENCLAW_TOKEN;
 const CONVEX_SITE_URL = process.env.CONVEX_SITE_URL || "https://kindhearted-goldfish-658.convex.site";
-const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL || "2000", 10);
+const BASE_POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL || "2000", 10);
+const BACKOFF_POLL_INTERVAL = 30_000; // 30s when auth is broken
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "";
+const USER_TIMEZONE = process.env.USER_TIMEZONE || "America/Phoenix";
 
-if (!OPENCLAW_TOKEN) {
-  console.error("Error: OPENCLAW_TOKEN environment variable is required");
+if (!OPENCLAW_PASSWORD) {
+  console.error("Error: OPENCLAW_PASSWORD (or OPENCLAW_TOKEN) environment variable is required");
   process.exit(1);
 }
 
 let processing = false;
+let authFailCount = 0;
+let authErrorPosted = false; // only post one friendly error per failure streak
+let pollTimer = null;
 
 // ---------------------------------------------------------------------------
 // Context fetching
@@ -79,6 +85,7 @@ function formatTimestamp(ms) {
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
+    timeZone: USER_TIMEZONE,
     timeZoneName: "short",
   });
 }
@@ -120,8 +127,12 @@ function buildSystemPrompt(context) {
 
   return `You are Loom, a calendar and task assistant for the Loom Cal app.
 
+## User's Timezone
+${USER_TIMEZONE}
+IMPORTANT: Always use this timezone for all dates and times. The user is in ${USER_TIMEZONE}. Do NOT use America/Los_Angeles or any other timezone.
+
 ## Current Date/Time
-${new Date().toLocaleString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "long" })}
+${new Date().toLocaleString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: USER_TIMEZONE, timeZoneName: "long" })}
 
 ## Current Calendar (next 7 days)
 ${eventsSection}
@@ -140,7 +151,7 @@ You have tools to create, edit, and delete calendar events and tasks. When the u
 - Default to calendar "personal" when none specified
 - Default to 60-minute events unless told otherwise
 - When no time is given, create an all-day event
-- Use ISO 8601 with timezone offset for dates (e.g. "2026-02-26T15:00:00-08:00")
+- ALWAYS use timezone "${USER_TIMEZONE}" for all events and dates
 - Be concise and friendly in your replies
 - IMPORTANT: After calling a tool, respond with ONLY a brief one-sentence acknowledgment (e.g. "Done!" or "I've set that up for you."). Do NOT repeat the action details — the user already sees them in a confirmation card. Never say "Proposed:" or describe what the tool did.`;
 }
@@ -150,30 +161,46 @@ You have tools to create, edit, and delete calendar events and tasks. When the u
 // ---------------------------------------------------------------------------
 
 /**
- * Detect and extract an ACTION: JSON block from Loom's reply text.
- * Safety net for when Loom outputs raw ACTION text instead of calling MCP tools.
+ * Detect and extract an action JSON block from Loom's reply text.
+ * Safety net for when Loom outputs action JSON instead of calling MCP tools.
  *
- * Expected format (anywhere in the text):
- *   ACTION: { "type": "create_event", "displaySummary": "...", "payload": {...} }
+ * Supported formats:
+ *   1. ACTION: { "type": "create_event", ... }     (prefixed)
+ *   2. { "type": "create_event", "payload": {...} } (bare JSON)
  *
- * Returns { action, cleanText } if found, or null if no ACTION block present.
+ * Returns { action, cleanText } if found, or null if no action block present.
  */
 function detectActionBlock(text) {
-  const actionIdx = text.indexOf("ACTION:");
-  if (actionIdx === -1) return null;
+  // Strategy 1: Look for "ACTION:" prefix
+  let jsonSource = null;
+  let blockStart = -1;
 
-  // Extract everything after "ACTION:" up to end of text or next double-newline
-  const afterAction = text.substring(actionIdx + "ACTION:".length).trim();
+  const actionIdx = text.indexOf("ACTION:");
+  if (actionIdx !== -1) {
+    jsonSource = text.substring(actionIdx + "ACTION:".length).trim();
+    blockStart = actionIdx;
+  }
+
+  // Strategy 2: Look for bare JSON with action signature (type + payload)
+  if (!jsonSource) {
+    const bareIdx = text.indexOf("{");
+    if (bareIdx !== -1) {
+      jsonSource = text.substring(bareIdx);
+      blockStart = bareIdx;
+    }
+  }
+
+  if (!jsonSource) return null;
 
   // Find the JSON object — look for balanced braces
-  const jsonStart = afterAction.indexOf("{");
+  const jsonStart = jsonSource.indexOf("{");
   if (jsonStart === -1) return null;
 
   let depth = 0;
   let jsonEnd = -1;
-  for (let i = jsonStart; i < afterAction.length; i++) {
-    if (afterAction[i] === "{") depth++;
-    else if (afterAction[i] === "}") {
+  for (let i = jsonStart; i < jsonSource.length; i++) {
+    if (jsonSource[i] === "{") depth++;
+    else if (jsonSource[i] === "}") {
       depth--;
       if (depth === 0) {
         jsonEnd = i;
@@ -183,7 +210,7 @@ function detectActionBlock(text) {
   }
   if (jsonEnd === -1) return null;
 
-  const jsonStr = afterAction.substring(jsonStart, jsonEnd + 1);
+  const jsonStr = jsonSource.substring(jsonStart, jsonEnd + 1);
   let action;
   try {
     action = JSON.parse(jsonStr);
@@ -192,17 +219,68 @@ function detectActionBlock(text) {
     return null;
   }
 
-  // Validate required fields
-  if (!action.type || !action.payload) {
-    console.error("[bridge] ACTION block missing required fields (type, payload)");
+  // Validate: must have type + payload, and type must be a known action
+  const validTypes = [
+    "create_event", "update_event", "delete_event",
+    "create_task", "update_task", "delete_task",
+  ];
+  if (!action.type || !action.payload || !validTypes.includes(action.type)) {
     return null;
   }
 
-  // Strip the entire ACTION block from the text
-  const fullBlock = text.substring(actionIdx, actionIdx + "ACTION:".length + jsonEnd + 1);
-  const cleanText = text.replace(fullBlock, "").trim();
+  // Strip the entire action block from the text
+  const prefixLen = actionIdx !== -1 ? "ACTION:".length : 0;
+  const fullBlockEnd = blockStart + prefixLen + jsonEnd + 1;
+  const cleanText = (text.substring(0, blockStart) + text.substring(fullBlockEnd)).trim();
 
   return { action, cleanText };
+}
+
+/**
+ * Normalize action payload values to match what the iOS app expects:
+ * - "start" and "dueDate" → UTC millisecond strings (converts ISO 8601 if needed)
+ * - "duration" → string of minutes (converts number to string if needed)
+ *
+ * Loom may output ISO dates or raw numbers; the MCP server converts these,
+ * but when Loom outputs bare JSON, we must do it here.
+ */
+function normalizeActionPayload(action) {
+  const p = action.payload;
+  if (!p) return action;
+
+  // Convert ISO date strings to UTC ms strings
+  for (const key of ["start", "dueDate"]) {
+    if (p[key] === undefined) continue;
+    const val = String(p[key]);
+    // Already a numeric ms string? Skip.
+    if (/^\d{10,}$/.test(val)) continue;
+    // Try parsing as a date (ISO 8601)
+    const ms = new Date(val).getTime();
+    if (!isNaN(ms)) {
+      p[key] = String(ms);
+    }
+  }
+
+  // Convert previousValues dates too
+  if (action.previousValues) {
+    for (const key of ["start", "dueDate"]) {
+      const val = action.previousValues[key];
+      if (val === undefined) continue;
+      const valStr = String(val);
+      if (/^\d{10,}$/.test(valStr)) continue;
+      const ms = new Date(valStr).getTime();
+      if (!isNaN(ms)) {
+        action.previousValues[key] = String(ms);
+      }
+    }
+  }
+
+  // Ensure duration is a string
+  if (p.duration !== undefined) {
+    p.duration = String(p.duration);
+  }
+
+  return action;
 }
 
 /**
@@ -286,12 +364,15 @@ async function poll() {
 
     console.log(`[bridge] Forwarding to Loom...`);
 
+    // Re-read password from env to support hot-reload (e.g. pm2 restart with new env)
+    const currentPassword = process.env.OPENCLAW_PASSWORD || process.env.OPENCLAW_TOKEN || OPENCLAW_PASSWORD;
+
     // Forward to local OpenClaw gateway with system message prepended
     const loomRes = await fetch(`${OPENCLAW_URL}/v1/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENCLAW_TOKEN}`,
+        "Authorization": `Bearer ${currentPassword}`,
       },
       body: JSON.stringify({
         model: "openclaw",
@@ -302,11 +383,38 @@ async function poll() {
       }),
     });
 
+    // --- Auth error detection and backoff ---
+    if (loomRes.status === 401 || loomRes.status === 403) {
+      const error = await loomRes.text();
+      authFailCount++;
+      console.error(`[bridge] Auth error (${loomRes.status}, streak: ${authFailCount}): ${error.substring(0, 200)}`);
+
+      if (!authErrorPosted) {
+        await postLoomReply("I'm having trouble connecting right now — please try again in a moment.");
+        authErrorPosted = true;
+      }
+
+      if (authFailCount > 3) {
+        setPollInterval(BACKOFF_POLL_INTERVAL);
+      }
+
+      processing = false;
+      return;
+    }
+
     if (!loomRes.ok) {
       const error = await loomRes.text();
       console.error(`[bridge] OpenClaw error: ${loomRes.status} ${error}`);
       processing = false;
       return;
+    }
+
+    // Auth succeeded — reset failure tracking
+    if (authFailCount > 0) {
+      console.log(`[bridge] Auth recovered after ${authFailCount} failures`);
+      authFailCount = 0;
+      authErrorPosted = false;
+      setPollInterval(BASE_POLL_INTERVAL);
     }
 
     const data = await loomRes.json();
@@ -318,17 +426,30 @@ async function poll() {
       return;
     }
 
+    // Guard: don't forward API errors as Loom replies
+    const isApiError = /authentication_error|invalid.bearer.token/i.test(replyText)
+      || /^HTTP \d{3} \w+_error[:;]/.test(replyText);
+    if (isApiError) {
+      console.error(`[bridge] Loom returned an API error (not forwarding): ${replyText.substring(0, 200)}`);
+      if (!authErrorPosted) {
+        await postLoomReply("I'm having trouble connecting right now — please try again in a moment.");
+        authErrorPosted = true;
+      }
+      processing = false;
+      return;
+    }
+
     console.log(`[bridge] Loom replied (${replyText.length} chars), posting to Convex...`);
 
-    // Check for ACTION: block fallback (when Loom doesn't use MCP tools)
+    // Check for ACTION block (when Loom outputs JSON instead of calling MCP tools)
     const actionResult = detectActionBlock(replyText);
     if (actionResult) {
-      console.log(`[bridge] ACTION block detected (type: ${actionResult.action.type}), creating confirmation card...`);
-      await postPendingAction(actionResult.action, actionResult.cleanText || undefined);
-      // Post cleaned text as the chat reply (may be empty if ACTION was the whole message)
-      if (actionResult.cleanText) {
-        await postLoomReply(actionResult.cleanText);
-      }
+      const normalizedAction = normalizeActionPayload(actionResult.action);
+      console.log(`[bridge] ACTION block detected (type: ${normalizedAction.type}), creating confirmation card...`);
+      // Use cleanText as display text, fall back to the action's displaySummary
+      const displayText = actionResult.cleanText || normalizedAction.displaySummary || "Action proposed";
+      await postPendingAction(normalizedAction, displayText);
+      // Don't post a separate assistant reply — the confirmation card is enough
     } else {
       await postLoomReply(replyText);
     }
@@ -339,12 +460,25 @@ async function poll() {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Dynamic poll interval
+// ---------------------------------------------------------------------------
+
+function setPollInterval(ms) {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(poll, ms);
+  if (ms !== BASE_POLL_INTERVAL) {
+    console.log(`[bridge] Poll interval changed to ${ms}ms`);
+  }
+}
+
 console.log(`[bridge] Loom Bridge started`);
 console.log(`[bridge] OpenClaw: ${OPENCLAW_URL}`);
 console.log(`[bridge] Convex:   ${CONVEX_SITE_URL}`);
-console.log(`[bridge] Polling every ${POLL_INTERVAL}ms`);
+console.log(`[bridge] Polling every ${BASE_POLL_INTERVAL}ms`);
+console.log(`[bridge] Auth: password mode (static credential)`);
 console.log(`[bridge] Actions handled by Convex MCP server (separate process)`);
 console.log("");
 
-setInterval(poll, POLL_INTERVAL);
+setPollInterval(BASE_POLL_INTERVAL);
 poll(); // Run immediately
