@@ -18,6 +18,10 @@ struct EventCreationView: View {
     @State private var endTime: Date
     @State private var isAllDay: Bool = false
     @State private var saveError: String? = nil
+    @State private var showDetails: Bool = false
+    @State private var hasParsed: Bool = false
+
+    @FocusState private var isNLInputFocused: Bool
 
     // MARK: - Init
 
@@ -36,51 +40,146 @@ struct EventCreationView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    HStack {
+            ScrollView {
+                VStack(spacing: 0) {
+                    // MARK: NL Hero Input
+                    VStack(spacing: 0) {
                         TextField("Dentist 3pm, Team lunch tomorrow...", text: $nlInput)
-                            .font(.title3)
+                            .textFieldStyle(.plain)
+                            .font(.title2)
+                            .fontWeight(.medium)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 16)
+                            .padding(.bottom, 10)
+                            .focused($isNLInputFocused)
                             .onSubmit { parseAndFill() }
                             .disabled(isParsing)
-                        if isParsing {
+
+                        Rectangle()
+                            .fill(isParsing ? LoomColors.gold : LoomColors.eventDefault)
+                            .frame(height: 2)
+                            .padding(.horizontal, 20)
+                            .animation(.easeInOut(duration: 0.3), value: isParsing)
+                    }
+
+                    // Parsing indicator
+                    if isParsing {
+                        HStack(spacing: 6) {
                             ProgressView()
                                 .controlSize(.small)
+                            Text("Parsing...")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
                         }
+                        .padding(.top, 10)
+                        .transition(.opacity)
                     }
-                }
 
-                Section("Details") {
-                    TextField("Title", text: $title)
+                    // MARK: Parsed Summary Card
+                    if hasParsed && !title.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(title)
+                                .font(.headline)
+                                .fontWeight(.semibold)
 
-                    DatePicker("Date", selection: $eventDate, displayedComponents: .date)
-                        .datePickerStyle(.compact)
-
-                    if !isAllDay {
-                        DatePicker("Starts", selection: $startTime, displayedComponents: .hourAndMinute)
-                            .datePickerStyle(.compact)
-                            .onChange(of: startTime) { _, newStart in
-                                // Keep end time at least 15 min after start
-                                if endTime <= newStart {
-                                    endTime = newStart.addingTimeInterval(3600)
+                            HStack(spacing: 16) {
+                                Label(eventDate.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()),
+                                      systemImage: "calendar")
+                                if !isAllDay {
+                                    Label(startTime.formatted(.dateTime.hour().minute()),
+                                          systemImage: "clock")
+                                } else {
+                                    Label("All Day", systemImage: "sun.max")
                                 }
                             }
-
-                        DatePicker("Ends", selection: $endTime, in: startTime.addingTimeInterval(900)..., displayedComponents: .hourAndMinute)
-                            .datePickerStyle(.compact)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        .background(LoomColors.eventDefault.opacity(0.06))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .padding(.horizontal, 20)
+                        .padding(.top, 16)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
                     }
 
-                    Toggle("All Day", isOn: $isAllDay)
-                }
+                    // MARK: Details Disclosure
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            showDetails.toggle()
+                        }
+                    } label: {
+                        HStack {
+                            Text("Details")
+                                .font(.caption2)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.tertiary)
+                                .textCase(.uppercase)
+                            Spacer()
+                            Image(systemName: showDetails ? "chevron.up" : "chevron.down")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
+                        .padding(.bottom, 8)
+                    }
+                    .buttonStyle(.plain)
 
-                if let error = saveError {
-                    Section {
+                    if showDetails {
+                        VStack(spacing: 16) {
+                            // Title field
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("TITLE")
+                                    .font(.caption2)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.tertiary)
+                                TextField("Event title", text: $title)
+                                    .textFieldStyle(.plain)
+                                    .font(.body)
+                            }
+
+                            // Date picker
+                            DatePicker("Date", selection: $eventDate, displayedComponents: .date)
+                                .datePickerStyle(.compact)
+
+                            // Time pickers (when not all-day)
+                            if !isAllDay {
+                                DatePicker("Starts", selection: $startTime, displayedComponents: .hourAndMinute)
+                                    .datePickerStyle(.compact)
+                                    .onChange(of: startTime) { _, newStart in
+                                        if endTime <= newStart {
+                                            endTime = newStart.addingTimeInterval(3600)
+                                        }
+                                    }
+
+                                DatePicker("Ends", selection: $endTime, in: startTime.addingTimeInterval(900)..., displayedComponents: .hourAndMinute)
+                                    .datePickerStyle(.compact)
+                            }
+
+                            // All-day toggle
+                            Toggle("All Day", isOn: $isAllDay)
+                                .tint(LoomColors.coral)
+                        }
+                        .padding(.horizontal, 20)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
+
+                    // MARK: Error
+                    if let error = saveError {
                         Text(error)
                             .foregroundStyle(.red)
                             .font(.footnote)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 16)
                     }
                 }
+                .padding(.bottom, 20)
             }
+            .scrollContentBackground(.hidden)
+            .background(LoomColors.contentBackground)
             .navigationTitle("New Event")
             #if !os(macOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -88,12 +187,22 @@ struct EventCreationView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { isPresented = false }
+                        .foregroundStyle(.secondary)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") { saveEvent() }
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(title.isEmpty ? Color.gray : LoomColors.coral)
                         .disabled(title.isEmpty)
                 }
             }
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    isNLInputFocused = true
+                }
+            }
+            .animation(.easeInOut(duration: 0.25), value: isParsing)
+            .animation(.easeInOut(duration: 0.25), value: hasParsed)
         }
     }
 
@@ -129,6 +238,12 @@ struct EventCreationView: View {
             }
 
             isParsing = false
+            hasParsed = true
+
+            // Auto-expand details after parsing
+            withAnimation(.easeInOut(duration: 0.25)) {
+                showDetails = true
+            }
         }
     }
 

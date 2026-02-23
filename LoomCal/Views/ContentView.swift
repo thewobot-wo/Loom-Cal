@@ -114,6 +114,8 @@ struct TaskListTabView: View {
                 taskViewModel: taskViewModel,
                 isPresented: $showTaskCreateSheet
             )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
         .sheet(item: $selectedTask) { task in
             TaskDetailView(
@@ -124,6 +126,8 @@ struct TaskListTabView: View {
                     set: { if !$0 { selectedTask = nil } }
                 )
             )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
     }
 }
@@ -277,12 +281,16 @@ struct ContentView: View {
                 viewModel: viewModel,
                 isPresented: $showCreateSheet
             )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showTaskCreateSheet) {
             TaskCreationView(
                 taskViewModel: taskViewModel,
                 isPresented: $showTaskCreateSheet
             )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
         .sheet(item: $selectedEvent) { event in
             EventDetailView(
@@ -293,6 +301,8 @@ struct ContentView: View {
                     set: { if !$0 { selectedEvent = nil } }
                 )
             )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
         .sheet(item: $selectedTask) { task in
             TaskDetailView(
@@ -303,6 +313,8 @@ struct ContentView: View {
                     set: { if !$0 { selectedTask = nil } }
                 )
             )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
         // MARK: FAB overlay (iOS only)
         #if !os(macOS)
