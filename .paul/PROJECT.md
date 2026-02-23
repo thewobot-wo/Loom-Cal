@@ -59,9 +59,9 @@ Single `ConvexClient` singleton created in `LoomCalApp.swift` as module-level `l
 |----------|-------|------|-----------|
 | Calendar Views (CALV) | 5 | 5 | 0 |
 | Task System (TASK) | 7 | 7 | 0 |
-| Loom AI (LOOM) | 11 | 8 | 3 |
+| Loom AI (LOOM) | 11 | 10 | 1 |
 | Platform (PLAT) | 5 | 1 | 4 |
-| **Total** | **28** | **21** | **7** |
+| **Total** | **28** | **23** | **5** |
 
 ## Constraints
 

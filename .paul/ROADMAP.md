@@ -8,7 +8,7 @@ Fresh milestone covering phases 5-8. Goal: Loom can act on the user's behalf —
 |-------|------|-------|--------|
 | 5 | Loom Calendar & Task Actions | 3/3 | Complete |
 | 6 | AI Daily Planning | 2/2 | Complete |
-| 7 | Natural Language Entry | 1/2 | In Progress |
+| 7 | Natural Language Entry | 2/2 | Complete |
 | 8 | Platform Polish | 0/TBD | Not Started |
 
 ---
@@ -62,7 +62,7 @@ Fresh milestone covering phases 5-8. Goal: Loom can act on the user's behalf —
 
 **Plans:**
 - [x] 07-01 — NL parse backend: Convex parse_requests table, HTTP endpoints, bridge OpenClaw integration
-- [ ] 07-02 — Swift NLParseService, EventCreationView upgrade, TaskCreationView NL field, verification
+- [x] 07-02 — Swift NLParseService, EventCreationView upgrade, TaskCreationView NL field, Things 3 UI redesign
 
 ### Phase 8: Platform Polish
 

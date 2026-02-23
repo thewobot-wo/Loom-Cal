@@ -3,29 +3,29 @@
 ## Current Position
 
 **Milestone:** v0.1 — Loom Intelligence
-**Phase:** 7 of 8 (Natural Language Entry) — In Progress
-**Plan:** 07-02 applying, checkpoint pending
-**Status:** APPLY in progress — Tasks 1-2 complete, human verification pending
-**Last activity:** 2026-02-22 — Applied 07-02 Tasks 1-2 (NLParseService + UI upgrades)
+**Phase:** 8 of 8 (Platform Polish) — Not Started
+**Plan:** Not started
+**Status:** Ready to plan
+**Last activity:** 2026-02-22 — Phase 7 complete, transitioned to Phase 8
 
 Progress:
-- Milestone: [█████████░] 93%
-- Phase 7: [█████░░░░░] 50% (1/2 plans)
+- Milestone: [██████████░] 95%
+- Phase 8: [░░░░░░░░░░] 0%
 
 ## Loop Position
 
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ◐        ○     [Apply in progress — checkpoint pending]
+  ✓        ✓        ✓     [Loop complete - ready for next PLAN]
 ```
 
 ## Velocity
 
 **Carried from `.planning/STATE.md`:**
-- Total plans completed: 19 (across phases 1-6)
-- Average duration: ~6.7 min/plan
-- Total execution time: ~2.1 hours
+- Total plans completed: 21 (across phases 1-7)
+- Average duration: ~7 min/plan
+- Total execution time: ~2.5 hours
 
 **By Phase:**
 
@@ -38,14 +38,15 @@ PLAN ──▶ APPLY ──▶ UNIFY
 | 04 Loom Chat | 3 | ~40 min | ~13 min |
 | 05 Loom Actions | 3 | ~10 min | ~3.3 min |
 | 06 AI Daily Planning | 2 | ~20 min | ~10 min |
+| 07 Natural Language Entry | 2 | ~35 min | ~17.5 min |
 
 ## Recent Decisions
 
-- **UndoContext struct** — replaces tuple, supports both single-action and batch-plan undo
-- **PlannedBlock flexible Codable** — handles both String and Int for start/duration
-- **Separate DailyPlanProposal type** — parallel to LoomAction, not extending it
-- **Daily plans create events only** — tasks are inputs (context), not outputs
-- **isDailyPlan routing guard** — checked before generic pending_action in ChatView
+- **ScrollView+VStack over Form** — full layout control for Things 3 aesthetic
+- **Progressive disclosure** — details hidden until toggle or NL parse completes
+- **Custom PriorityChip capsules** — sage/gold/coral instead of segmented Picker
+- **Sheet detents (.medium/.large)** — consistent half-screen sheet presentation app-wide
+- **NLParseService as singleton utility** — not an ObservableObject, views manage own @State
 
 ## Pending Todos
 
@@ -59,6 +60,6 @@ PLAN ──▶ APPLY ──▶ UNIFY
 ## Session Continuity
 
 **Last session:** 2026-02-22
-**Stopped at:** Plan 07-02 created
-**Next action:** Review and approve plan, then run /paul:apply .paul/phases/07-natural-language-entry/07-02-PLAN.md
-**Resume file:** .paul/phases/07-natural-language-entry/07-02-PLAN.md
+**Stopped at:** Phase 7 complete, ready to plan Phase 8
+**Next action:** /paul:plan for Phase 8 (Platform Polish)
+**Resume file:** .paul/ROADMAP.md
