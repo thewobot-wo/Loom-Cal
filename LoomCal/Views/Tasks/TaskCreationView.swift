@@ -9,6 +9,8 @@ struct TaskCreationView: View {
 
     // MARK: - State
 
+    @State private var nlInput: String = ""
+    @State private var isParsing: Bool = false
     @State private var title: String = ""
     @State private var priority: String = "low"
     @State private var hasDueDate: Bool = false
@@ -38,6 +40,19 @@ struct TaskCreationView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // Section 0: Quick NL Entry
+                Section("Quick Entry") {
+                    HStack {
+                        TextField("e.g. Buy groceries by Friday", text: $nlInput)
+                            .onSubmit { parseAndFillTask() }
+                            .disabled(isParsing)
+                        if isParsing {
+                            ProgressView()
+                                .controlSize(.small)
+                        }
+                    }
+                }
+
                 // Section 1: Title
                 Section {
                     TextField("Task name", text: $title)
@@ -110,6 +125,51 @@ struct TaskCreationView: View {
     }
 
     // MARK: - Actions
+
+    private func parseAndFillTask() {
+        guard !nlInput.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        isParsing = true
+
+        Task {
+            let result = await NLParseService.shared.parse(text: nlInput, type: "task")
+
+            if let fields = result?.taskFields, result?.status == "complete" {
+                title = fields.title
+                priority = fields.priority ?? "medium"
+
+                if let dueDateStr = fields.dueDate,
+                   let date = parseFlexibleDate(dueDateStr) {
+                    hasDueDate = true
+                    dueDate = date
+                    hasDueTime = fields.hasDueTime ?? false
+                } else {
+                    hasDueDate = false
+                }
+            } else {
+                // No local fallback for tasks — use raw input as title
+                title = nlInput
+            }
+
+            isParsing = false
+        }
+    }
+
+    /// Parse ISO 8601 and common date formats the LLM may return.
+    private func parseFlexibleDate(_ string: String) -> Date? {
+        let iso = ISO8601DateFormatter()
+        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = iso.date(from: string) { return date }
+        iso.formatOptions = [.withInternetDateTime]
+        if let date = iso.date(from: string) { return date }
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        for format in ["yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm", "yyyy-MM-dd"] {
+            formatter.dateFormat = format
+            if let date = formatter.date(from: string) { return date }
+        }
+        return nil
+    }
 
     private func saveTask() {
         let trimmedTitle = title.trimmingCharacters(in: .whitespaces)

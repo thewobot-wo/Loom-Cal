@@ -181,6 +181,171 @@ Rules for daily plans:
 }
 
 // ---------------------------------------------------------------------------
+// NL Parse request handling
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a focused system prompt for NL parsing (no chat history, no calendar context).
+ * Returns a prompt tailored to the parse type ("event" or "task").
+ */
+function buildParsePrompt(type) {
+  const now = new Date().toLocaleString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: USER_TIMEZONE,
+    timeZoneName: "long",
+  });
+
+  if (type === "event") {
+    return `You are a natural language parser for calendar events. Parse the user's text into a structured event.
+
+Current date/time: ${now}
+User's timezone: ${USER_TIMEZONE}
+
+Respond with ONLY a JSON object (no markdown, no explanation, no code fences):
+{
+  "title": "event title (cleaned of date/time words)",
+  "start": "ISO 8601 datetime in ${USER_TIMEZONE}",
+  "duration": 60,
+  "isAllDay": false
+}
+
+Rules:
+- If no time specified, set isAllDay to true and start to the date at midnight
+- If no date specified, assume today (or tomorrow if current time is past the mentioned time)
+- Default duration is 60 minutes unless specified
+- Extract the title by removing date/time references from the input
+- Always use timezone ${USER_TIMEZONE}`;
+  }
+
+  return `You are a natural language parser for tasks. Parse the user's text into a structured task.
+
+Current date/time: ${now}
+User's timezone: ${USER_TIMEZONE}
+
+Respond with ONLY a JSON object (no markdown, no explanation, no code fences):
+{
+  "title": "task title (cleaned of date/time/priority words)",
+  "priority": "medium",
+  "dueDate": "ISO 8601 datetime or null if no due date mentioned",
+  "hasDueTime": false
+}
+
+Rules:
+- Priority: "high" if words like urgent/important/critical/asap, "low" if words like maybe/sometime/low-priority, "medium" otherwise
+- If a date but no time is mentioned, set hasDueTime to false
+- If a specific time is mentioned, set hasDueTime to true
+- Extract the title by removing date/time/priority references
+- Always use timezone ${USER_TIMEZONE}`;
+}
+
+/**
+ * Extract a JSON object from text. Tries full text first, then finds first { to last }.
+ * Returns parsed object or null.
+ */
+function extractJSON(text) {
+  // Try parsing the entire text as JSON
+  try {
+    return JSON.parse(text.trim());
+  } catch {
+    // Fall through
+  }
+
+  // Find first { and last } and try to parse that substring
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) return null;
+
+  try {
+    return JSON.parse(text.substring(start, end + 1));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Post a parse result back to Convex.
+ */
+async function postParseResult(requestId, status, result) {
+  const headers = { "Content-Type": "application/json" };
+  if (WEBHOOK_SECRET) headers["Authorization"] = `Bearer ${WEBHOOK_SECRET}`;
+
+  const body = { requestId, status };
+  if (result) body.result = result;
+
+  const res = await fetch(`${CONVEX_SITE_URL}/parse-result`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    console.error(`[bridge] Parse result post failed: ${res.status}`);
+  }
+}
+
+/**
+ * Check for pending NL parse requests and process them via OpenClaw.
+ * Runs independently of the chat message flow (no processing lock).
+ */
+async function checkParseRequests() {
+  try {
+    const headers = { "Content-Type": "application/json" };
+    if (WEBHOOK_SECRET) headers["Authorization"] = `Bearer ${WEBHOOK_SECRET}`;
+
+    const res = await fetch(`${CONVEX_SITE_URL}/pending-parse`, { headers });
+    if (!res.ok) return;
+
+    const { pending, requestId, text, type } = await res.json();
+    if (!pending) return;
+
+    console.log(`[bridge] Parse request: "${text}" (${type})`);
+
+    const systemPrompt = buildParsePrompt(type);
+    const currentPassword = process.env.OPENCLAW_PASSWORD || process.env.OPENCLAW_TOKEN || OPENCLAW_PASSWORD;
+
+    const loomRes = await fetch(`${OPENCLAW_URL}/v1/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${currentPassword}`,
+      },
+      body: JSON.stringify({
+        model: "openclaw",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: text },
+        ],
+      }),
+    });
+
+    if (!loomRes.ok) {
+      console.error(`[bridge] Parse OpenClaw error: ${loomRes.status}`);
+      await postParseResult(requestId, "error", null);
+      return;
+    }
+
+    const data = await loomRes.json();
+    const replyText = data.choices?.[0]?.message?.content ?? "";
+
+    const parsed = extractJSON(replyText);
+    if (parsed) {
+      console.log(`[bridge] Parse result: ${JSON.stringify(parsed)}`);
+      await postParseResult(requestId, "complete", JSON.stringify(parsed));
+    } else {
+      console.error("[bridge] Could not extract JSON from parse response:", replyText.substring(0, 200));
+      await postParseResult(requestId, "error", null);
+    }
+  } catch (err) {
+    console.error(`[bridge] Parse request error: ${err.message}`);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // ACTION text fallback parsing
 // ---------------------------------------------------------------------------
 
@@ -381,6 +546,9 @@ async function postLoomReply(content) {
 // ---------------------------------------------------------------------------
 
 async function poll() {
+  // Check for NL parse requests first (independent of chat processing lock)
+  await checkParseRequests();
+
   if (processing) return;
 
   try {

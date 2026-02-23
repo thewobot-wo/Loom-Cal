@@ -53,6 +53,8 @@
 		L00MC0L0R5000000000A0002 /* CalendarToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00MC0L0R5000000000B0002 /* CalendarToolbar.swift */; };
 		L00MC0L0R5000000000A0003 /* MonthGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00MC0L0R5000000000B0003 /* MonthGridView.swift */; };
 		L00MC0L0R5000000000A0004 /* MacCalendarLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00MC0L0R5000000000B0004 /* MacCalendarLayout.swift */; };
+		NL07020000000000000A0001 /* ParsedNLResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL07020000000000000B0001 /* ParsedNLResult.swift */; };
+		NL07020000000000000A0002 /* NLParseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL07020000000000000B0002 /* NLParseService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -102,6 +104,8 @@
 		L00MC0L0R5000000000B0002 /* CalendarToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarToolbar.swift; sourceTree = "<group>"; };
 		L00MC0L0R5000000000B0003 /* MonthGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthGridView.swift; sourceTree = "<group>"; };
 		L00MC0L0R5000000000B0004 /* MacCalendarLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCalendarLayout.swift; sourceTree = "<group>"; };
+		NL07020000000000000B0001 /* ParsedNLResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsedNLResult.swift; sourceTree = "<group>"; };
+		NL07020000000000000B0002 /* NLParseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NLParseService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +127,7 @@
 			children = (
 				A1B2C3D4E5F601234567890B /* EventKitService.swift */,
 				F2A3B4C5D6E7F80234567801 /* NLEventParser.swift */,
+				NL07020000000000000B0002 /* NLParseService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -206,6 +211,7 @@
 				5D11F15AA89546D588127322 /* StudioEvent.swift */,
 				A5B6C7D8E9F0A1234567B000 /* LoomAction.swift */,
 				A5B6C7D8E9F0A1234567C000 /* DailyPlanProposal.swift */,
+				NL07020000000000000B0001 /* ParsedNLResult.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -395,6 +401,8 @@
 				L00MC0L0R5000000000A0002 /* CalendarToolbar.swift in Sources */,
 				L00MC0L0R5000000000A0003 /* MonthGridView.swift in Sources */,
 				L00MC0L0R5000000000A0004 /* MacCalendarLayout.swift in Sources */,
+				NL07020000000000000A0001 /* ParsedNLResult.swift in Sources */,
+				NL07020000000000000A0002 /* NLParseService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

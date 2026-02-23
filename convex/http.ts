@@ -189,4 +189,97 @@ http.route({
   }),
 });
 
+/**
+ * GET /pending-parse
+ *
+ * Returns the oldest pending NL parse request for the bridge to process.
+ * The bridge calls this on each poll cycle alongside /pending-messages.
+ *
+ * Optional auth: Bearer token matching LOOM_WEBHOOK_SECRET env var.
+ */
+http.route({
+  path: "/pending-parse",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const secret = process.env.LOOM_WEBHOOK_SECRET;
+    if (secret) {
+      const auth = request.headers.get("Authorization");
+      if (auth !== `Bearer ${secret}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+    }
+
+    const doc = await ctx.runQuery(internal.nlParse.oldestPending, {});
+
+    if (!doc) {
+      return new Response(JSON.stringify({ pending: false }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({
+      pending: true,
+      requestId: doc.requestId,
+      text: doc.text,
+      type: doc.type,
+    }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
+/**
+ * POST /parse-result
+ *
+ * Bridge posts the parsed NL result for a given requestId.
+ * Also triggers opportunistic cleanup of old parse requests.
+ *
+ * Request body: { "requestId": "...", "status": "complete"|"error", "result": "..." }
+ * Optional auth: Bearer token matching LOOM_WEBHOOK_SECRET env var.
+ */
+http.route({
+  path: "/parse-result",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const secret = process.env.LOOM_WEBHOOK_SECRET;
+    if (secret) {
+      const auth = request.headers.get("Authorization");
+      if (auth !== `Bearer ${secret}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+    }
+
+    let body: { requestId?: string; status?: string; result?: string };
+    try {
+      body = (await request.json()) as { requestId?: string; status?: string; result?: string };
+    } catch {
+      return new Response("Invalid JSON", { status: 400 });
+    }
+
+    const { requestId, status, result } = body;
+    if (
+      !requestId ||
+      typeof requestId !== "string" ||
+      !status ||
+      (status !== "complete" && status !== "error")
+    ) {
+      return new Response("Missing or invalid fields", { status: 400 });
+    }
+
+    await ctx.runMutation(internal.nlParse.updateResult, {
+      requestId,
+      status,
+      result: result ?? undefined,
+    });
+
+    // Opportunistic cleanup of old parse requests
+    await ctx.runMutation(internal.nlParse.cleanup, {});
+
+    return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
 export default http;

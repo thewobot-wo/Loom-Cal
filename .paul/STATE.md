@@ -3,21 +3,21 @@
 ## Current Position
 
 **Milestone:** v0.1 — Loom Intelligence
-**Phase:** 7 of 8 (Natural Language Entry) — Not Started
-**Plan:** Not started
-**Status:** Ready to plan
-**Last activity:** 2026-02-22 — Phase 6 complete, transitioned to Phase 7
+**Phase:** 7 of 8 (Natural Language Entry) — In Progress
+**Plan:** 07-02 applying, checkpoint pending
+**Status:** APPLY in progress — Tasks 1-2 complete, human verification pending
+**Last activity:** 2026-02-22 — Applied 07-02 Tasks 1-2 (NLParseService + UI upgrades)
 
 Progress:
-- Milestone: [█████████░] 90%
-- Phase 7: [░░░░░░░░░░] 0%
+- Milestone: [█████████░] 93%
+- Phase 7: [█████░░░░░] 50% (1/2 plans)
 
 ## Loop Position
 
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ○        ○        ○     [Ready for new PLAN]
+  ✓        ◐        ○     [Apply in progress — checkpoint pending]
 ```
 
 ## Velocity
@@ -59,6 +59,6 @@ PLAN ──▶ APPLY ──▶ UNIFY
 ## Session Continuity
 
 **Last session:** 2026-02-22
-**Stopped at:** Phase 6 complete, ready to plan Phase 7
-**Next action:** /paul:plan for Phase 7 (Natural Language Entry)
-**Resume file:** .paul/ROADMAP.md
+**Stopped at:** Plan 07-02 created
+**Next action:** Review and approve plan, then run /paul:apply .paul/phases/07-natural-language-entry/07-02-PLAN.md
+**Resume file:** .paul/phases/07-natural-language-entry/07-02-PLAN.md

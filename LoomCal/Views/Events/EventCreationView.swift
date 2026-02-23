@@ -11,6 +11,7 @@ struct EventCreationView: View {
     // MARK: - State
 
     @State private var nlInput: String = ""
+    @State private var isParsing: Bool = false
     @State private var title: String = ""
     @State private var eventDate: Date
     @State private var startTime: Date
@@ -37,9 +38,16 @@ struct EventCreationView: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Dentist 3pm, Team lunch tomorrow...", text: $nlInput)
-                        .font(.title3)
-                        .onSubmit { parseAndFill() }
+                    HStack {
+                        TextField("Dentist 3pm, Team lunch tomorrow...", text: $nlInput)
+                            .font(.title3)
+                            .onSubmit { parseAndFill() }
+                            .disabled(isParsing)
+                        if isParsing {
+                            ProgressView()
+                                .controlSize(.small)
+                        }
+                    }
                 }
 
                 Section("Details") {
@@ -93,15 +101,54 @@ struct EventCreationView: View {
 
     private func parseAndFill() {
         guard !nlInput.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-        let parsed = NLEventParser.parse(nlInput)
-        if !parsed.title.isEmpty { title = parsed.title }
-        if let parsedDate = parsed.date {
-            eventDate = parsedDate
-            if parsed.hasTime {
-                startTime = parsedDate
-                endTime = parsedDate.addingTimeInterval(3600)
+        isParsing = true
+
+        Task {
+            let result = await NLParseService.shared.parse(text: nlInput, type: "event")
+
+            if let fields = result?.eventFields, result?.status == "complete" {
+                title = fields.title
+                isAllDay = fields.isAllDay ?? false
+
+                if let startDate = parseFlexibleDate(fields.start) {
+                    eventDate = startDate
+                    startTime = startDate
+                    let mins = fields.duration ?? 60
+                    endTime = startDate.addingTimeInterval(Double(mins) * 60)
+                }
+            } else {
+                // Fallback to local NLEventParser
+                let parsed = NLEventParser.parse(nlInput)
+                if !parsed.title.isEmpty { title = parsed.title }
+                if let date = parsed.date {
+                    eventDate = date
+                    startTime = date
+                    endTime = date.addingTimeInterval(3600)
+                    isAllDay = !parsed.hasTime
+                }
             }
+
+            isParsing = false
         }
+    }
+
+    /// Parse ISO 8601 and common date formats the LLM may return.
+    private func parseFlexibleDate(_ string: String) -> Date? {
+        // Try ISO8601DateFormatter first (handles timezone offsets)
+        let iso = ISO8601DateFormatter()
+        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = iso.date(from: string) { return date }
+        iso.formatOptions = [.withInternetDateTime]
+        if let date = iso.date(from: string) { return date }
+
+        // Try common formats without timezone offset
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        for format in ["yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm", "yyyy-MM-dd"] {
+            formatter.dateFormat = format
+            if let date = formatter.date(from: string) { return date }
+        }
+        return nil
     }
 
     private func saveEvent() {

@@ -60,6 +60,17 @@ export default defineSchema({
   })
     .index("by_sent_at", ["sentAt"]),
 
+  parse_requests: defineTable({
+    requestId: v.string(),                            // client-generated UUID
+    text: v.string(),                                 // raw NL input
+    type: v.union(v.literal("event"), v.literal("task")),
+    status: v.union(v.literal("pending"), v.literal("complete"), v.literal("error")),
+    result: v.optional(v.string()),                   // JSON string of parsed fields
+    createdAt: v.int64(),                             // UTC milliseconds
+  })
+    .index("by_request_id", ["requestId"])
+    .index("by_status", ["status"]),
+
   studio_events: defineTable({
     calendarId: v.string(),                       // fixed value: "studio"
     title: v.string(),
