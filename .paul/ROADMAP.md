@@ -6,8 +6,8 @@ Fresh milestone covering phases 5-8. Goal: Loom can act on the user's behalf —
 
 | Phase | Name | Plans | Status |
 |-------|------|-------|--------|
-| 5 | Loom Calendar & Task Actions | 2/3 | In Progress (verification pending) |
-| 6 | AI Daily Planning | 0/TBD | Not Started |
+| 5 | Loom Calendar & Task Actions | 3/3 | Complete |
+| 6 | AI Daily Planning | 1/2 | In Progress |
 | 7 | Natural Language Entry | 0/TBD | Not Started |
 | 8 | Platform Polish | 0/TBD | Not Started |
 
@@ -31,7 +31,7 @@ Fresh milestone covering phases 5-8. Goal: Loom can act on the user's behalf —
 **Plans:**
 - [x] 05-01 — Convex schema extension, context/action HTTP endpoints, bridge upgrade with system prompt and action parsing
 - [x] 05-02 — Swift models (ChatMessage extension, LoomAction), ChatViewModel confirm/cancel/undo, highlight support
-- [ ] 05-03 — ActionConfirmationCard, UndoBanner, ChatView integration, highlight pulse animation, end-to-end verification
+- [x] 05-03 — End-to-end verification (user-tested all 6 scenarios — confirmed working)
 
 ### Phase 6: AI Daily Planning
 
@@ -45,7 +45,9 @@ Fresh milestone covering phases 5-8. Goal: Loom can act on the user's behalf —
 3. User can approve plan and all proposed time blocks are created at once
 4. User can reject/dismiss plan and calendar remains unchanged
 
-**Plans:** TBD
+**Plans:**
+- [ ] 06-01 — Bridge daily planning support, DailyPlanProposal model, ChatViewModel batch approve/reject/undo
+- [ ] 06-02 — DailyPlanCard UI, ChatView integration, end-to-end verification
 
 ### Phase 7: Natural Language Entry
 

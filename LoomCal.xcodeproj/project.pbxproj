@@ -18,6 +18,7 @@
 		C4001A00000000000000BB06 /* ChatFAB.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB06 /* ChatFAB.swift */; };
 		C4001A00000000000000BB07 /* ActionConfirmationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB07 /* ActionConfirmationCard.swift */; };
 		C4001A00000000000000BB08 /* UndoBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB08 /* UndoBanner.swift */; };
+		C4001A00000000000000BB09 /* DailyPlanCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4001B00000000000000BB09 /* DailyPlanCard.swift */; };
 		C4001A00000000000000CC01 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = C4001D00000000000000CC01 /* MarkdownUI */; };
 		A1B2C3D4E5F601234567890A /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F601234567890B /* EventKitService.swift */; };
 		F2A3B4C5D6E7F80234567800 /* NLEventParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A3B4C5D6E7F80234567801 /* NLEventParser.swift */; };
@@ -27,6 +28,7 @@
 		1A5118B6ED3A4668805A1F31 /* LoomCalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF164E410628480EB1EB0286 /* LoomCalApp.swift */; };
 		6DF29E450551441382D397E8 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 554F4E556D274D37B8E492C9 /* ChatMessage.swift */; };
 		A5B6C7D8E9F0A1234567B001 /* LoomAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5B6C7D8E9F0A1234567B000 /* LoomAction.swift */; };
+		A5B6C7D8E9F0A1234567C001 /* DailyPlanProposal.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5B6C7D8E9F0A1234567C000 /* DailyPlanProposal.swift */; };
 		80E8BCB7ED0E40EB982212A5 /* LoomTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E86A5C0C1E4E8BB0B85A13 /* LoomTask.swift */; };
 		862F350F167445A7959E9E7C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 982B51ED173A420B81002FD8 /* ContentView.swift */; };
 		90962D61D8C74D34997ED517 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A616D88800F4FFA9AF9F693 /* Assets.xcassets */; };
@@ -64,12 +66,14 @@
 		C4001B00000000000000BB06 /* ChatFAB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFAB.swift; sourceTree = "<group>"; };
 		C4001B00000000000000BB07 /* ActionConfirmationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionConfirmationCard.swift; sourceTree = "<group>"; };
 		C4001B00000000000000BB08 /* UndoBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoBanner.swift; sourceTree = "<group>"; };
+		C4001B00000000000000BB09 /* DailyPlanCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPlanCard.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F601234567890B /* EventKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitService.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F601234567890C /* LoomCal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LoomCal.entitlements; sourceTree = "<group>"; };
 		1EAC04D985614080945480C4 /* ConvexEnv.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvexEnv.swift; sourceTree = "<group>"; };
 		41E86A5C0C1E4E8BB0B85A13 /* LoomTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoomTask.swift; sourceTree = "<group>"; };
 		554F4E556D274D37B8E492C9 /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
 		A5B6C7D8E9F0A1234567B000 /* LoomAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoomAction.swift; sourceTree = "<group>"; };
+		A5B6C7D8E9F0A1234567C000 /* DailyPlanProposal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPlanProposal.swift; sourceTree = "<group>"; };
 		5D11F15AA89546D588127322 /* StudioEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudioEvent.swift; sourceTree = "<group>"; };
 		6CD0C89A47E94DE0B14FEC60 /* LoomEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoomEvent.swift; sourceTree = "<group>"; };
 		8A616D88800F4FFA9AF9F693 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -156,6 +160,7 @@
 				C4001B00000000000000BB06 /* ChatFAB.swift */,
 				C4001B00000000000000BB07 /* ActionConfirmationCard.swift */,
 				C4001B00000000000000BB08 /* UndoBanner.swift */,
+				C4001B00000000000000BB09 /* DailyPlanCard.swift */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -200,6 +205,7 @@
 				554F4E556D274D37B8E492C9 /* ChatMessage.swift */,
 				5D11F15AA89546D588127322 /* StudioEvent.swift */,
 				A5B6C7D8E9F0A1234567B000 /* LoomAction.swift */,
+				A5B6C7D8E9F0A1234567C000 /* DailyPlanProposal.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -354,6 +360,7 @@
 				6DF29E450551441382D397E8 /* ChatMessage.swift in Sources */,
 				12FA6D2EF6D946E3AB7D3D0F /* StudioEvent.swift in Sources */,
 				A5B6C7D8E9F0A1234567B001 /* LoomAction.swift in Sources */,
+				A5B6C7D8E9F0A1234567C001 /* DailyPlanProposal.swift in Sources */,
 				862F350F167445A7959E9E7C /* ContentView.swift in Sources */,
 				A1B2C3D4E5F601234567890A /* EventKitService.swift in Sources */,
 				F1A2B3C4D5E6F70123456701 /* CalendarViewModel.swift in Sources */,
@@ -383,6 +390,7 @@
 				C4001A00000000000000BB06 /* ChatFAB.swift in Sources */,
 				C4001A00000000000000BB07 /* ActionConfirmationCard.swift in Sources */,
 				C4001A00000000000000BB08 /* UndoBanner.swift in Sources */,
+				C4001A00000000000000BB09 /* DailyPlanCard.swift in Sources */,
 				L00MC0L0R5000000000A0001 /* LoomColors.swift in Sources */,
 				L00MC0L0R5000000000A0002 /* CalendarToolbar.swift in Sources */,
 				L00MC0L0R5000000000A0003 /* MonthGridView.swift in Sources */,

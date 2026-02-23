@@ -9,11 +9,43 @@ class ChatViewModel: ObservableObject {
     @Published var isLoomAvailable: Bool = true            // false when timeout fires or send fails
     @Published var timedOutMessageIds: Set<String> = []    // messages that got no reply — shows retry bubble
 
+    // MARK: - Undo Context
+
+    /// Tracks state for the undo window after a confirmed action or daily plan.
+    struct UndoContext: Equatable {
+        let displaySummary: String     // Summary text for the undo banner
+        let messageId: String          // Chat message ID to mark as "undone"
+        let action: LoomAction?        // For single-action reverse (nil for daily plans)
+        let createdId: String?         // Single created item ID (single actions)
+        let createdIds: [String]       // Batch created item IDs (daily plans)
+        let isDailyPlan: Bool
+
+        /// Convenience init for single-action undo (backward compat with existing flow).
+        init(action: LoomAction, messageId: String, createdId: String?) {
+            self.displaySummary = action.displaySummary
+            self.messageId = messageId
+            self.action = action
+            self.createdId = createdId
+            self.createdIds = []
+            self.isDailyPlan = false
+        }
+
+        /// Init for daily plan batch undo.
+        init(displaySummary: String, messageId: String, createdIds: [String]) {
+            self.displaySummary = displaySummary
+            self.messageId = messageId
+            self.action = nil
+            self.createdId = nil
+            self.createdIds = createdIds
+            self.isDailyPlan = true
+        }
+    }
+
     // MARK: - Action State
 
     /// Active undo context — set after a successful action confirmation.
     /// Cleared when the undo timer expires or undoAction() is called.
-    @Published var activeUndoAction: (action: LoomAction, messageId: String, createdId: String?)? = nil
+    @Published var activeUndoAction: UndoContext? = nil
 
     /// Countdown remaining for the undo window (seconds).
     @Published var undoSecondsRemaining: Int = 0
@@ -171,7 +203,8 @@ class ChatViewModel: ObservableObject {
 
                 // 3. Start undo timer (not started for delete actions — data is gone)
                 if !action.isDelete {
-                    self.startUndoTimer(for: action, messageId: message._id, createdId: createdId)
+                    let context = UndoContext(action: action, messageId: message._id, createdId: createdId)
+                    self.startUndoTimer(for: context)
                 }
 
             } catch {
@@ -203,6 +236,77 @@ class ChatViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Daily Plan Lifecycle
+
+    /// Approves a daily plan: batch-creates all proposed time blocks as events,
+    /// marks the plan confirmed, and starts a batch undo timer.
+    func approveDailyPlan(_ message: ChatMessage) {
+        guard message.isDailyPlan,
+              let plan = message.decodedPlan,
+              let calVM = calendarViewModel
+        else { return }
+
+        Task {
+            do {
+                let beforeIds = Set(calVM.events.map { $0._id })
+
+                // Create each proposed time block as an event
+                for block in plan.payload.blocks {
+                    try await calVM.createEvent(
+                        title: block.title,
+                        start: block.startDate,
+                        durationMinutes: block.duration,
+                        isAllDay: false
+                    )
+                }
+
+                // Wait for subscription to reflect new events, then collect IDs
+                try? await Task.sleep(for: .seconds(2))
+                let afterIds = Set(calVM.events.map { $0._id })
+                let createdIds = Array(afterIds.subtracting(beforeIds))
+
+                // Mark confirmed
+                let statusArgs: [String: ConvexEncodable?] = [
+                    "id": message._id,
+                    "actionStatus": "confirmed"
+                ]
+                try await convex.mutation("chatMessages:updateActionStatus", with: statusArgs)
+
+                // Navigate to today and flash highlights
+                calVM.navigateToDate(Date())
+                for id in createdIds {
+                    calVM.flashHighlight(eventId: id)
+                }
+
+                // Start batch undo timer
+                let context = UndoContext(
+                    displaySummary: plan.displaySummary,
+                    messageId: message._id,
+                    createdIds: createdIds
+                )
+                self.startUndoTimer(for: context)
+
+            } catch {
+                let failArgs: [String: ConvexEncodable?] = [
+                    "id": message._id,
+                    "actionStatus": "cancelled"
+                ]
+                try? await convex.mutation("chatMessages:updateActionStatus", with: failArgs)
+
+                let errorArgs: [String: ConvexEncodable?] = [
+                    "role": "assistant",
+                    "content": "I couldn't create the schedule — please try again."
+                ]
+                try? await convex.mutation("chatMessages:send", with: errorArgs)
+            }
+        }
+    }
+
+    /// Rejects a daily plan without creating any events.
+    func rejectDailyPlan(_ message: ChatMessage) {
+        cancelAction(message)
+    }
+
     /// Reverses the most recent confirmed action within the undo window.
     /// For create actions: deletes the created item.
     /// For update actions with previousValues: patches back to previous state.
@@ -222,7 +326,14 @@ class ChatViewModel: ObservableObject {
 
             // Reverse the action
             do {
-                try await self.reverseAction(undo.action, createdId: undo.createdId)
+                if undo.isDailyPlan {
+                    // Batch undo — delete all created events
+                    for id in undo.createdIds {
+                        try? await calendarViewModel?.deleteEvent(id: id)
+                    }
+                } else if let action = undo.action {
+                    try await self.reverseAction(action, createdId: undo.createdId)
+                }
             } catch {
                 // Undo failed — log silently (no user-facing error for undo)
             }
@@ -385,8 +496,8 @@ class ChatViewModel: ObservableObject {
 
     // MARK: - Private: Undo Timer
 
-    func startUndoTimer(for action: LoomAction, messageId: String, createdId: String?) {
-        activeUndoAction = (action, messageId, createdId)
+    func startUndoTimer(for context: UndoContext) {
+        activeUndoAction = context
         undoSecondsRemaining = 5
         undoTask?.cancel()
         undoTask = Task {

@@ -153,7 +153,31 @@ You have tools to create, edit, and delete calendar events and tasks. When the u
 - When no time is given, create an all-day event
 - ALWAYS use timezone "${USER_TIMEZONE}" for all events and dates
 - Be concise and friendly in your replies
-- IMPORTANT: After calling a tool, respond with ONLY a brief one-sentence acknowledgment (e.g. "Done!" or "I've set that up for you."). Do NOT repeat the action details — the user already sees them in a confirmation card. Never say "Proposed:" or describe what the tool did.`;
+- IMPORTANT: After calling a tool, respond with ONLY a brief one-sentence acknowledgment (e.g. "Done!" or "I've set that up for you."). Do NOT repeat the action details — the user already sees them in a confirmation card. Never say "Proposed:" or describe what the tool did.
+
+## Daily Planning
+When the user asks you to plan their day (e.g. "plan my day", "schedule my day", "what should I work on today"), respond with a single ACTION block of type "daily_plan". Do NOT call individual create_event tools — the user reviews the whole plan first.
+
+Format:
+ACTION: {
+  "type": "daily_plan",
+  "displaySummary": "Brief one-line plan overview",
+  "payload": {
+    "blocks": [
+      { "title": "Task/event name", "start": "ISO-8601 datetime in ${USER_TIMEZONE}", "duration": 60 },
+      ...
+    ]
+  }
+}
+
+Rules for daily plans:
+- Look at today's existing events and avoid scheduling conflicts
+- Prioritize high-priority tasks by giving them dedicated time blocks
+- Include breaks between blocks (at least 15 min gaps)
+- Default to 60-minute blocks unless the task clearly needs more/less
+- Use the user's timezone (${USER_TIMEZONE}) for all times
+- Keep the plan realistic — typically 4-6 focused blocks per day
+- Start from the current time if the day has already begun`;
 }
 
 // ---------------------------------------------------------------------------
@@ -220,12 +244,17 @@ function detectActionBlock(text) {
   }
 
   // Validate: must have type + payload, and type must be a known action
-  const validTypes = [
-    "create_event", "update_event", "delete_event",
-    "create_task", "update_task", "delete_task",
-  ];
-  if (!action.type || !action.payload || !validTypes.includes(action.type)) {
-    return null;
+  if (!action.type || !action.payload) return null;
+
+  if (action.type === "daily_plan") {
+    // Daily plan requires a blocks array in payload
+    if (!Array.isArray(action.payload.blocks)) return null;
+  } else {
+    const validTypes = [
+      "create_event", "update_event", "delete_event",
+      "create_task", "update_task", "delete_task",
+    ];
+    if (!validTypes.includes(action.type)) return null;
   }
 
   // Strip the entire action block from the text
@@ -278,6 +307,22 @@ function normalizeActionPayload(action) {
   // Ensure duration is a string
   if (p.duration !== undefined) {
     p.duration = String(p.duration);
+  }
+
+  // Normalize daily plan blocks
+  if (Array.isArray(p.blocks)) {
+    for (const block of p.blocks) {
+      if (block.start !== undefined) {
+        const val = String(block.start);
+        if (!/^\d{10,}$/.test(val)) {
+          const ms = new Date(val).getTime();
+          if (!isNaN(ms)) block.start = String(ms);
+        }
+      }
+      if (block.duration !== undefined) {
+        block.duration = String(block.duration);
+      }
+    }
   }
 
   return action;

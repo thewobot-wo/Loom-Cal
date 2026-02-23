@@ -30,4 +30,19 @@ struct ChatMessage: Decodable, Identifiable {
         else { return nil }
         return try? JSONDecoder().decode(LoomAction.self, from: data)
     }
+
+    // Decode the JSON action string as a daily plan proposal.
+    var decodedPlan: DailyPlanProposal? {
+        guard let action = action,
+              let data = action.data(using: .utf8)
+        else { return nil }
+        let plan = try? JSONDecoder().decode(DailyPlanProposal.self, from: data)
+        // Only return if it's actually a daily_plan type
+        return plan?.type == "daily_plan" ? plan : nil
+    }
+
+    // True when this message is a daily plan proposal awaiting user approval.
+    var isDailyPlan: Bool {
+        role == "pending_action" && decodedPlan != nil
+    }
 }

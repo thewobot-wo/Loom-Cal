@@ -42,7 +42,14 @@ struct ChatView: View {
                                     .padding(.top, 8)
 
                                 ForEach(group.messages) { message in
-                                    if message.role == "pending_action" {
+                                    if message.isDailyPlan {
+                                        DailyPlanCard(
+                                            message: message,
+                                            onApprove: { chatViewModel.approveDailyPlan(message) },
+                                            onReject: { chatViewModel.rejectDailyPlan(message) }
+                                        )
+                                        .id(message.id)
+                                    } else if message.role == "pending_action" {
                                         ActionConfirmationCard(
                                             message: message,
                                             onConfirm: { chatViewModel.confirmAction(message) },
@@ -99,7 +106,7 @@ struct ChatView: View {
             // Undo banner — appears above divider during the undo window
             if let undo = chatViewModel.activeUndoAction {
                 UndoBanner(
-                    displaySummary: undo.action.displaySummary,
+                    displaySummary: undo.displaySummary,
                     secondsRemaining: chatViewModel.undoSecondsRemaining,
                     onUndo: { chatViewModel.undoAction() }
                 )
