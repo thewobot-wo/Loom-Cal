@@ -58,6 +58,7 @@ export default defineSchema({
       v.literal("cancelled"),
       v.literal("undone"),
     )),                                           // lifecycle state of an action card
+    audioStorageId: v.optional(v.id("_storage")), // Convex file storage ref for TTS audio
   })
     .index("by_sent_at", ["sentAt"]),
 

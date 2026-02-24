@@ -57,6 +57,7 @@
 		NL07020000000000000A0001 /* ParsedNLResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL07020000000000000B0001 /* ParsedNLResult.swift */; };
 		NL07020000000000000A0002 /* NLParseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL07020000000000000B0002 /* NLParseService.swift */; };
 		NOTIF0802000000000A0001 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NOTIF0802000000000B0001 /* NotificationService.swift */; };
+		V01C31001000000000A0001 /* VoiceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = V01C31001000000000B0001 /* VoiceService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -110,6 +111,7 @@
 		NL07020000000000000B0001 /* ParsedNLResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsedNLResult.swift; sourceTree = "<group>"; };
 		NL07020000000000000B0002 /* NLParseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NLParseService.swift; sourceTree = "<group>"; };
 		NOTIF0802000000000B0001 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		V01C31001000000000B0001 /* VoiceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +135,7 @@
 				F2A3B4C5D6E7F80234567801 /* NLEventParser.swift */,
 				NL07020000000000000B0002 /* NLParseService.swift */,
 				NOTIF0802000000000B0001 /* NotificationService.swift */,
+				V01C31001000000000B0001 /* VoiceService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -411,6 +414,7 @@
 				NL07020000000000000A0001 /* ParsedNLResult.swift in Sources */,
 				NL07020000000000000A0002 /* NLParseService.swift in Sources */,
 				NOTIF0802000000000A0001 /* NotificationService.swift in Sources */,
+				V01C31001000000000A0001 /* VoiceService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

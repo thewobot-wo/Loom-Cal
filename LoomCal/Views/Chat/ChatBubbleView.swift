@@ -3,8 +3,18 @@ import MarkdownUI
 
 struct ChatBubbleView: View {
     let message: ChatMessage
+    @ObservedObject var voiceService: VoiceService
+    var onPlayTap: (() -> Void)?
 
     var isUser: Bool { message.role == "user" }
+
+    private var isThisPlaying: Bool {
+        voiceService.playingMessageId == message._id
+    }
+
+    private var isThisLoading: Bool {
+        voiceService.isLoadingAudio && voiceService.playingMessageId == nil
+    }
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 8) {
@@ -27,6 +37,30 @@ struct ChatBubbleView: View {
                 .padding(.vertical, 8)
                 .background(isUser ? Color.accentColor : Color.gray.opacity(0.15))
                 .clipShape(RoundedRectangle(cornerRadius: 16))
+
+                // Play/pause button for assistant messages with audio
+                if !isUser, message.audioUrl != nil {
+                    Button {
+                        onPlayTap?()
+                    } label: {
+                        HStack(spacing: 4) {
+                            if isThisLoading {
+                                ProgressView()
+                                    .controlSize(.small)
+                            } else {
+                                Image(systemName: isThisPlaying ? "pause.circle.fill" : "play.circle.fill")
+                            }
+                            if isThisPlaying {
+                                Text("Playing")
+                                    .font(.caption2)
+                            }
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.leading, 4)
+                }
             }
 
             if !isUser { Spacer(minLength: 60) }

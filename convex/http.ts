@@ -28,9 +28,9 @@ http.route({
       }
     }
 
-    let body: { content?: string };
+    let body: { content?: string; audioStorageId?: string };
     try {
-      body = (await request.json()) as { content?: string };
+      body = (await request.json()) as { content?: string; audioStorageId?: string };
     } catch {
       return new Response("Invalid JSON", { status: 400 });
     }
@@ -42,6 +42,7 @@ http.route({
 
     await ctx.runMutation(internal.chatMessages.writeAssistantReply, {
       content: content.trim(),
+      ...(body.audioStorageId ? { audioStorageId: body.audioStorageId as any } : {}),
     });
 
     return new Response(JSON.stringify({ ok: true }), {
@@ -276,6 +277,34 @@ http.route({
     await ctx.runMutation(internal.nlParse.cleanup, {});
 
     return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
+/**
+ * POST /generate-upload-url
+ *
+ * Returns a short-lived upload URL for Convex file storage.
+ * Used by the bridge to upload TTS audio before posting a reply.
+ *
+ * Optional auth: Bearer token matching LOOM_WEBHOOK_SECRET env var.
+ */
+http.route({
+  path: "/generate-upload-url",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const secret = process.env.LOOM_WEBHOOK_SECRET;
+    if (secret) {
+      const auth = request.headers.get("Authorization");
+      if (auth !== `Bearer ${secret}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+    }
+
+    const url = await ctx.storage.generateUploadUrl();
+    return new Response(JSON.stringify({ url }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

@@ -30,6 +30,9 @@ const BASE_POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL || "2000", 10);
 const BACKOFF_POLL_INTERVAL = 30_000; // 30s when auth is broken
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "";
 const USER_TIMEZONE = process.env.USER_TIMEZONE || "America/Phoenix";
+const ENABLE_TTS = (process.env.ENABLE_TTS || "true").toLowerCase() !== "false";
+const TTS_VOICE = process.env.TTS_VOICE || "shimmer";
+const TTS_MODEL = process.env.TTS_MODEL || "tts-1";
 
 if (!OPENCLAW_PASSWORD) {
   console.error("Error: OPENCLAW_PASSWORD (or OPENCLAW_TOKEN) environment variable is required");
@@ -518,20 +521,121 @@ async function postPendingAction(action, displayText) {
 }
 
 // ---------------------------------------------------------------------------
+// TTS generation + Convex file upload
+// ---------------------------------------------------------------------------
+
+/**
+ * Strip markdown formatting from text before sending to TTS.
+ * Removes: bold, italic, headers, code blocks, links, list markers.
+ */
+function stripMarkdown(text) {
+  return text
+    .replace(/```[\s\S]*?```/g, "")       // code blocks
+    .replace(/`([^`]+)`/g, "$1")           // inline code
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // links → text
+    .replace(/#{1,6}\s+/g, "")             // headers
+    .replace(/\*\*([^*]+)\*\*/g, "$1")     // bold
+    .replace(/\*([^*]+)\*/g, "$1")         // italic
+    .replace(/__([^_]+)__/g, "$1")         // bold (underscore)
+    .replace(/_([^_]+)_/g, "$1")           // italic (underscore)
+    .replace(/^[-*+]\s+/gm, "")           // list markers
+    .replace(/^\d+\.\s+/gm, "")           // numbered list markers
+    .replace(/\n{3,}/g, "\n\n")            // collapse extra newlines
+    .trim();
+}
+
+/**
+ * Generate TTS audio via OpenClaw and upload to Convex file storage.
+ * Returns the Convex storageId string, or null on any failure.
+ * Non-blocking: failures are logged but never prevent the text reply.
+ */
+async function generateAndUploadTTS(text) {
+  try {
+    const cleanText = stripMarkdown(text);
+    if (!cleanText || cleanText.length < 2) return null;
+
+    const currentPassword = process.env.OPENCLAW_PASSWORD || process.env.OPENCLAW_TOKEN || OPENCLAW_PASSWORD;
+
+    // 1. Generate audio via OpenClaw TTS
+    console.log(`[bridge] Generating TTS (${cleanText.length} chars, voice: ${TTS_VOICE})...`);
+    const ttsRes = await fetch(`${OPENCLAW_URL}/v1/audio/speech`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${currentPassword}`,
+      },
+      body: JSON.stringify({
+        model: TTS_MODEL,
+        voice: TTS_VOICE,
+        input: cleanText,
+      }),
+    });
+
+    if (!ttsRes.ok) {
+      const err = await ttsRes.text();
+      console.error(`[bridge] TTS generation failed: ${ttsRes.status} ${err.substring(0, 200)}`);
+      return null;
+    }
+
+    const audioData = Buffer.from(await ttsRes.arrayBuffer());
+    console.log(`[bridge] TTS audio generated (${audioData.length} bytes)`);
+
+    // 2. Get upload URL from Convex
+    const uploadHeaders = { "Content-Type": "application/json" };
+    if (WEBHOOK_SECRET) uploadHeaders["Authorization"] = `Bearer ${WEBHOOK_SECRET}`;
+
+    const uploadUrlRes = await fetch(`${CONVEX_SITE_URL}/generate-upload-url`, {
+      method: "POST",
+      headers: uploadHeaders,
+    });
+
+    if (!uploadUrlRes.ok) {
+      console.error(`[bridge] Failed to get upload URL: ${uploadUrlRes.status}`);
+      return null;
+    }
+
+    const { url: uploadUrl } = await uploadUrlRes.json();
+
+    // 3. Upload audio to Convex file storage
+    const uploadRes = await fetch(uploadUrl, {
+      method: "POST",
+      headers: { "Content-Type": "audio/mpeg" },
+      body: audioData,
+    });
+
+    if (!uploadRes.ok) {
+      console.error(`[bridge] Audio upload failed: ${uploadRes.status}`);
+      return null;
+    }
+
+    const { storageId } = await uploadRes.json();
+    console.log(`[bridge] Audio uploaded to Convex storage: ${storageId}`);
+    return storageId;
+
+  } catch (err) {
+    console.error(`[bridge] TTS error (non-blocking): ${err.message}`);
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Convex posting
 // ---------------------------------------------------------------------------
 
 /**
- * Post Loom's text reply to Convex.
+ * Post Loom's text reply to Convex, optionally with TTS audio reference.
  */
-async function postLoomReply(content) {
+async function postLoomReply(content, audioStorageId = null) {
   const headers = { "Content-Type": "application/json" };
   if (WEBHOOK_SECRET) headers["Authorization"] = `Bearer ${WEBHOOK_SECRET}`;
+
+  const body = { content };
+  if (audioStorageId) body.audioStorageId = audioStorageId;
 
   const postRes = await fetch(`${CONVEX_SITE_URL}/loom-reply`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ content }),
+    body: JSON.stringify(body),
   });
 
   if (!postRes.ok) {
@@ -664,7 +768,12 @@ async function poll() {
       await postPendingAction(normalizedAction, displayText);
       // Don't post a separate assistant reply — the confirmation card is enough
     } else {
-      await postLoomReply(replyText);
+      // Generate TTS audio (non-blocking — text reply posts even if TTS fails)
+      let audioStorageId = null;
+      if (ENABLE_TTS) {
+        audioStorageId = await generateAndUploadTTS(replyText);
+      }
+      await postLoomReply(replyText, audioStorageId);
     }
   } catch (err) {
     console.error(`[bridge] Error: ${err.message}`);
@@ -690,6 +799,7 @@ console.log(`[bridge] OpenClaw: ${OPENCLAW_URL}`);
 console.log(`[bridge] Convex:   ${CONVEX_SITE_URL}`);
 console.log(`[bridge] Polling every ${BASE_POLL_INTERVAL}ms`);
 console.log(`[bridge] Auth: password mode (static credential)`);
+console.log(`[bridge] TTS: ${ENABLE_TTS ? `enabled (voice: ${TTS_VOICE}, model: ${TTS_MODEL})` : "disabled"}`);
 console.log(`[bridge] Actions handled by Convex MCP server (separate process)`);
 console.log("");
 

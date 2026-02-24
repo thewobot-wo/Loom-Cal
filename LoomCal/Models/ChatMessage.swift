@@ -14,6 +14,9 @@ struct ChatMessage: Decodable, Identifiable {
     let action: String?                // JSON string of the LoomAction payload
     let actionStatus: String?          // "pending", "confirmed", "cancelled", or "undone"
 
+    // Audio fields — present when bridge generated TTS for this message.
+    let audioUrl: String?              // Resolved Convex storage URL for TTS audio
+
     // Identifiable conformance — matches LoomEvent and LoomTask pattern.
     // var id avoids CodingKeys issues with @ConvexInt wrapper properties.
     var id: String { _id }

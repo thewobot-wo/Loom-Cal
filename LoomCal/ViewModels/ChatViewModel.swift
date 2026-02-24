@@ -9,6 +9,11 @@ class ChatViewModel: ObservableObject {
     @Published var isLoomAvailable: Bool = true            // false when timeout fires or send fails
     @Published var timedOutMessageIds: Set<String> = []    // messages that got no reply — shows retry bubble
 
+    // MARK: - Voice
+
+    let voiceService = VoiceService()
+    @AppStorage("loomVoiceEnabled") var voiceEnabled: Bool = false
+
     // MARK: - Undo Context
 
     /// Tracks state for the undo window after a confirmed action or daily plan.
@@ -90,6 +95,12 @@ class ChatViewModel: ObservableObject {
                     if !self.isLoomAvailable {
                         self.isLoomAvailable = true
                     }
+                    // Auto-play TTS when voice is enabled and message has audio
+                    if self.voiceEnabled,
+                       lastMessage.role == "assistant",
+                       let audioUrl = lastMessage.audioUrl {
+                        self.voiceService.play(url: audioUrl, messageId: lastMessage._id)
+                    }
                 }
             }
         }
@@ -142,6 +153,12 @@ class ChatViewModel: ObservableObject {
         Task {
             try? await convex.mutation("chatMessages:clearAll", with: [:])
         }
+    }
+
+    /// Toggle play/pause for a message's TTS audio.
+    func playMessage(_ message: ChatMessage) {
+        guard let audioUrl = message.audioUrl else { return }
+        voiceService.togglePlayPause(url: audioUrl, messageId: message._id)
     }
 
     private func startReplyTimeout() {

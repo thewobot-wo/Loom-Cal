@@ -3,10 +3,19 @@ import { v } from "convex/values";
 
 /**
  * List all chat messages ordered by sentAt time (ascending).
+ * Resolves audioStorageId → audioUrl for messages with TTS audio.
  */
 export const list = query({
   handler: async (ctx) => {
-    return await ctx.db.query("chat_messages").withIndex("by_sent_at").collect();
+    const messages = await ctx.db.query("chat_messages").withIndex("by_sent_at").collect();
+    return Promise.all(
+      messages.map(async (msg) => {
+        const audioUrl = msg.audioStorageId
+          ? await ctx.storage.getUrl(msg.audioStorageId)
+          : null;
+        return { ...msg, audioUrl };
+      })
+    );
   },
 });
 
@@ -45,14 +54,19 @@ export const listForLoom = internalQuery({
 
 /**
  * Internal mutation: write Loom's reply to the chat_messages table.
+ * Optionally includes a reference to TTS audio in Convex file storage.
  */
 export const writeAssistantReply = internalMutation({
-  args: { content: v.string() },
-  handler: async (ctx, { content }) => {
+  args: {
+    content: v.string(),
+    audioStorageId: v.optional(v.id("_storage")),
+  },
+  handler: async (ctx, { content, audioStorageId }) => {
     await ctx.db.insert("chat_messages", {
       role: "assistant",
       content,
       sentAt: BigInt(Date.now()),
+      ...(audioStorageId ? { audioStorageId } : {}),
     });
   },
 });

@@ -57,8 +57,12 @@ struct ChatView: View {
                                         )
                                         .id(message.id)
                                     } else {
-                                        ChatBubbleView(message: message)
-                                            .id(message.id)
+                                        ChatBubbleView(
+                                            message: message,
+                                            voiceService: chatViewModel.voiceService,
+                                            onPlayTap: { chatViewModel.playMessage(message) }
+                                        )
+                                        .id(message.id)
                                     }
                                 }
                             }
@@ -116,7 +120,21 @@ struct ChatView: View {
 
             Divider()
 
-            // Input bar
+            // Voice toggle + Input bar
+            HStack {
+                Spacer()
+                Button {
+                    chatViewModel.voiceEnabled.toggle()
+                } label: {
+                    Image(systemName: chatViewModel.voiceEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                        .font(.caption)
+                        .foregroundStyle(chatViewModel.voiceEnabled ? Color.accentColor : Color.secondary)
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing)
+                .padding(.top, 4)
+            }
+
             ChatInputBar(
                 text: $inputText,
                 isEnabled: chatViewModel.isLoomAvailable,
