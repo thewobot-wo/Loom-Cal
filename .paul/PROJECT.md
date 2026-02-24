@@ -69,7 +69,8 @@ Single `ConvexClient` singleton created in `LoomCalApp.swift` as module-level `l
 | Task System (TASK) | 7 | 7 | 0 |
 | Loom AI (LOOM) | 11 | 11 | 0 |
 | Platform (PLAT) | 5 | 5 | 0 |
-| **Total** | **28** | **28** | **0** |
+| Recurring Events (RECR) | 5 | 5 | 0 |
+| **Total** | **33** | **33** | **0** |
 
 ## Constraints
 
@@ -87,10 +88,14 @@ Single `ConvexClient` singleton created in `LoomCalApp.swift` as module-level `l
 | NotificationService as NSObject singleton | Phase 8 | UNUserNotificationCenterDelegate for foreground banners |
 | mainContent @ViewBuilder pattern | Phase 8 | Shared .task{} and .sheet{} modifiers, no duplication |
 | Cancel-all + re-add notification scheduling | Phase 8 | Simple, correct; triggers on every Convex subscription update |
+| exceptionDates as JSON string | Phase 9 | v.string() instead of v.array(v.int64()) for ConvexMobile BigInt array limitation |
+| Client-side recurrence expansion | Phase 9 | CalendarViewModel expands per-day on demand; no server-side query needed |
+| Virtual occurrence IDs | Phase 9 | Synthetic `{masterId}_occ_{startMs}` format for unique identification |
+| Edit-this creates standalone + exception | Phase 9 | Two-step: new event + addExceptionDate on master |
 
 ## Pre-PAUL History
 
 Phases 1-4 were executed under the GSD workflow in `.planning/`. That directory is preserved as a read-only archive. See `.planning/phases/` for detailed execution history, plans, summaries, and verification reports.
 
 ---
-*Last updated: 2026-02-23 after Phase 8*
+*Last updated: 2026-02-24 after Phase 9*

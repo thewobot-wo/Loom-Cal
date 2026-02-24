@@ -6,7 +6,7 @@ Deepen the core experience with recurring events, Loom's voice, and quality-of-l
 
 | Phase | Name | Plans | Status |
 |-------|------|-------|--------|
-| 9 | Recurring Events | 1/3 | In progress |
+| 9 | Recurring Events | 3/3 | Complete |
 | 10 | Loom Voice | TBD | Not started |
 | 11 | Chat & Settings Polish | TBD | Not started |
 
@@ -27,7 +27,10 @@ Deepen the core experience with recurring events, Loom's voice, and quality-of-l
 4. User can edit all future occurrences of a series
 5. User can delete a single occurrence or the entire series
 
-**Plans:** TBD (defined during /paul:plan)
+**Plans:**
+- 09-01: Recurrence data model + expansion engine (Complete)
+- 09-02: Recurrence UI — create, edit this/all, delete this/all (Complete)
+- 09-03: Recurring event notifications (Complete)
 
 ### Phase 10: Loom Voice
 

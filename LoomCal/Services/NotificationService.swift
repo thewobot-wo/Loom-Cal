@@ -53,6 +53,7 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate, @un
     // MARK: - Event Notifications
 
     /// Cancels existing event notifications and schedules new ones for upcoming events.
+    /// Expands recurring events into occurrences within the 48-hour window.
     /// Only schedules for non-all-day events starting within the next 48 hours.
     func rescheduleEventNotifications(_ events: [LoomEvent]) {
         let prefix = "event-"
@@ -62,10 +63,11 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate, @un
         let leadMinutes = eventLeadMinutes
         let cutoff = now.addingTimeInterval(48 * 60 * 60)
 
-        for event in events {
+        let expandedEvents = expandForNotifications(events, now: now, cutoff: cutoff)
+
+        for (event, startDate) in expandedEvents {
             guard !event.isAllDay else { continue }
 
-            let startDate = Date(timeIntervalSince1970: TimeInterval(event.start) / 1000)
             let fireDate = startDate.addingTimeInterval(TimeInterval(-leadMinutes * 60))
 
             guard fireDate > now, startDate <= cutoff else { continue }
@@ -81,8 +83,10 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate, @un
             )
             let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
 
+            // Include timestamp in ID to differentiate occurrences of the same recurring event
+            let startMs = Int(startDate.timeIntervalSince1970 * 1000)
             let request = UNNotificationRequest(
-                identifier: "\(prefix)\(event._id)",
+                identifier: "\(prefix)\(event._id)_\(startMs)",
                 content: content,
                 trigger: trigger
             )
@@ -92,6 +96,36 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate, @un
                 }
             }
         }
+    }
+
+    /// Expands events into (event, startDate) pairs, generating occurrences for recurring events.
+    private func expandForNotifications(
+        _ events: [LoomEvent],
+        now: Date,
+        cutoff: Date
+    ) -> [(event: LoomEvent, startDate: Date)] {
+        var result: [(event: LoomEvent, startDate: Date)] = []
+
+        for event in events {
+            if event.isRecurring,
+               let rruleStr = event.rrule,
+               let rule = RecurrenceRule.from(rrule: rruleStr) {
+                // Recurring: expand occurrences within the notification window
+                let masterStart = Date(timeIntervalSince1970: TimeInterval(event.start) / 1000)
+                let exceptions = event.exceptionDateValues
+                let occurrences = rule.occurrences(from: masterStart, through: cutoff, excluding: exceptions)
+
+                for occDate in occurrences {
+                    result.append((event: event, startDate: occDate))
+                }
+            } else {
+                // Non-recurring: single entry with original start
+                let startDate = Date(timeIntervalSince1970: TimeInterval(event.start) / 1000)
+                result.append((event: event, startDate: startDate))
+            }
+        }
+
+        return result
     }
 
     // MARK: - Task Notifications
