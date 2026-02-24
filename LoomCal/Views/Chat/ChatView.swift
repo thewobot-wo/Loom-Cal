@@ -127,8 +127,10 @@ struct ChatView: View {
                     chatViewModel.voiceEnabled.toggle()
                 } label: {
                     Image(systemName: chatViewModel.voiceEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                        .font(.caption)
+                        .font(.body)
                         .foregroundStyle(chatViewModel.voiceEnabled ? Color.accentColor : Color.secondary)
+                        .frame(minWidth: 44, minHeight: 36)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .padding(.trailing)

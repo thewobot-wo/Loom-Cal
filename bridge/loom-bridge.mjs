@@ -15,12 +15,14 @@
  *   OPENCLAW_PASSWORD=<password> node loom-bridge.mjs
  *
  * Environment variables:
- *   OPENCLAW_PASSWORD — OpenClaw gateway password (required; set gateway to password auth mode)
- *   OPENCLAW_TOKEN    — Deprecated alias for OPENCLAW_PASSWORD (still works)
- *   OPENCLAW_URL      — Gateway URL (default: http://127.0.0.1:18789)
- *   CONVEX_SITE_URL   — Convex HTTP endpoint base (default: https://kindhearted-goldfish-658.convex.site)
- *   POLL_INTERVAL     — Polling interval in ms (default: 2000)
- *   WEBHOOK_SECRET    — Optional shared secret for Convex endpoints
+ *   OPENCLAW_PASSWORD  — OpenClaw gateway password (required; set gateway to password auth mode)
+ *   OPENCLAW_TOKEN     — Deprecated alias for OPENCLAW_PASSWORD (still works)
+ *   OPENCLAW_URL       — Gateway URL (default: http://127.0.0.1:18789)
+ *   CONVEX_SITE_URL    — Convex HTTP endpoint base (default: https://kindhearted-goldfish-658.convex.site)
+ *   POLL_INTERVAL      — Polling interval in ms (default: 2000)
+ *   WEBHOOK_SECRET     — Optional shared secret for Convex endpoints
+ *   ELEVENLABS_API_KEY — ElevenLabs API key for TTS (required if TTS enabled)
+ *   ELEVENLABS_VOICE_ID — ElevenLabs voice ID (default: WAhoMTNdLdMoq1j3wf3I)
  */
 
 const OPENCLAW_URL = process.env.OPENCLAW_URL || "http://127.0.0.1:18789";
@@ -31,8 +33,8 @@ const BACKOFF_POLL_INTERVAL = 30_000; // 30s when auth is broken
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "";
 const USER_TIMEZONE = process.env.USER_TIMEZONE || "America/Phoenix";
 const ENABLE_TTS = (process.env.ENABLE_TTS || "true").toLowerCase() !== "false";
-const TTS_VOICE = process.env.TTS_VOICE || "shimmer";
-const TTS_MODEL = process.env.TTS_MODEL || "tts-1";
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
+const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || "WAhoMTNdLdMoq1j3wf3I";
 
 if (!OPENCLAW_PASSWORD) {
   console.error("Error: OPENCLAW_PASSWORD (or OPENCLAW_TOKEN) environment variable is required");
@@ -545,7 +547,7 @@ function stripMarkdown(text) {
 }
 
 /**
- * Generate TTS audio via OpenClaw and upload to Convex file storage.
+ * Generate TTS audio via ElevenLabs and upload to Convex file storage.
  * Returns the Convex storageId string, or null on any failure.
  * Non-blocking: failures are logged but never prevent the text reply.
  */
@@ -554,20 +556,31 @@ async function generateAndUploadTTS(text) {
     const cleanText = stripMarkdown(text);
     if (!cleanText || cleanText.length < 2) return null;
 
-    const currentPassword = process.env.OPENCLAW_PASSWORD || process.env.OPENCLAW_TOKEN || OPENCLAW_PASSWORD;
+    if (!ELEVENLABS_API_KEY) {
+      console.error("[bridge] TTS skipped: ELEVENLABS_API_KEY not set");
+      return null;
+    }
 
-    // 1. Generate audio via OpenClaw TTS
-    console.log(`[bridge] Generating TTS (${cleanText.length} chars, voice: ${TTS_VOICE})...`);
-    const ttsRes = await fetch(`${OPENCLAW_URL}/v1/audio/speech`, {
+    // 1. Generate audio via ElevenLabs TTS
+    console.log(`[bridge] Generating TTS (${cleanText.length} chars, voice: ${ELEVENLABS_VOICE_ID})...`);
+    const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${currentPassword}`,
+        "xi-api-key": ELEVENLABS_API_KEY,
+        "Accept": "audio/mpeg",
       },
       body: JSON.stringify({
-        model: TTS_MODEL,
-        voice: TTS_VOICE,
-        input: cleanText,
+        text: cleanText,
+        model_id: "eleven_multilingual_v2",
+        language_code: "en",
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0,
+          use_speaker_boost: true,
+          speed: 1.1,
+        },
       }),
     });
 
@@ -799,7 +812,7 @@ console.log(`[bridge] OpenClaw: ${OPENCLAW_URL}`);
 console.log(`[bridge] Convex:   ${CONVEX_SITE_URL}`);
 console.log(`[bridge] Polling every ${BASE_POLL_INTERVAL}ms`);
 console.log(`[bridge] Auth: password mode (static credential)`);
-console.log(`[bridge] TTS: ${ENABLE_TTS ? `enabled (voice: ${TTS_VOICE}, model: ${TTS_MODEL})` : "disabled"}`);
+console.log(`[bridge] TTS: ${ENABLE_TTS ? `enabled (ElevenLabs, voice: ${ELEVENLABS_VOICE_ID})` : "disabled"}`);
 console.log(`[bridge] Actions handled by Convex MCP server (separate process)`);
 console.log("");
 

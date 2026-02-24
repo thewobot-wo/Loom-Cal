@@ -43,23 +43,25 @@ struct ChatBubbleView: View {
                     Button {
                         onPlayTap?()
                     } label: {
-                        HStack(spacing: 4) {
+                        HStack(spacing: 6) {
                             if isThisLoading {
                                 ProgressView()
                                     .controlSize(.small)
                             } else {
                                 Image(systemName: isThisPlaying ? "pause.circle.fill" : "play.circle.fill")
+                                    .font(.title3)
                             }
                             if isThisPlaying {
                                 Text("Playing")
-                                    .font(.caption2)
+                                    .font(.caption)
                             }
                         }
-                        .font(.caption)
                         .foregroundStyle(.secondary)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .padding(.leading, 4)
+                    .padding(.leading, 0)
                 }
             }
 
