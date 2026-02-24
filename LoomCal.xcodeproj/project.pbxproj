@@ -55,6 +55,7 @@
 		L00MC0L0R5000000000A0004 /* MacCalendarLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = L00MC0L0R5000000000B0004 /* MacCalendarLayout.swift */; };
 		NL07020000000000000A0001 /* ParsedNLResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL07020000000000000B0001 /* ParsedNLResult.swift */; };
 		NL07020000000000000A0002 /* NLParseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL07020000000000000B0002 /* NLParseService.swift */; };
+		NOTIF0802000000000A0001 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NOTIF0802000000000B0001 /* NotificationService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -106,6 +107,7 @@
 		L00MC0L0R5000000000B0004 /* MacCalendarLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCalendarLayout.swift; sourceTree = "<group>"; };
 		NL07020000000000000B0001 /* ParsedNLResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsedNLResult.swift; sourceTree = "<group>"; };
 		NL07020000000000000B0002 /* NLParseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NLParseService.swift; sourceTree = "<group>"; };
+		NOTIF0802000000000B0001 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +130,7 @@
 				A1B2C3D4E5F601234567890B /* EventKitService.swift */,
 				F2A3B4C5D6E7F80234567801 /* NLEventParser.swift */,
 				NL07020000000000000B0002 /* NLParseService.swift */,
+				NOTIF0802000000000B0001 /* NotificationService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -403,6 +406,7 @@
 				L00MC0L0R5000000000A0004 /* MacCalendarLayout.swift in Sources */,
 				NL07020000000000000A0001 /* ParsedNLResult.swift in Sources */,
 				NL07020000000000000A0002 /* NLParseService.swift in Sources */,
+				NOTIF0802000000000A0001 /* NotificationService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

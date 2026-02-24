@@ -6,7 +6,7 @@ Manage projects, tasks and events with my AI personal assistant Loom. The app gi
 
 ## Description
 
-Morgen-clone calendar + task app for iOS/macOS built with SwiftUI and a Convex real-time backend. Integrates Apple Calendar (read-only via EventKit), Convex-native events/tasks, and a Supabase-synced studio calendar. An AI assistant ("Loom") handles chat, calendar mutations, and daily planning via an OpenClaw bridge.
+Morgen-clone calendar + task app for iOS/macOS built with SwiftUI and a Convex real-time backend. Integrates Apple Calendar (read-only via EventKit), Convex-native events/tasks, and a Supabase-synced studio calendar. An AI assistant ("Loom") handles chat, calendar mutations, daily planning, and natural language entry via an OpenClaw bridge. Local notifications alert for upcoming events and task deadlines.
 
 ## Tech Stack
 
@@ -19,6 +19,7 @@ Morgen-clone calendar + task app for iOS/macOS built with SwiftUI and a Convex r
 | Node.js bridge | Loom AI relay | `bridge/loom-bridge.mjs` polls Convex, calls OpenClaw |
 | Supabase | Studio calendar source | Read-only sync into Convex via cron |
 | EventKit | Apple Calendar access | On-device read-only, never stored in Convex |
+| UserNotifications | Local notifications | Event reminders + task due dates |
 
 ## Architecture
 
@@ -30,6 +31,13 @@ SwiftUI Views <- @Published <- ViewModels <- Convex subscriptions (WebSocket)
 ```
 
 Single `ConvexClient` singleton created in `LoomCalApp.swift` as module-level `let convex`. All ViewModels subscribe through this one client.
+
+### Navigation
+
+| Platform | Navigation Pattern |
+|----------|-------------------|
+| iOS | TabView with native bottom tab bar (Calendar, Tasks, Loom) |
+| macOS | NavigationSplitView with sidebar (Calendar, Tasks, Loom) |
 
 ### Data Ownership
 
@@ -49,7 +57,7 @@ Single `ConvexClient` singleton created in `LoomCalApp.swift` as module-level `l
 | `LoomCal/Models/` | Decodable structs matching Convex schema tables |
 | `LoomCal/ViewModels/` | `@MainActor @ObservableObject` classes with `@Published` properties |
 | `LoomCal/Views/` | SwiftUI views organized by feature (Calendar/, Events/, Tasks/, Today/, Chat/) |
-| `LoomCal/Services/` | EventKitService (Apple Calendar), NLEventParser (date extraction) |
+| `LoomCal/Services/` | EventKitService, NLParseService, NotificationService |
 | `convex/` | TypeScript backend: schema.ts, query/mutation functions, cron jobs |
 | `bridge/` | Node.js bridge script connecting Convex to OpenClaw gateway |
 
@@ -59,9 +67,9 @@ Single `ConvexClient` singleton created in `LoomCalApp.swift` as module-level `l
 |----------|-------|------|-----------|
 | Calendar Views (CALV) | 5 | 5 | 0 |
 | Task System (TASK) | 7 | 7 | 0 |
-| Loom AI (LOOM) | 11 | 10 | 1 |
-| Platform (PLAT) | 5 | 1 | 4 |
-| **Total** | **28** | **23** | **5** |
+| Loom AI (LOOM) | 11 | 11 | 0 |
+| Platform (PLAT) | 5 | 5 | 0 |
+| **Total** | **28** | **28** | **0** |
 
 ## Constraints
 
@@ -71,6 +79,18 @@ Single `ConvexClient` singleton created in `LoomCalApp.swift` as module-level `l
 - **Studio Data**: Supabase vocal studio calendar stays in Supabase — sync only
 - **HorizonCalendar**: iOS-only (UIKit); macOS uses LazyVGrid fallback via `#if canImport(UIKit)`
 
+## Key Decisions
+
+| Decision | Phase | Impact |
+|----------|-------|--------|
+| NavigationSplitView for macOS, TabView for iOS | Phase 8 | Native feel on both platforms |
+| NotificationService as NSObject singleton | Phase 8 | UNUserNotificationCenterDelegate for foreground banners |
+| mainContent @ViewBuilder pattern | Phase 8 | Shared .task{} and .sheet{} modifiers, no duplication |
+| Cancel-all + re-add notification scheduling | Phase 8 | Simple, correct; triggers on every Convex subscription update |
+
 ## Pre-PAUL History
 
 Phases 1-4 were executed under the GSD workflow in `.planning/`. That directory is preserved as a read-only archive. See `.planning/phases/` for detailed execution history, plans, summaries, and verification reports.
+
+---
+*Last updated: 2026-02-23 after Phase 8*

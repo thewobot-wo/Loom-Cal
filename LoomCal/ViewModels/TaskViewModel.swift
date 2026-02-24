@@ -23,6 +23,7 @@ class TaskViewModel: ObservableObject {
                 guard !Task.isCancelled else { break }
                 self.tasks = result
                 self.isLoading = false
+                NotificationService.shared.rescheduleTaskNotifications(result)
             }
         }
     }

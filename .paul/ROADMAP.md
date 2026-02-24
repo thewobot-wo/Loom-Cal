@@ -9,7 +9,7 @@ Fresh milestone covering phases 5-8. Goal: Loom can act on the user's behalf —
 | 5 | Loom Calendar & Task Actions | 3/3 | Complete |
 | 6 | AI Daily Planning | 2/2 | Complete |
 | 7 | Natural Language Entry | 2/2 | Complete |
-| 8 | Platform Polish | 0/TBD | Not Started |
+| 8 | Platform Polish | 2/2 | Complete |
 
 ---
 
@@ -76,7 +76,9 @@ Fresh milestone covering phases 5-8. Goal: Loom can act on the user's behalf —
 3. Local notification before upcoming calendar events (configurable lead time)
 4. Local notification when task due date arrives
 
-**Plans:** TBD
+**Plans:**
+- [x] 08-01 — macOS NavigationSplitView sidebar, iOS TabView preserved, platform-branched ContentView
+- [x] 08-02 — NotificationService (event + task local notifications), configurable lead time menu, foreground banner display
 
 ---
 

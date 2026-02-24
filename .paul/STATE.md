@@ -2,30 +2,29 @@
 
 ## Current Position
 
-**Milestone:** v0.1 — Loom Intelligence
-**Phase:** 8 of 8 (Platform Polish) — Not Started
-**Plan:** Not started
-**Status:** Ready to plan
-**Last activity:** 2026-02-22 — Phase 7 complete, transitioned to Phase 8
+**Milestone:** v0.1 — Loom Intelligence — COMPLETE
+**Phase:** 8 of 8 (Platform Polish) — Complete
+**Plan:** All plans complete
+**Status:** Milestone complete
+**Last activity:** 2026-02-23 — Phase 8 complete, milestone v0.1 finished
 
 Progress:
-- Milestone: [██████████░] 95%
-- Phase 8: [░░░░░░░░░░] 0%
+- Milestone: [██████████] 100%
+- Phase 8: [██████████] 100%
 
 ## Loop Position
 
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ✓     [Loop complete - ready for next PLAN]
+  ✓        ✓        ✓     [Loop complete — milestone finished]
 ```
 
 ## Velocity
 
-**Carried from `.planning/STATE.md`:**
-- Total plans completed: 21 (across phases 1-7)
+- Total plans completed: 23 (across phases 1-8)
 - Average duration: ~7 min/plan
-- Total execution time: ~2.5 hours
+- Total execution time: ~2.7 hours
 
 **By Phase:**
 
@@ -39,14 +38,15 @@ PLAN ──▶ APPLY ──▶ UNIFY
 | 05 Loom Actions | 3 | ~10 min | ~3.3 min |
 | 06 AI Daily Planning | 2 | ~20 min | ~10 min |
 | 07 Natural Language Entry | 2 | ~35 min | ~17.5 min |
+| 08 Platform Polish | 2 | ~15 min | ~7.5 min |
 
 ## Recent Decisions
 
-- **ScrollView+VStack over Form** — full layout control for Things 3 aesthetic
-- **Progressive disclosure** — details hidden until toggle or NL parse completes
-- **Custom PriorityChip capsules** — sage/gold/coral instead of segmented Picker
-- **Sheet detents (.medium/.large)** — consistent half-screen sheet presentation app-wide
-- **NLParseService as singleton utility** — not an ObservableObject, views manage own @State
+- **NavigationSplitView for macOS** — sidebar with Calendar/Tasks/Loom sections; iOS keeps TabView
+- **mainContent @ViewBuilder pattern** — shared .task{} and .sheet{} applied once, no duplication
+- **NotificationService as NSObject singleton** — UNUserNotificationCenterDelegate for foreground banners
+- **Bell menu for lead time** — toolbar Menu with 5/10/15/30/60 min options, @AppStorage backed
+- **Cancel-all + re-add scheduling** — simple notification strategy on every Convex subscription update
 
 ## Pending Todos
 
@@ -55,11 +55,11 @@ PLAN ──▶ APPLY ──▶ UNIFY
 
 ## Blockers/Concerns
 
-- Convex background subscription behavior on iOS not documented — test before notification implementation (Phase 8)
+- None
 
 ## Session Continuity
 
-**Last session:** 2026-02-22
-**Stopped at:** Phase 7 complete, ready to plan Phase 8
-**Next action:** /paul:plan for Phase 8 (Platform Polish)
+**Last session:** 2026-02-23
+**Stopped at:** Milestone v0.1 complete
+**Next action:** /paul:complete-milestone or /paul:milestone for v0.2
 **Resume file:** .paul/ROADMAP.md

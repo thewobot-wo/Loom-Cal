@@ -62,6 +62,7 @@ class CalendarViewModel: ObservableObject {
                 guard !Task.isCancelled else { break }
                 self.events = result
                 self.isLoading = false
+                NotificationService.shared.rescheduleEventNotifications(result)
             }
         }
     }
