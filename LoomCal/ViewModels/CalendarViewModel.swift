@@ -76,14 +76,29 @@ class CalendarViewModel: ObservableObject {
     // MARK: - Date Filtering
 
     /// All events (timed and all-day) whose start falls within the given calendar day.
+    /// Expands recurring events into virtual occurrences for the requested date.
     func events(for date: Date) -> [LoomEvent] {
-        let start = Calendar.current.startOfDay(for: date)
-        let end = Calendar.current.date(byAdding: .day, value: 1, to: start)!
-        return events.filter { event in
-            let ms = TimeInterval(event.start) / 1000
-            let d = Date(timeIntervalSince1970: ms)
-            return d >= start && d < end
+        let cal = Calendar.current
+        let dayStart = cal.startOfDay(for: date)
+        let dayEnd = cal.date(byAdding: .day, value: 1, to: dayStart)!
+
+        var result: [LoomEvent] = []
+
+        for event in events {
+            if event.isRecurring {
+                // Expand recurring event — check if any occurrence falls on this day
+                result.append(contentsOf: expandRecurringEvent(event, dayStart: dayStart, dayEnd: dayEnd))
+            } else {
+                // Non-recurring: original date filter
+                let ms = TimeInterval(event.start) / 1000
+                let d = Date(timeIntervalSince1970: ms)
+                if d >= dayStart && d < dayEnd {
+                    result.append(event)
+                }
+            }
         }
+
+        return result
     }
 
     /// All-day events for the given date.
@@ -96,20 +111,66 @@ class CalendarViewModel: ObservableObject {
         events(for: date).filter { !$0.isAllDay }
     }
 
+    // MARK: - Recurrence Expansion
+
+    /// Expand a recurring master event into virtual occurrences that fall within [dayStart, dayEnd).
+    /// Returns the master itself if its original start falls in range, plus any virtual occurrences.
+    private func expandRecurringEvent(_ master: LoomEvent, dayStart: Date, dayEnd: Date) -> [LoomEvent] {
+        guard let rruleStr = master.rrule, let rule = RecurrenceRule.from(rrule: rruleStr) else {
+            // Invalid/unparseable rrule — fall back to treating as non-recurring
+            let ms = TimeInterval(master.start) / 1000
+            let d = Date(timeIntervalSince1970: ms)
+            return (d >= dayStart && d < dayEnd) ? [master] : []
+        }
+
+        let masterStart = Date(timeIntervalSince1970: TimeInterval(master.start) / 1000)
+        let exceptions = master.exceptionDateValues
+
+        // Expand from master start through end of requested day
+        // Use a 1-year horizon cap to avoid unbounded expansion
+        let cal = Calendar.current
+        let horizon = cal.date(byAdding: .year, value: 1, to: masterStart) ?? dayEnd
+        let expansionEnd = min(dayEnd, horizon)
+
+        // Only expand if the requested day is on or after the master start
+        guard dayEnd > masterStart else { return [] }
+
+        let occurrenceDates = rule.occurrences(from: masterStart, through: expansionEnd, excluding: exceptions)
+
+        var results: [LoomEvent] = []
+        for occDate in occurrenceDates {
+            let occDayStart = cal.startOfDay(for: occDate)
+            guard occDayStart == dayStart else { continue }
+
+            let occMs = Int(occDate.timeIntervalSince1970 * 1000)
+            if occMs == master.start {
+                // Original occurrence — use the master event directly
+                results.append(master)
+            } else {
+                // Virtual occurrence — create with synthetic ID
+                results.append(LoomEvent.virtualOccurrence(of: master, startMs: occMs))
+            }
+        }
+
+        return results
+    }
+
     // MARK: - CRUD Mutations
 
     /// Creates a new event in Convex.
     /// - Parameter start: Event start time (converted to ms Int — SDK encodes as BigInt for v.int64())
     /// - Parameter durationMinutes: Duration in minutes (plain Int — SDK encodes as BigInt)
+    /// - Parameter rrule: Optional RRULE string for recurring events (e.g. "FREQ=DAILY")
     func createEvent(
         title: String,
         start: Date,
         durationMinutes: Int,
-        isAllDay: Bool = false
+        isAllDay: Bool = false,
+        rrule: String? = nil
     ) async throws {
         let startMs = Int(start.timeIntervalSince1970 * 1000)
         // ConvexEncodable? is required — Int, String, Bool all conform
-        let args: [String: ConvexEncodable?] = [
+        var args: [String: ConvexEncodable?] = [
             "calendarId": "personal",
             "title": title,
             "start": startMs,               // Swift Int → SDK encodes as BigInt for v.int64()
@@ -117,6 +178,9 @@ class CalendarViewModel: ObservableObject {
             "timezone": TimeZone.current.identifier,
             "isAllDay": isAllDay
         ]
+        if let rrule {
+            args["rrule"] = rrule
+        }
         try await convex.mutation("events:create", with: args)
     }
 
@@ -138,6 +202,67 @@ class CalendarViewModel: ObservableObject {
     func deleteEvent(id: String) async throws {
         let args: [String: ConvexEncodable?] = ["id": id]
         try await convex.mutation("events:remove", with: args)
+    }
+
+    // MARK: - Recurrence Mutations
+
+    /// Adds an exception date to a recurring event's master, hiding that occurrence.
+    /// For virtual occurrences, resolves to the master event ID automatically.
+    func addExceptionDate(event: LoomEvent, occurrenceDate: Date) async throws {
+        let masterId = event.masterEventId ?? event._id
+
+        // Find the master event to get current exception dates
+        guard let master = events.first(where: { $0._id == masterId }) else { return }
+
+        // Parse existing exceptions, append new one, re-encode
+        var exceptions = master.parsedExceptionDates
+        let occMs = Int(occurrenceDate.timeIntervalSince1970 * 1000)
+        exceptions.append(occMs)
+
+        let jsonData = try JSONEncoder().encode(exceptions)
+        let jsonString = String(data: jsonData, encoding: .utf8) ?? "[]"
+
+        let args: [String: ConvexEncodable?] = [
+            "id": masterId,
+            "exceptionDates": jsonString
+        ]
+        try await convex.mutation("events:update", with: args)
+    }
+
+    /// Deletes the entire recurring series. Resolves virtual occurrences to master ID.
+    func deleteRecurringSeries(event: LoomEvent) async throws {
+        let targetId = event.masterEventId ?? event._id
+        try await deleteEvent(id: targetId)
+    }
+
+    /// Edits a single occurrence: creates a standalone event copy + adds exception to master.
+    /// The new standalone event has no rrule and links back via recurrenceGroupId.
+    func editSingleOccurrence(
+        masterEvent: LoomEvent,
+        occurrenceStartMs: Int,
+        title: String,
+        start: Date,
+        durationMinutes: Int,
+        isAllDay: Bool
+    ) async throws {
+        let masterId = masterEvent.masterEventId ?? masterEvent._id
+
+        // 1. Create standalone event (no rrule) with edited fields
+        let startMs = Int(start.timeIntervalSince1970 * 1000)
+        let args: [String: ConvexEncodable?] = [
+            "calendarId": masterEvent.calendarId,
+            "title": title,
+            "start": startMs,
+            "duration": durationMinutes,
+            "timezone": masterEvent.timezone,
+            "isAllDay": isAllDay,
+            "recurrenceGroupId": masterId
+        ]
+        try await convex.mutation("events:create", with: args)
+
+        // 2. Add exception date to master for the original occurrence
+        let occDate = Date(timeIntervalSince1970: TimeInterval(occurrenceStartMs) / 1000)
+        try await addExceptionDate(event: masterEvent, occurrenceDate: occDate)
     }
 
     // MARK: - Highlight Feedback

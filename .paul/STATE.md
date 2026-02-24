@@ -2,27 +2,27 @@
 
 ## Current Position
 
-**Milestone:** v0.1 — Loom Intelligence — COMPLETE
-**Phase:** 8 of 8 (Platform Polish) — Complete
-**Plan:** All plans complete
-**Status:** Milestone complete
-**Last activity:** 2026-02-23 — Phase 8 complete, milestone v0.1 finished
+**Milestone:** v0.2 — Voice & Depth
+**Phase:** 9 of 11 (Recurring Events) — In Progress
+**Plan:** 09-02 created, awaiting approval
+**Status:** PLAN created, ready for APPLY
+**Last activity:** 2026-02-24 — Created phases/09-recurring-events/09-02-PLAN.md
 
 Progress:
-- Milestone: [██████████] 100%
-- Phase 8: [██████████] 100%
+- v0.2 — Voice & Depth: [█░░░░░░░░░] 11%
+- Phase 9: [███░░░░░░░] 33% (1/3 plans)
 
 ## Loop Position
 
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ✓     [Loop complete — milestone finished]
+  ✓        ○        ○     [Plan created, awaiting approval]
 ```
 
 ## Velocity
 
-- Total plans completed: 23 (across phases 1-8)
+- Total plans completed: 23 (across phases 1-8, milestone v0.1)
 - Average duration: ~7 min/plan
 - Total execution time: ~2.7 hours
 
@@ -42,16 +42,13 @@ PLAN ──▶ APPLY ──▶ UNIFY
 
 ## Recent Decisions
 
-- **NavigationSplitView for macOS** — sidebar with Calendar/Tasks/Loom sections; iOS keeps TabView
-- **mainContent @ViewBuilder pattern** — shared .task{} and .sheet{} applied once, no duplication
-- **NotificationService as NSObject singleton** — UNUserNotificationCenterDelegate for foreground banners
-- **Bell menu for lead time** — toolbar Menu with 5/10/15/30/60 min options, @AppStorage backed
-- **Cancel-all + re-add scheduling** — simple notification strategy on every Convex subscription update
+- **exceptionDates as JSON string** — v.string() instead of v.array(v.int64()) for ConvexMobile compatibility
+- **Client-side recurrence expansion** — no server-side query; CalendarViewModel expands per-day on demand
+- **Virtual occurrence IDs** — synthetic format `{masterId}_occ_{startMs}` for unique identification
 
 ## Pending Todos
 
 - Bridge script (`bridge/loom-bridge.mjs`) must run on Loom machine for AI replies
-- Optional: clean up unused Convex env vars
 
 ## Blockers/Concerns
 
@@ -59,7 +56,7 @@ PLAN ──▶ APPLY ──▶ UNIFY
 
 ## Session Continuity
 
-**Last session:** 2026-02-23
-**Stopped at:** Milestone v0.1 complete
-**Next action:** /paul:complete-milestone or /paul:milestone for v0.2
-**Resume file:** .paul/ROADMAP.md
+**Last session:** 2026-02-24
+**Stopped at:** Plan 09-02 created
+**Next action:** Review and approve plan, then run /paul:apply
+**Resume file:** .paul/phases/09-recurring-events/09-02-PLAN.md

@@ -1,8 +1,68 @@
 # Roadmap: Loom Cal
 
-## Current Milestone: v0.1 — Loom Intelligence
+## Current Milestone: v0.2 — Voice & Depth
 
-Fresh milestone covering phases 5-8. Goal: Loom can act on the user's behalf — creating/editing/deleting events and tasks, planning days, and accepting natural language input — with platform polish to make it feel native on both iOS and Mac.
+Deepen the core experience with recurring events, Loom's voice, and quality-of-life improvements.
+
+| Phase | Name | Plans | Status |
+|-------|------|-------|--------|
+| 9 | Recurring Events | 1/3 | In progress |
+| 10 | Loom Voice | TBD | Not started |
+| 11 | Chat & Settings Polish | TBD | Not started |
+
+---
+
+## Phase Details
+
+### Phase 9: Recurring Events
+
+**Goal:** RRULE support for creating repeating events (daily, weekly, monthly, custom), expanding them on calendar views, and handling edit/delete of single vs all occurrences.
+
+**Depends on:** Phase 5 (Loom Calendar & Task Actions)
+
+**Success Criteria:**
+1. User can create a recurring event with daily, weekly, or monthly patterns
+2. Calendar views correctly expand recurring events into individual occurrences
+3. User can edit a single occurrence without affecting the series
+4. User can edit all future occurrences of a series
+5. User can delete a single occurrence or the entire series
+
+**Plans:** TBD (defined during /paul:plan)
+
+### Phase 10: Loom Voice
+
+**Goal:** Audio I/O in chat — ElevenLabs voice output with playback controls, speech-to-text input for hands-free messaging, and a voice toggle preference.
+
+**Depends on:** Phase 4 (Loom Chat)
+
+**Success Criteria:**
+1. Loom's responses play as audio via ElevenLabs TTS with play/pause controls
+2. User can record voice input that gets transcribed and submitted as a chat message
+3. Voice toggle enables/disables audio output globally
+4. Audio playback works correctly on both iOS and macOS
+
+**Plans:** TBD (defined during /paul:plan)
+
+### Phase 11: Chat & Settings Polish
+
+**Goal:** UX quality improvements — selectable/copyable chat text and a minimal settings screen consolidating user preferences.
+
+**Depends on:** Phase 10 (Loom Voice — for voice toggle setting)
+
+**Success Criteria:**
+1. User can select and copy text from Loom's chat responses
+2. Settings screen shows notification lead time, voice toggle, and default calendar preferences
+3. Settings accessible from both iOS and macOS navigation patterns
+4. All settings persist across app launches
+
+**Plans:** TBD (defined during /paul:plan)
+
+---
+
+## Previous Milestones
+
+<details>
+<summary>v0.1 — Loom Intelligence (complete)</summary>
 
 | Phase | Name | Plans | Status |
 |-------|------|-------|--------|
@@ -11,78 +71,7 @@ Fresh milestone covering phases 5-8. Goal: Loom can act on the user's behalf —
 | 7 | Natural Language Entry | 2/2 | Complete |
 | 8 | Platform Polish | 2/2 | Complete |
 
----
-
-## Phase Details
-
-### Phase 5: Loom Calendar & Task Actions
-
-**Goal:** Loom can create, edit, and delete events and tasks via Convex MCP, and all changes appear in the app in real-time.
-
-**Depends on:** Phase 4 (Loom Chat) — complete
-
-**Success Criteria:**
-1. User asks Loom to create an event -> event appears on calendar within 2 seconds
-2. User asks Loom to change an event -> calendar reflects update in real-time
-3. User asks Loom to delete an event -> event disappears after confirmation
-4. User asks Loom to create a task -> task appears in list with correct details
-5. User asks Loom to complete/delete a task -> task list updates in real-time
-
-**Plans:**
-- [x] 05-01 — Convex schema extension, context/action HTTP endpoints, bridge upgrade with system prompt and action parsing
-- [x] 05-02 — Swift models (ChatMessage extension, LoomAction), ChatViewModel confirm/cancel/undo, highlight support
-- [x] 05-03 — End-to-end verification (user-tested all 6 scenarios — confirmed working)
-
-### Phase 6: AI Daily Planning
-
-**Goal:** Loom generates a recommended daily plan based on the user's tasks and events, and no plan changes commit without explicit user approval.
-
-**Depends on:** Phase 5
-
-**Success Criteria:**
-1. User can request "plan my day" and receive a structured recommendation
-2. Plan shown as preview with proposed time blocks — no changes until user approves
-3. User can approve plan and all proposed time blocks are created at once
-4. User can reject/dismiss plan and calendar remains unchanged
-
-**Plans:**
-- [x] 06-01 — Bridge daily planning support, DailyPlanProposal model, ChatViewModel batch approve/reject/undo
-- [x] 06-02 — DailyPlanCard UI, ChatView integration, end-to-end verification
-
-### Phase 7: Natural Language Entry
-
-**Goal:** Users can create events and tasks by typing natural language directly in the app without opening the chat panel.
-
-**Depends on:** Phase 5
-
-**Success Criteria:**
-1. NL phrase in event entry field parsed into structured event — user confirms before creation
-2. NL phrase in task entry field parsed into task with correct details — user confirms before creation
-3. When Loom unreachable, user prompted to enter details manually
-
-**Plans:**
-- [x] 07-01 — NL parse backend: Convex parse_requests table, HTTP endpoints, bridge OpenClaw integration
-- [x] 07-02 — Swift NLParseService, EventCreationView upgrade, TaskCreationView NL field, Things 3 UI redesign
-
-### Phase 8: Platform Polish
-
-**Goal:** Native navigation and interaction patterns on both iOS and Mac, plus local notifications for events and task deadlines.
-
-**Depends on:** Phase 3, Phase 4
-
-**Success Criteria:**
-1. iPhone uses native tab bar (Calendar, Tasks, Chat) with standard touch gestures
-2. Mac uses NavigationSplitView sidebar — no iOS-specific UI artifacts
-3. Local notification before upcoming calendar events (configurable lead time)
-4. Local notification when task due date arrives
-
-**Plans:**
-- [x] 08-01 — macOS NavigationSplitView sidebar, iOS TabView preserved, platform-branched ContentView
-- [x] 08-02 — NotificationService (event + task local notifications), configurable lead time menu, foreground banner display
-
----
-
-## Pre-PAUL History
+</details>
 
 <details>
 <summary>Phases 1-4 (completed before PAUL adoption)</summary>

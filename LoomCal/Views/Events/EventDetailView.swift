@@ -1,5 +1,11 @@
 import SwiftUI
 
+/// Edit mode for recurring event operations.
+enum RecurrenceEditMode {
+    case single  // Edit/delete this occurrence only
+    case all     // Edit/delete the entire series
+}
+
 /// EventDetailView shows a read-only summary of a calendar event.
 /// Edit opens EventEditView, Delete uses an alert for reliability in nested sheets.
 struct EventDetailView: View {
@@ -9,6 +15,8 @@ struct EventDetailView: View {
 
     @State private var showEditSheet = false
     @State private var showDeleteAlert = false
+    @State private var showEditChoiceAlert = false
+    @State private var editMode: RecurrenceEditMode = .all
 
     // MARK: - Computed
 
@@ -54,11 +62,29 @@ struct EventDetailView: View {
                     }
                 }
 
+                // Recurrence badge
+                if event.isRecurring,
+                   let rruleStr = event.rrule,
+                   let rule = RecurrenceRule.from(rrule: rruleStr) {
+                    HStack {
+                        Image(systemName: "repeat")
+                            .foregroundStyle(.secondary)
+                        Text(rule.displayDescription)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
                 Spacer()
 
                 HStack {
-                    Button("Edit") { showEditSheet = true }
-                        .buttonStyle(.bordered)
+                    Button("Edit") {
+                        if event.isRecurring || event.isVirtualOccurrence {
+                            showEditChoiceAlert = true
+                        } else {
+                            showEditSheet = true
+                        }
+                    }
+                    .buttonStyle(.bordered)
 
                     Spacer()
 
@@ -76,24 +102,65 @@ struct EventDetailView: View {
                     Button("Done") { isPresented = false }
                 }
             }
-            // Use .alert instead of .confirmationDialog — more reliable in nested sheets
-            .alert("Delete Event?", isPresented: $showDeleteAlert) {
-                Button("Delete", role: .destructive) {
-                    Task {
-                        try? await viewModel.deleteEvent(id: event._id)
-                        isPresented = false
+            // Delete alert — branches for recurring vs non-recurring
+            .alert(
+                (event.isRecurring || event.isVirtualOccurrence) ? "Delete Recurring Event?" : "Delete Event?",
+                isPresented: $showDeleteAlert
+            ) {
+                if event.isRecurring || event.isVirtualOccurrence {
+                    Button("This Event", role: .destructive) {
+                        Task {
+                            try? await viewModel.addExceptionDate(
+                                event: event,
+                                occurrenceDate: startDate
+                            )
+                            isPresented = false
+                        }
                     }
+                    Button("All Events", role: .destructive) {
+                        Task {
+                            try? await viewModel.deleteRecurringSeries(event: event)
+                            isPresented = false
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } else {
+                    Button("Delete", role: .destructive) {
+                        Task {
+                            try? await viewModel.deleteEvent(id: event._id)
+                            isPresented = false
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                }
+            } message: {
+                if event.isRecurring || event.isVirtualOccurrence {
+                    Text("Do you want to delete this event or all events in the series?")
+                } else {
+                    Text("\"\(event.title)\" will be permanently deleted.")
+                }
+            }
+            // Edit choice alert — for recurring events
+            .alert("Edit Recurring Event?", isPresented: $showEditChoiceAlert) {
+                Button("This Event") {
+                    editMode = .single
+                    showEditSheet = true
+                }
+                Button("All Events") {
+                    editMode = .all
+                    showEditSheet = true
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("\"\(event.title)\" will be permanently deleted.")
+                Text("Do you want to edit this event or all events in the series?")
             }
             .sheet(isPresented: $showEditSheet) {
                 EventEditView(
                     event: event,
                     viewModel: viewModel,
                     isPresented: $showEditSheet,
-                    isDetailPresented: $isPresented
+                    isDetailPresented: $isPresented,
+                    editMode: (event.isRecurring || event.isVirtualOccurrence) ? editMode : .all
                 )
             }
         }

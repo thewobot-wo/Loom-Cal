@@ -26,6 +26,7 @@ export default defineSchema({
     color: v.optional(v.string()),                // user-picked color from palette
     rrule: v.optional(v.string()),                // RRULE string for recurrence (UI deferred)
     recurrenceGroupId: v.optional(v.string()),    // links recurring instances
+    exceptionDates: v.optional(v.string()),          // JSON array of UTC ms timestamps where recurrence skips, e.g. "[1708819200000]"
     attachments: v.optional(v.array(v.string())), // file references (upload UI deferred)
     taskId: v.optional(v.id("tasks")),            // links time-blocked events to source task
   })

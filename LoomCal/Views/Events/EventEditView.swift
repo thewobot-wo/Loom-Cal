@@ -2,11 +2,13 @@ import SwiftUI
 
 /// EventEditView provides an editable form pre-filled with the existing event's data.
 /// On save, calls viewModel.updateEvent() with only changed fields.
+/// For recurring events, editMode determines whether changes apply to this occurrence or the series.
 struct EventEditView: View {
     let event: LoomEvent
     @ObservedObject var viewModel: CalendarViewModel
     @Binding var isPresented: Bool
     @Binding var isDetailPresented: Bool
+    let editMode: RecurrenceEditMode
 
     @Environment(\.dismiss) private var dismiss
 
@@ -25,12 +27,14 @@ struct EventEditView: View {
         event: LoomEvent,
         viewModel: CalendarViewModel,
         isPresented: Binding<Bool>,
-        isDetailPresented: Binding<Bool>
+        isDetailPresented: Binding<Bool>,
+        editMode: RecurrenceEditMode = .all
     ) {
         self.event = event
         self.viewModel = viewModel
         self._isPresented = isPresented
         self._isDetailPresented = isDetailPresented
+        self.editMode = editMode
 
         let startDate = Date(timeIntervalSince1970: TimeInterval(event.start) / 1000)
         let endDate = startDate.addingTimeInterval(TimeInterval(event.duration) * 60)
@@ -115,18 +119,32 @@ struct EventEditView: View {
         let endMins = (endComponents.hour ?? 0) * 60 + (endComponents.minute ?? 0)
         let durationMinutes = max(endMins - startMins, 15)
 
-        let newTitle: String? = (title != event.title) ? title : nil
-        let newStart: Date? = (abs(finalStart.timeIntervalSince(originalStart)) > 30) ? finalStart : nil
-        let newDuration: Int? = (durationMinutes != event.duration) ? durationMinutes : nil
-
         Task {
             do {
-                try await viewModel.updateEvent(
-                    id: event._id,
-                    title: newTitle,
-                    start: newStart,
-                    durationMinutes: newDuration
-                )
+                if editMode == .single && (event.isRecurring || event.isVirtualOccurrence) {
+                    // Edit single occurrence: create standalone + add exception to master
+                    try await viewModel.editSingleOccurrence(
+                        masterEvent: event,
+                        occurrenceStartMs: event.start,
+                        title: title,
+                        start: finalStart,
+                        durationMinutes: isAllDay ? 1440 : durationMinutes,
+                        isAllDay: isAllDay
+                    )
+                } else {
+                    // Edit all (or non-recurring): update the event directly
+                    let targetId = event.masterEventId ?? event._id
+                    let newTitle: String? = (title != event.title) ? title : nil
+                    let newStart: Date? = (abs(finalStart.timeIntervalSince(originalStart)) > 30) ? finalStart : nil
+                    let newDuration: Int? = (durationMinutes != event.duration) ? durationMinutes : nil
+
+                    try await viewModel.updateEvent(
+                        id: targetId,
+                        title: newTitle,
+                        start: newStart,
+                        durationMinutes: newDuration
+                    )
+                }
                 isDetailPresented = false
                 dismiss()
             } catch {

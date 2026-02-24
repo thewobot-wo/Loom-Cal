@@ -1,5 +1,38 @@
 import SwiftUI
 
+/// Preset recurrence options for the creation picker.
+enum RecurrencePreset: String, CaseIterable, Identifiable {
+    case never = "Never"
+    case daily = "Daily"
+    case weekdays = "Weekdays"
+    case weekly = "Weekly"
+    case monthly = "Monthly"
+
+    var id: String { rawValue }
+
+    /// Convert to a RecurrenceRule for the given event date.
+    func toRule(for date: Date) -> RecurrenceRule? {
+        let cal = Calendar.current
+        switch self {
+        case .never:
+            return nil
+        case .daily:
+            return .daily()
+        case .weekdays:
+            return .weekdays()
+        case .weekly:
+            let wd = cal.component(.weekday, from: date)
+            if let day = Weekday.from(calendarWeekday: wd) {
+                return .weekly(days: [day])
+            }
+            return .weekly(days: [.monday])
+        case .monthly:
+            let day = cal.component(.day, from: date)
+            return .monthly(dayOfMonth: day)
+        }
+    }
+}
+
 /// EventCreationView presents a sheet for creating new calendar events.
 /// Top section: natural language text field (e.g. "Dentist 3pm").
 /// Detail section: title, date, start time, end time, all-day toggle.
@@ -17,6 +50,7 @@ struct EventCreationView: View {
     @State private var startTime: Date
     @State private var endTime: Date
     @State private var isAllDay: Bool = false
+    @State private var selectedRecurrence: RecurrencePreset = .never
     @State private var saveError: String? = nil
     @State private var showDetails: Bool = false
     @State private var hasParsed: Bool = false
@@ -94,6 +128,13 @@ struct EventCreationView: View {
                             }
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+
+                            if selectedRecurrence != .never,
+                               let rule = selectedRecurrence.toRule(for: eventDate) {
+                                Label(rule.displayDescription, systemImage: "repeat")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.vertical, 12)
@@ -162,6 +203,19 @@ struct EventCreationView: View {
                             // All-day toggle
                             Toggle("All Day", isOn: $isAllDay)
                                 .tint(LoomColors.coral)
+
+                            // Recurrence picker
+                            HStack {
+                                Text("Repeat")
+                                Spacer()
+                                Picker("Repeat", selection: $selectedRecurrence) {
+                                    ForEach(RecurrencePreset.allCases) { preset in
+                                        Text(preset.rawValue).tag(preset)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                                .tint(selectedRecurrence == .never ? .secondary : LoomColors.coral)
+                            }
                         }
                         .padding(.horizontal, 20)
                         .transition(.opacity.combined(with: .move(edge: .top)))
@@ -286,13 +340,16 @@ struct EventCreationView: View {
         let endMins = (endComponents.hour ?? 0) * 60 + (endComponents.minute ?? 0)
         let durationMinutes = max(endMins - startMins, 15)
 
+        let rrule = selectedRecurrence.toRule(for: eventDate)?.toRRULE()
+
         Task {
             do {
                 try await viewModel.createEvent(
                     title: title,
                     start: finalStart,
                     durationMinutes: isAllDay ? 1440 : durationMinutes,
-                    isAllDay: isAllDay
+                    isAllDay: isAllDay,
+                    rrule: rrule
                 )
                 isPresented = false
             } catch {

@@ -30,6 +30,7 @@ export const create = mutation({
     color: v.optional(v.string()),
     rrule: v.optional(v.string()),
     recurrenceGroupId: v.optional(v.string()),
+    exceptionDates: v.optional(v.string()),
     attachments: v.optional(v.array(v.string())),
     taskId: v.optional(v.id("tasks")),
   },
@@ -57,6 +58,7 @@ export const update = mutation({
     color: v.optional(v.string()),
     rrule: v.optional(v.string()),
     recurrenceGroupId: v.optional(v.string()),
+    exceptionDates: v.optional(v.string()),
     attachments: v.optional(v.array(v.string())),
     taskId: v.optional(v.id("tasks")),
   },
@@ -107,6 +109,9 @@ export const listForLoom = internalQuery({
       location: e.location,
       calendarId: e.calendarId,
       taskId: e.taskId,
+      rrule: e.rrule,
+      recurrenceGroupId: e.recurrenceGroupId,
+      exceptionDates: e.exceptionDates,
     }));
   },
 });
