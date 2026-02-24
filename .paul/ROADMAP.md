@@ -7,7 +7,7 @@ Deepen the core experience with recurring events, Loom's voice, and quality-of-l
 | Phase | Name | Plans | Status |
 |-------|------|-------|--------|
 | 9 | Recurring Events | 3/3 | Complete |
-| 10 | Loom Voice | TBD | Not started |
+| 10 | Loom Voice | 0/2 | Planning |
 | 11 | Chat & Settings Polish | TBD | Not started |
 
 ---
@@ -44,7 +44,9 @@ Deepen the core experience with recurring events, Loom's voice, and quality-of-l
 3. Voice toggle enables/disables audio output globally
 4. Audio playback works correctly on both iOS and macOS
 
-**Plans:** TBD (defined during /paul:plan)
+**Plans:**
+- 10-01: ElevenLabs TTS voice output + playback controls + voice toggle (Planning)
+- 10-02: Speech-to-text voice input (Not started)
 
 ### Phase 11: Chat & Settings Polish
 
